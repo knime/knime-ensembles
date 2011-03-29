@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Ensemble Learning
+Bundle-SymbolicName: org.knime.ensembles;singleton:=true
+Bundle-Version: 2.4.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.knime.base;bundle-version="2.4.0",
+ org.knime.workbench.repository;bundle-version="2.4.0"

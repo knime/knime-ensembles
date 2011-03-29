@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.workbench.repository.categories">
+      <category
+            icon="icons/missing.gif"
+            level-id="ensembles"
+            name="Ensemble Learning"
+            path="/mining">
+      </category>
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.nodes">
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.metanode">
+   </extension>
+
+</plugin>
