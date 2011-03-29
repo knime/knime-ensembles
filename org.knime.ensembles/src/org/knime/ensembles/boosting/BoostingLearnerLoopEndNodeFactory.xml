@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="bla.png" type="LoopEnd">
+    <name>Boosting Loop End</name>
+
+    <shortDescription>
+        Loop end node for learning an ensemble model with boosting
+    </shortDescription>
+
+    <fullDescription>
+        <intro>
+            Together with the corresponding loop start node a boosting loop can be constructed. It repeatedly trains
+            simple models
+            and weights them according to their classification error.
+            The algorithm used is AdaBoost.M1.
+            The loop is stopped either after the maximum number of iterations has been reached or the prediction error for a model
+            is greater than 0.5. 
+        </intro>
+        <option name="Model column">The column from the first input table that contains the learned model</option>
+        <option name="Real class column">The column from the second input table that contains the real class values for each row
+        </option>
+        <option name="Predicted class column">The column from the second input table that contains the predicted class values for each row
+        </option>
+        <option name="Number of iterations">The number of iterations the loop should be run i.e. the number of models to be learned
+        </option>
+    </fullDescription>
+
+    <ports>
+        <inPort index="0" name="Model table">The trained model converted into a single-row, single-column table</inPort>
+        <inPort index="1" name="Predicted data">The data with predicted classes and also the real class values</inPort>
+        <outPort index="0" name="Boosting model">The boosted model together with their weights in data table</outPort>
+    </ports>
+</knimeNode>

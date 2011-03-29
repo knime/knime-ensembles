@@ -36,6 +36,18 @@
             factory-class="org.knime.ensembles.modelloopstart.ModelLoopStartNodeFactory"
             id="org.knime.ensembles.modelloopstart.ModelLoopStartNodeFactory">
       </node>
+      <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">

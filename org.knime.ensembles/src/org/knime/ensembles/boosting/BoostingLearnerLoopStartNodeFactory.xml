@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="bla.png" type="LoopStart">
+    <name>Boosting Loop Start</name>
+
+    <shortDescription>
+        Loop start node for learning an ensemble model with boosting
+    </shortDescription>
+
+    <fullDescription>
+        <intro>
+            Together with the corresponding loop end node a boosting loop can be constructed. It repeatedly trains
+            simple models
+            and weights them according to their classification error.
+            The algorithm used is AdaBoost.M1.
+        </intro>
+    </fullDescription>
+
+    <ports>
+        <inPort index="0" name="Input">Any input data with class labels</inPort>
+        <outPort index="0" name="Training data">Possibly re-sampled training data, must be connected to the learner node inside
+            the loop</outPort>
+        <outPort index="1" name="Output">Unaltered input data, must be connected to the predictor node inside the loop
+        </outPort>
+    </ports>
+</knimeNode>
