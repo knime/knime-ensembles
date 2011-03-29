@@ -13,6 +13,18 @@
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
+            category-path="/"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.pmmlporttocell.PMMLPortToCellNodeFactory"
+            id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
+      </node>
+      <node
+            category-path="/"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory"
+            id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
+      </node>
+      <node
             category-path="/mining/ensembles"
             expert-flag="false"
             factory-class="org.knime.ensembles.modeltotable.ModelToTableNodeFactory"

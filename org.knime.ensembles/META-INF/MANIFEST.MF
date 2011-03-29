@@ -7,5 +7,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.knime.base;bundle-version="2.4.0",
- org.knime.workbench.repository;bundle-version="2.4.0"
+ org.knime.workbench.repository;bundle-version="2.4.0",
+ org.knime.xml;bundle-version="1.0.0"
 Export-Package: org.knime.ensembles.modeltotable
