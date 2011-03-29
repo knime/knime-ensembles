@@ -12,6 +12,18 @@
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.modeltotable.ModelToTableNodeFactory"
+            id="org.knime.ensembles.modeltotable.ModelToTableNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.modelloopstart.ModelLoopStartNodeFactory"
+            id="org.knime.ensembles.modelloopstart.ModelLoopStartNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">

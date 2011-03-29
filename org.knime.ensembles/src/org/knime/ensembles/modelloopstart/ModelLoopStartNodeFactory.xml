@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="loop_start_count.png" type="LoopStart">
+	<name>Model Loop Start</name>
+	
+	<shortDescription>
+		Node at the start of a loop
+	</shortDescription>
+	
+	<fullDescription>
+		<intro>
+		</intro>
+		
+	</fullDescription>
+	
+	<ports>
+		<inPort index="0" name="Any port object">The input data, which can be a data table or any other arbitrary port object.</inPort>
+		<outPort index="0" name="Unaltered input">The unaltered input object</outPort>
+	</ports>
+</knimeNode>
