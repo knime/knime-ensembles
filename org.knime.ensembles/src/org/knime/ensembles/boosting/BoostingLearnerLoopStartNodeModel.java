@@ -99,7 +99,8 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         if (getLoopEndNode() == null) {
-            throw new RuntimeException("No loop end node found");
+            // first iteration
+            return new BufferedDataTable[] {inData[0], inData[0]};
         }
         if (!(getLoopEndNode() instanceof BoostingLearnerLoopEndNodeModel)) {
             throw new RuntimeException(
@@ -109,12 +110,6 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
         BoostingWeights weightModel =
                 ((BoostingLearnerLoopEndNodeModel)getLoopEndNode())
                         .getWeightModel();
-
-        if (weightModel == null) {
-            // presumably first iteration => all rows have same weight
-            return inData;
-        }
-
 
         final int rowCount = inData[0].getRowCount();
         int[] distribution = new int[rowCount];

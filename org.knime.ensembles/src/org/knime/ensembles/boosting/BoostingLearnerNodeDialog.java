@@ -147,7 +147,9 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
     protected void saveSettingsTo(final NodeSettingsWO settings)
             throws InvalidSettingsException {
         m_settings.maxIterations((Integer) m_iterations.getValue());
-
+        m_settings.modelColumn(m_modelColumn.getSelectedColumn());
+        m_settings.classColumn(m_classColumn.getSelectedColumn());
+        m_settings.predictionColumn(m_predictionColumn.getSelectedColumn());
         m_settings.saveSettings(settings);
     }
 }
