@@ -61,7 +61,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.def.StringCell;
+import org.knime.core.data.model.PortObjectCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -93,7 +93,7 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
     static {
         // TODO change type
         DataColumnSpec modelSpec =
-                new DataColumnSpecCreator("Models", StringCell.TYPE)
+                new DataColumnSpecCreator("Models", PortObjectCell.TYPE)
                         .createSpec();
         DataColumnSpec weightSpec =
                 new DataColumnSpecCreator("Model weight", DoubleCell.TYPE)

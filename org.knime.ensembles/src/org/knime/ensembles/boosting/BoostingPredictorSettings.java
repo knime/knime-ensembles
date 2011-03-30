@@ -46,106 +46,51 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.03.2011 (meinl): created
+ *   30.03.2011 (meinl): created
  */
 package org.knime.ensembles.boosting;
 
-import java.util.Arrays;
-import java.util.Random;
-
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataRow;
-import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 /**
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class AdaBoostWeights implements BoostingWeights {
-    private final double[] m_probabilities;
+public class BoostingPredictorSettings {
+    private String m_weightColumn;
+    private String m_predictionColumn;
 
-    private final double[] m_samples;
-
-    private final Random m_rand = new Random();
-
-
-    /**
-     *
-     */
-    public AdaBoostWeights(final int numberOfRows) {
-        m_probabilities = new double[numberOfRows];
-        m_samples = new double[numberOfRows];
-
-        for (int i = 0; i < numberOfRows; i++) {
-            m_probabilities[i] = 1.0 / numberOfRows;
-            m_samples[i] = i / (double)numberOfRows;
-        }
+    public String weightColumn() {
+        return m_weightColumn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double sampleWeight(final int rowIndex) {
-        return m_probabilities[rowIndex];
+    public void weightColumn(final String colName) {
+        m_weightColumn = colName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int nextSample() {
-        int index = Arrays.binarySearch(m_samples, m_rand.nextDouble());
-        if (index < 0) {
-            index = -(index + 1) - 1;
-        }
-        assert (index >= 0) && (index < m_samples.length);
-        return index;
+    public String predictionColumn() {
+        return m_predictionColumn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double[] score(final BufferedDataTable table,
-            final int predictionColIndex, final int classColIndex) {
-        int count = 0;
-        boolean[] correct = new boolean[table.getRowCount()];
-        int correctCount = 0;
-        double correctSum = 0;
-        for (DataRow row : table) {
-            DataCell realValue = row.getCell(classColIndex);
-            DataCell predictedValue = row.getCell(predictionColIndex);
-            if (realValue.equals(predictedValue)) {
-                correct[count] = true;
-                correctSum += m_probabilities[count];
-                correctCount++;
-            }
-            count++;
-        }
+    public void predictionColumn(final String colName) {
+        m_predictionColumn = colName;
+    }
 
-        double error = 1 - correctSum;
-        // double error = 1 - (correctCount / (double)count);
-        double modelWeight = 0.5 * Math.log((1 - error) / error);
 
-        double sum = 0;
-        for (int i = 0; i < correct.length; i++) {
-            if (correct[i]) {
-                m_probabilities[i] *= modelWeight;
-            }
-            sum += m_probabilities[i];
-        }
+    public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_weightColumn = settings.getString("weightColumn");
+        m_predictionColumn = settings.getString("predictionColumn");
+    }
 
-        System.out.println();
+    public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        m_weightColumn = settings.getString("weightColumn", null);
+        m_predictionColumn = settings.getString("predictionColumn", null);
+    }
 
-        for (int i = 0; i < m_probabilities.length; i++) {
-            m_probabilities[i] /= sum;
-        }
-
-        for (int i = 1; i < m_samples.length; i++) {
-            m_samples[i] = m_samples[i - 1] + m_probabilities[i - 1];
-        }
-
-        return new double[] {error, modelWeight};
+    public void saveSettings(final NodeSettingsWO settings) {
+        settings.addString("weightColumn", m_weightColumn);
+        settings.addString("predictionColumn", m_predictionColumn);
     }
 }

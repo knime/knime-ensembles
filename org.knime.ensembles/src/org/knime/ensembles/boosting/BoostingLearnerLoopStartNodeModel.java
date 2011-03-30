@@ -112,7 +112,7 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
                         .getWeightModel();
 
         final int rowCount = inData[0].getRowCount();
-        int[] distribution = new int[rowCount];
+        int[] distribution = new int[3 * rowCount]; // oversampling
         for (int i = 0; i < distribution.length; i++) {
             distribution[i] = weightModel.nextSample();
         }

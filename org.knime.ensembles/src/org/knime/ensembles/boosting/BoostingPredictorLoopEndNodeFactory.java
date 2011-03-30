@@ -46,106 +46,58 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.03.2011 (meinl): created
+ *   30.03.2011 (meinl): created
  */
 package org.knime.ensembles.boosting;
 
-import java.util.Arrays;
-import java.util.Random;
-
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataRow;
-import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class AdaBoostWeights implements BoostingWeights {
-    private final double[] m_probabilities;
-
-    private final double[] m_samples;
-
-    private final Random m_rand = new Random();
-
-
+public class BoostingPredictorLoopEndNodeFactory extends
+        NodeFactory<BoostingPredictorLoopEndNodeModel> {
     /**
-     *
+     * {@inheritDoc}
      */
-    public AdaBoostWeights(final int numberOfRows) {
-        m_probabilities = new double[numberOfRows];
-        m_samples = new double[numberOfRows];
-
-        for (int i = 0; i < numberOfRows; i++) {
-            m_probabilities[i] = 1.0 / numberOfRows;
-            m_samples[i] = i / (double)numberOfRows;
-        }
+    @Override
+    public BoostingPredictorLoopEndNodeModel createNodeModel() {
+        return new BoostingPredictorLoopEndNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public double sampleWeight(final int rowIndex) {
-        return m_probabilities[rowIndex];
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int nextSample() {
-        int index = Arrays.binarySearch(m_samples, m_rand.nextDouble());
-        if (index < 0) {
-            index = -(index + 1) - 1;
-        }
-        assert (index >= 0) && (index < m_samples.length);
-        return index;
+    public NodeView<BoostingPredictorLoopEndNodeModel> createNodeView(
+            final int viewIndex, final BoostingPredictorLoopEndNodeModel nodeModel) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public double[] score(final BufferedDataTable table,
-            final int predictionColIndex, final int classColIndex) {
-        int count = 0;
-        boolean[] correct = new boolean[table.getRowCount()];
-        int correctCount = 0;
-        double correctSum = 0;
-        for (DataRow row : table) {
-            DataCell realValue = row.getCell(classColIndex);
-            DataCell predictedValue = row.getCell(predictionColIndex);
-            if (realValue.equals(predictedValue)) {
-                correct[count] = true;
-                correctSum += m_probabilities[count];
-                correctCount++;
-            }
-            count++;
-        }
+    protected boolean hasDialog() {
+        return true;
+    }
 
-        double error = 1 - correctSum;
-        // double error = 1 - (correctCount / (double)count);
-        double modelWeight = 0.5 * Math.log((1 - error) / error);
-
-        double sum = 0;
-        for (int i = 0; i < correct.length; i++) {
-            if (correct[i]) {
-                m_probabilities[i] *= modelWeight;
-            }
-            sum += m_probabilities[i];
-        }
-
-        System.out.println();
-
-        for (int i = 0; i < m_probabilities.length; i++) {
-            m_probabilities[i] /= sum;
-        }
-
-        for (int i = 1; i < m_samples.length; i++) {
-            m_samples[i] = m_samples[i - 1] + m_probabilities[i - 1];
-        }
-
-        return new double[] {error, modelWeight};
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new BoostingPredictorNodeDialog();
     }
 }

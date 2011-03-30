@@ -51,6 +51,12 @@
       <node
             category-path="/mining/ensembles"
             expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
             factory-class="org.knime.ensembles.tabletomodel.TableToModelNodeFactory"
             id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
       </node>

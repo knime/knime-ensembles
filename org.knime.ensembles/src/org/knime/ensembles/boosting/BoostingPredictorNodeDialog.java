@@ -46,7 +46,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.03.2011 (meinl): created
+ *   30.03.2011 (meinl): created
  */
 package org.knime.ensembles.boosting;
 
@@ -56,13 +56,11 @@ import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
-import org.knime.core.data.model.PortObjectValue;
+import org.knime.core.data.DoubleValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
@@ -74,58 +72,41 @@ import org.knime.core.node.util.ColumnSelectionComboxBox;
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class BoostingLearnerNodeDialog extends NodeDialogPane {
-    private final ColumnSelectionComboxBox m_classColumn =
-            new ColumnSelectionComboxBox((Border)null, DataValue.class);
+public class BoostingPredictorNodeDialog extends NodeDialogPane {
+    private final BoostingPredictorSettings m_settings =
+            new BoostingPredictorSettings();
 
     private final ColumnSelectionComboxBox m_predictionColumn =
             new ColumnSelectionComboxBox((Border)null, DataValue.class);
 
-    private final ColumnSelectionComboxBox m_modelColumn =
-            new ColumnSelectionComboxBox((Border)null, PortObjectValue.class);
-
-    private final JSpinner m_iterations = new JSpinner(new SpinnerNumberModel(
-            1000, 1, Integer.MAX_VALUE, 1));
-
-    private final BoostingLearnerSettings m_settings =
-            new BoostingLearnerSettings();
+    private final ColumnSelectionComboxBox m_weightColumn =
+            new ColumnSelectionComboxBox((Border)null, DoubleValue.class);
 
     /**
      *
      */
-    public BoostingLearnerNodeDialog() {
+    public BoostingPredictorNodeDialog() {
         JPanel p = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
+        c.gridx = 0;
+        c.gridy = 0;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(2, 0, 2, 0);
 
-        c.gridx = 0;
-        c.gridy = 0;
-        p.add(new JLabel("Model column   "), c);
+        p.add(new JLabel("Model weight column   "), c);
         c.gridx = 1;
-        p.add(m_modelColumn, c);
+        p.add(m_weightColumn, c);
 
         c.gridx = 0;
         c.gridy++;
-        p.add(new JLabel("Real class column   "), c);
-        c.gridx = 1;
-        p.add(m_classColumn, c);
-
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Predicted class column   "), c);
+        p.add(new JLabel("Prediction column   "), c);
         c.gridx = 1;
         p.add(m_predictionColumn, c);
 
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Number of iterations   "), c);
-        c.gridx = 1;
-        p.add(m_iterations, c);
-
         addTab("Standard settings", p);
     }
+
 
     /**
      * {@inheritDoc}
@@ -135,10 +116,8 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
             final DataTableSpec[] specs) throws NotConfigurableException {
         m_settings.loadSettingsForDialog(settings);
 
-        m_modelColumn.update(specs[0], m_settings.modelColumn());
-        m_classColumn.update(specs[1], m_settings.classColumn());
+        m_weightColumn.update(specs[0], m_settings.weightColumn());
         m_predictionColumn.update(specs[1], m_settings.predictionColumn());
-        m_iterations.setValue(m_settings.maxIterations());
     }
 
     /**
@@ -147,10 +126,8 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings)
             throws InvalidSettingsException {
-        m_settings.maxIterations((Integer) m_iterations.getValue());
-        m_settings.modelColumn(m_modelColumn.getSelectedColumn());
-        m_settings.classColumn(m_classColumn.getSelectedColumn());
         m_settings.predictionColumn(m_predictionColumn.getSelectedColumn());
+        m_settings.weightColumn(m_weightColumn.getSelectedColumn());
         m_settings.saveSettings(settings);
     }
 }

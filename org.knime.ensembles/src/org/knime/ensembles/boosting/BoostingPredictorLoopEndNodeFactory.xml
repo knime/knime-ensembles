@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="bla.png" type="LoopEnd">
+    <name>Boosting Predictor Loop End</name>
+
+    <shortDescription>
+        Loop end node for predicting a boosted ensemble model
+    </shortDescription>
+
+    <fullDescription>
+        <intro>
+            Together with the corresponding loop start node a boosting prediction loop can be constructed. It uses the
+            weighted models an creates a prediction based on a majority vote of all models.
+        </intro>
+        <option name="Model weight column">The column from the first input table that contains the weight for each model
+        <option name="Prediction column">The column from the second input table that contains the prediction from each single model</option>
+        </option>
+    </fullDescription>
+
+    <ports>
+        <inPort index="0" name="Weight table">The data with the weight for the current model</inPort>
+        <inPort index="1" name="Prediction table">The table containing the predictions from the single models</inPort>
+        <outPort index="0" name="Boosting prediction">The classes predicted by the boosted model</outPort>
+    </ports>
+</knimeNode>
