@@ -42,7 +42,7 @@ public class TableToModelNodeFactory
      */
     @Override
     public boolean hasDialog() {
-        return false;
+        return true;
     }
 
     /**
@@ -50,7 +50,7 @@ public class TableToModelNodeFactory
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new TableToModelNodeDialog();
     }
 
 }

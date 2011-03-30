@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.model.PortObjectCell;
 import org.knime.core.node.BufferedDataTable;
@@ -15,6 +16,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -30,6 +32,9 @@ public class TableToModelNodeModel extends NodeModel {
     /** Default row key, if no key is entered. */
     static final RowKey DEFAULT_ROWKEY = RowKey.createRowKey(0);
 
+    private final SettingsModelString m_column =
+        TableToModelNodeDialog.createColumnModel();
+
     /** Constructor for the node model. */
     protected TableToModelNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
@@ -42,7 +47,8 @@ public class TableToModelNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         BufferedDataTable table = (BufferedDataTable) inObjects[0];
         Iterator<DataRow> it = table.iterator();
-        PortObjectCell model = (PortObjectCell) it.next().getCell(0);
+        int index = table.getSpec().findColumnIndex(m_column.getStringValue());
+        PortObjectCell model = (PortObjectCell) it.next().getCell(index);
         return new PortObject[] {model.getPortObject()};
     }
 
@@ -60,6 +66,11 @@ public class TableToModelNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
+        DataTableSpec spec = (DataTableSpec) inSpecs[0];
+        if (!spec.containsName(m_column.getStringValue())) {
+            throw new InvalidSettingsException("Selected column '"
+                    + m_column.getStringValue() + "' not in input spec.");
+        }
         return new PortObjectSpec[]{null};
     }
 
@@ -68,7 +79,7 @@ public class TableToModelNodeModel extends NodeModel {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // no op
+        m_column.saveSettingsTo(settings);
     }
 
     /**
@@ -77,7 +88,7 @@ public class TableToModelNodeModel extends NodeModel {
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // no op
+        m_column.loadSettingsFrom(settings);
     }
 
     /**
@@ -86,7 +97,7 @@ public class TableToModelNodeModel extends NodeModel {
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // no op
+        m_column.validateSettings(settings);
     }
 
     /**
