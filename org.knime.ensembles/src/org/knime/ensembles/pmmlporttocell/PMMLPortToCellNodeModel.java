@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.xml.XMLCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -18,7 +19,6 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
-import org.knime.xml.type.*;
 
 public class PMMLPortToCellNodeModel extends NodeModel {
 
@@ -26,9 +26,9 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 		super(	new PortType[] {new PortType(PMMLPortObject.class)},
 				new PortType[] {new PortType(BufferedDataTable.class)});
 	}
-	
+
 	@Override
-	protected PortObject[] execute(PortObject[] inObjects, ExecutionContext exec)
+	protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
 			throws Exception {
 		PMMLPortObject in = (PMMLPortObject) inObjects[0];
 //		in.
@@ -36,54 +36,54 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 		  DataColumnSpecCreator colSpecCreator =
               new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
 		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
-		  
+
 		BufferedDataContainer out = exec.createDataContainer(createSpec());
 		out.close();
 		return new PortObject[]{out.getTable()};
 	}
-	
+
 	private DataTableSpec createSpec(){
 		DataColumnSpecCreator colSpecCreator =
             new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
 		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
 		  return spec;
 	}
-	
+
 	@Override
-	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs)
+	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
 			throws InvalidSettingsException {
 		return new PortObjectSpec[]{createSpec()};
 	}
 
 	@Override
-	protected void loadInternals(File nodeInternDir, ExecutionMonitor exec)
+	protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
 			throws IOException, CanceledExecutionException {
 		// nothing to load
 
 	}
 
 	@Override
-	protected void saveInternals(File nodeInternDir, ExecutionMonitor exec)
+	protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
 			throws IOException, CanceledExecutionException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void saveSettingsTo(NodeSettingsWO settings) {
+	protected void saveSettingsTo(final NodeSettingsWO settings) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void validateSettings(NodeSettingsRO settings)
+	protected void validateSettings(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void loadValidatedSettingsFrom(NodeSettingsRO settings)
+	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
 		// TODO Auto-generated method stub
 
