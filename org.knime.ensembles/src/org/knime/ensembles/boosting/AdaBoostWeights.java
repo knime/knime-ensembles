@@ -126,7 +126,7 @@ public class AdaBoostWeights implements BoostingWeights {
 
         double error = 1 - correctSum;
         // double error = 1 - (correctCount / (double)count);
-        double modelWeight = 0.5 * Math.log((1 - error) / error);
+        double modelWeight = error / (1 - error);
 
         double sum = 0;
         for (int i = 0; i < correct.length; i++) {
@@ -136,7 +136,7 @@ public class AdaBoostWeights implements BoostingWeights {
             sum += m_probabilities[i];
         }
 
-        System.out.println();
+        sum += 0;
 
         for (int i = 0; i < m_probabilities.length; i++) {
             m_probabilities[i] /= sum;
@@ -146,6 +146,6 @@ public class AdaBoostWeights implements BoostingWeights {
             m_samples[i] = m_samples[i - 1] + m_probabilities[i - 1];
         }
 
-        return new double[] {error, modelWeight};
+        return new double[] {error, Math.log(1 / modelWeight)};
     }
 }
