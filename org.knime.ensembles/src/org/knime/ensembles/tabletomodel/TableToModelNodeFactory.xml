@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./default.png" type="Manipulator">
-    <name>Model to Table</name>
+    <name>Table To Model</name>
     
     <shortDescription>
-        Converts a model input into a single table cell.
+        Coverts a single table cell into a model output.
     </shortDescription>
     
     <fullDescription>
@@ -12,7 +12,7 @@
     </fullDescription>
     
     <ports>
-        <inPort index="0" name="Input Model">Input table</inPort>
-        <outPort index="0" name="Output table">Model in cell form</outPort>
+        <inPort index="0" name="Input Table">Input Table</inPort>
+        <outPort index="0" name="Output Model">Output Model</outPort>
     </ports>    
 </knimeNode>

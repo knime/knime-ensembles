@@ -1,4 +1,4 @@
-package org.knime.ensembles.modeltotable;
+package org.knime.ensembles.tabletomodel;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -9,15 +9,15 @@ import org.knime.core.node.NodeView;
  *
  * @author Sebastian Peter, University of Konstanz, Germany
  */
-public class ModelToTableNodeFactory
-        extends NodeFactory<ModelToTableNodeModel> {
+public class TableToModelNodeFactory
+        extends NodeFactory<TableToModelNodeModel> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ModelToTableNodeModel createNodeModel() {
-        return new ModelToTableNodeModel();
+    public TableToModelNodeModel createNodeModel() {
+        return new TableToModelNodeModel();
     }
 
     /**
@@ -32,8 +32,8 @@ public class ModelToTableNodeFactory
      * {@inheritDoc}
      */
     @Override
-    public NodeView<ModelToTableNodeModel> createNodeView(final int viewIndex,
-            final ModelToTableNodeModel nodeModel) {
+    public NodeView<TableToModelNodeModel> createNodeView(final int viewIndex,
+            final TableToModelNodeModel nodeModel) {
         return null;
     }
 

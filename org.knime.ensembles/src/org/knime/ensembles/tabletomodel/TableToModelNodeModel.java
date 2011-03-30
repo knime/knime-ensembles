@@ -1,15 +1,14 @@
-package org.knime.ensembles.modeltotable;
+package org.knime.ensembles.tabletomodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.model.PortObjectCell;
-import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -28,7 +27,7 @@ import org.knime.core.node.port.PortType;
  *
  * @author Sebastian Peter, University of Konstanz, Germany
  */
-public class ModelToTableNodeModel extends NodeModel {
+public class TableToModelNodeModel extends NodeModel {
 
     private final static DataColumnSpec SPEC = new DataColumnSpecCreator(
             "PortObject", PortObjectCell.TYPE).createSpec();
@@ -37,9 +36,9 @@ public class ModelToTableNodeModel extends NodeModel {
     static final RowKey DEFAULT_ROWKEY = RowKey.createRowKey(0);
 
     /** Constructor for the node model. */
-    protected ModelToTableNodeModel() {
-        super(new PortType[]{new PortType(PortObject.class)},
-                new PortType[]{BufferedDataTable.TYPE});
+    protected TableToModelNodeModel() {
+        super(new PortType[]{BufferedDataTable.TYPE},
+                new PortType[]{new PortType(PortObject.class)});
     }
 
     /**
@@ -48,13 +47,10 @@ public class ModelToTableNodeModel extends NodeModel {
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
-        BufferedDataContainer buf = exec.createDataContainer(
-                new DataTableSpec(SPEC));
-        buf.addRowToTable(new DefaultRow(DEFAULT_ROWKEY,
-                new PortObjectCell(inObjects[0])));
-        buf.close();
-        buf.getTable();
-        return new PortObject[] {buf.getTable()};
+        BufferedDataTable table = (BufferedDataTable) inObjects[0];
+        Iterator<DataRow> it = table.iterator();
+        PortObjectCell model = (PortObjectCell) it.next().getCell(0);
+        return new PortObject[] {model.getPortObject()};
     }
 
     /**
@@ -71,7 +67,7 @@ public class ModelToTableNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[]{new DataTableSpec(SPEC)};
+        return new PortObjectSpec[]{null};
     }
 
     /**

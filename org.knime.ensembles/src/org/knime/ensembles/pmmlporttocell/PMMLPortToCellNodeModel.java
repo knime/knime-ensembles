@@ -33,9 +33,9 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 		PMMLPortObject in = (PMMLPortObject) inObjects[0];
 //		in.
 		System.out.println(in.getSummary());
-		  DataColumnSpecCreator colSpecCreator =
-              new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
-		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
+//		  DataColumnSpecCreator colSpecCreator =
+//              new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
+//		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
 
 		BufferedDataContainer out = exec.createDataContainer(createSpec());
 		out.close();
