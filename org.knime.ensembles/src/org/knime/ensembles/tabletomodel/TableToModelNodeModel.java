@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.model.PortObjectCell;
@@ -29,9 +27,6 @@ import org.knime.core.node.port.PortType;
  */
 public class TableToModelNodeModel extends NodeModel {
 
-    private final static DataColumnSpec SPEC = new DataColumnSpecCreator(
-            "PortObject", PortObjectCell.TYPE).createSpec();
-
     /** Default row key, if no key is entered. */
     static final RowKey DEFAULT_ROWKEY = RowKey.createRowKey(0);
 
@@ -41,9 +36,7 @@ public class TableToModelNodeModel extends NodeModel {
                 new PortType[]{new PortType(PortObject.class)});
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
