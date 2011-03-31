@@ -98,6 +98,6 @@ public class BoostingPredictorLoopEndNodeFactory extends
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new BoostingPredictorNodeDialog();
+        return new BoostingPredictorEndNodeDialog();
     }
 }

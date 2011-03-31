@@ -46,7 +46,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.03.2011 (meinl): created
+ *   31.03.2011 (meinl): created
  */
 package org.knime.ensembles.boosting;
 
@@ -58,55 +58,41 @@ import org.knime.core.node.NodeSettingsWO;
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class BoostingLearnerSettings {
-    private int m_maxIterations = 100;
+public class BoostingPredictorStartSettings {
+    private String m_modelColumn;
 
-    private String m_classColumn;
+    private String m_weightColumn;
 
-    private String m_predictionColumn;
-
-
-    public String predictionColumn() {
-        return m_predictionColumn;
+    public String modelColumn() {
+        return m_modelColumn;
     }
 
-    public void predictionColumn(final String colName) {
-        m_predictionColumn = colName;
+    public void modelColumn(final String colName) {
+        m_modelColumn = colName;
     }
 
-    public String classColumn() {
-        return m_classColumn;
+    public String weightColumn() {
+        return m_weightColumn;
     }
 
-
-    public void classColumn(final String colName) {
-        m_classColumn = colName;
+    public void weightColumn(final String colName) {
+        m_weightColumn = colName;
     }
 
-    public int maxIterations() {
-        return m_maxIterations;
-    }
-
-    public void maxIterations(final int max) {
-        m_maxIterations = max;
-    }
 
     public void loadSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        m_maxIterations = settings.getInt("maxIterations");
-        m_classColumn = settings.getString("classColumn");
-        m_predictionColumn = settings.getString("predictionColumn");
+        m_modelColumn = settings.getString("modelColumn");
+        m_weightColumn = settings.getString("weightColumn");
     }
 
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
-        m_maxIterations = settings.getInt("maxIterations", 100);
-        m_classColumn = settings.getString("classColumn", null);
-        m_predictionColumn = settings.getString("predictionColumn", null);
+        m_modelColumn = settings.getString("modelColumn", null);
+        m_weightColumn = settings.getString("weightColumn", null);
     }
 
     public void saveSettings(final NodeSettingsWO settings) {
-        settings.addInt("maxIterations", m_maxIterations);
-        settings.addString("classColumn", m_classColumn);
-        settings.addString("predictionColumn", m_predictionColumn);
+        settings.addString("modelColumn", m_modelColumn);
+        settings.addString("weightColumn", m_weightColumn);
     }
 }

@@ -12,9 +12,8 @@
             Together with the corresponding loop start node a boosting prediction loop can be constructed. It uses the
             weighted models an creates a prediction based on a majority vote of all models.
         </intro>
-        <option name="Model weight column">The column from the first input table that contains the weight for each model
+        <option name="Model weight column">The column from the first input table that contains the weight for each model</option>
         <option name="Prediction column">The column from the second input table that contains the prediction from each single model</option>
-        </option>
     </fullDescription>
 
     <ports>

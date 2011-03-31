@@ -60,7 +60,6 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
@@ -74,6 +73,9 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.LoopEndNode;
 
 /**
@@ -89,14 +91,13 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
 
     private int m_iteration;
 
-    private double m_errorThreshold;
-
     private BufferedDataContainer m_container;
+
+    private static final double MIN_MODEL_WEIGHT = 0.01;
 
     private static final DataTableSpec OUT_SPEC;
 
     static {
-        // TODO change type
         DataColumnSpec modelSpec =
                 new DataColumnSpecCreator("Models", PortObjectCell.TYPE)
                         .createSpec();
@@ -104,13 +105,14 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
                 new DataColumnSpecCreator("Model weight", DoubleCell.TYPE)
                         .createSpec();
         DataColumnSpec errorSpec =
-            new DataColumnSpecCreator("Model error", DoubleCell.TYPE)
-                    .createSpec();
+                new DataColumnSpecCreator("Model error", DoubleCell.TYPE)
+                        .createSpec();
         OUT_SPEC = new DataTableSpec(modelSpec, weightSpec, errorSpec);
     }
 
     public BoostingLearnerLoopEndNodeModel() {
-        super(2, 1);
+        super(new PortType[]{new PortType(PortObject.class),
+                BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     BoostingWeights getWeightModel() {
@@ -121,45 +123,20 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
+    protected DataTableSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        if (m_settings.modelColumn() == null) {
-            for (DataColumnSpec cs : inSpecs[0]) {
-                if (cs.getType().isCompatible(DataValue.class)) {
-                    m_settings.modelColumn(cs.getName());
-                    setWarningMessage("Auto-selected column '" + cs.getName()
-                            + "' as model column.");
-                    break;
-                }
-            }
-            if (m_settings.modelColumn() == null) {
-                throw new InvalidSettingsException(
-                        "No model column in first input table");
-            }
-        }
-        DataColumnSpec mSpec =
-                inSpecs[0].getColumnSpec(m_settings.modelColumn());
-        if (mSpec == null) {
-            throw new InvalidSettingsException("Model column '"
-                    + m_settings.modelColumn()
-                    + "' does not exist in first input table.");
-        }
-        if (!mSpec.getType().isCompatible(DataValue.class)) {
-            throw new InvalidSettingsException("Model column '"
-                    + m_settings.modelColumn() + "' does not contain models");
-        }
+        DataTableSpec spec = (DataTableSpec)inSpecs[1];
 
-        if (inSpecs[1].getNumColumns() < 2) {
+        if (spec.getNumColumns() < 2) {
             throw new InvalidSettingsException(
                     "Second input table must have at least two column");
         }
 
         if (m_settings.classColumn() == null) {
-            m_settings.classColumn(inSpecs[1].getColumnSpec(
-                    inSpecs[1].getNumColumns() - 2).getName());
+            m_settings.classColumn(spec.getColumnSpec(spec.getNumColumns() - 2)
+                    .getName());
         }
-        DataColumnSpec cSpec =
-                inSpecs[1].getColumnSpec(m_settings.classColumn());
+        DataColumnSpec cSpec = spec.getColumnSpec(m_settings.classColumn());
         if (cSpec == null) {
             throw new InvalidSettingsException("Class column '"
                     + m_settings.classColumn()
@@ -167,11 +144,11 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
         }
 
         if (m_settings.predictionColumn() == null) {
-            m_settings.predictionColumn(inSpecs[1].getColumnSpec(
-                    inSpecs[1].getNumColumns() - 1).getName());
+            m_settings.predictionColumn(spec.getColumnSpec(
+                    spec.getNumColumns() - 1).getName());
         }
         DataColumnSpec pSpec =
-                inSpecs[1].getColumnSpec(m_settings.predictionColumn());
+                spec.getColumnSpec(m_settings.predictionColumn());
         if (pSpec == null) {
             throw new InvalidSettingsException("Prediction column '"
                     + m_settings.predictionColumn()
@@ -185,54 +162,52 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
+    protected PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
+        BufferedDataTable data = (BufferedDataTable)inData[1];
+
         int classIndex =
-                inData[1].getDataTableSpec().findColumnIndex(
+                data.getDataTableSpec().findColumnIndex(
                         m_settings.classColumn());
         int predictionIndex =
-                inData[1].getDataTableSpec().findColumnIndex(
+                data.getDataTableSpec().findColumnIndex(
                         m_settings.predictionColumn());
         if (m_weightModel == null) {
             Set<DataCell> domain =
-                    inData[1].getDataTableSpec().getColumnSpec(classIndex)
+                    data.getDataTableSpec().getColumnSpec(classIndex)
                             .getDomain().getValues();
             if (domain == null) {
                 domain = new HashSet<DataCell>();
-                for (DataRow row : inData[1]) {
+                for (DataRow row : data) {
                     domain.add(row.getCell(classIndex));
                 }
             }
             m_weightModel =
-                    new AdaBoostWeights(inData[1].getRowCount(), domain.size());
+                    new AdaBoostWeights(data.getRowCount(), domain.size());
             m_container = exec.createDataContainer(OUT_SPEC);
-            m_errorThreshold = Math.min(0.2, Math.log(domain.size()) * 0.04) + 0.5;
         }
 
-        double[] res =
-                m_weightModel.score(inData[1], predictionIndex, classIndex);
+        double[] res = m_weightModel.score(data, predictionIndex, classIndex);
 
         m_iteration++;
-        if (m_iteration >= m_settings.maxIterations() || (res[1] <= 0.01)) {
-            if (res[1] < 0.01) {
+        if (m_iteration >= m_settings.maxIterations()
+                || (res[1] <= MIN_MODEL_WEIGHT)) {
+            if (res[1] < MIN_MODEL_WEIGHT) {
                 setWarningMessage("Prediction error too big. Finishing.");
             }
             m_container.close();
-            return new BufferedDataTable[]{m_container.getTable()};
+            return new PortObject[]{m_container.getTable()};
         } else {
-            int modelIndex =
-                    inData[0].getDataTableSpec().findColumnIndex(
-                            m_settings.modelColumn());
             DataRow row =
-                    new DefaultRow(RowKey.createRowKey(m_iteration), inData[0]
-                            .iterator().next().getCell(modelIndex),
-                            new DoubleCell(res[1]), new DoubleCell(res[0]));
+                    new DefaultRow(RowKey.createRowKey(m_iteration),
+                            new PortObjectCell(inData[0]), new DoubleCell(
+                                    res[1]), new DoubleCell(res[0]));
             m_container.addRowToTable(row);
 
             exec.setProgress(m_iteration / (double)m_settings.maxIterations(),
                     "Model error " + res[1]);
             continueLoop();
-            return new BufferedDataTable[]{null};
+            return new PortObject[]{null};
         }
     }
 

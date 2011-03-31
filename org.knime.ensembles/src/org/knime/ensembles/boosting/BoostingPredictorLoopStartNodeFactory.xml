@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="bla.png" type="LoopStart">
+    <name>Boosting Predictor Loop Start</name>
+
+    <shortDescription>
+        Loop start node for predicting a boosted ensemble model
+    </shortDescription>
+
+    <fullDescription>
+        <intro>
+            Together with the corresponding loop end node a boosting prediction loop can be constructed. It uses the
+            weighted models an creates a prediction based on a majority vote of all models.
+        </intro>
+        <option name="Model column">The column that contains the models</option>
+        <option name="Model weight column">The column that contains the weight for each model
+        </option>
+    </fullDescription>
+
+    <ports>
+        <inPort index="0" name="Model table">The data table that contains the models and the corresponding weights</inPort>
+        <outPort index="0" name="Model">The current model</outPort>
+    </ports>
+</knimeNode>

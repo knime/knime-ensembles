@@ -46,67 +46,60 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   29.03.2011 (meinl): created
+ *   31.03.2011 (meinl): created
  */
 package org.knime.ensembles.boosting;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class BoostingLearnerSettings {
-    private int m_maxIterations = 100;
+public class BoostingPredictorLoopStartNodeFactory extends
+        NodeFactory<BoostingPredictorLoopStartNodeModel> {
 
-    private String m_classColumn;
-
-    private String m_predictionColumn;
-
-
-    public String predictionColumn() {
-        return m_predictionColumn;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BoostingPredictorLoopStartNodeModel createNodeModel() {
+        return new BoostingPredictorLoopStartNodeModel();
     }
 
-    public void predictionColumn(final String colName) {
-        m_predictionColumn = colName;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
     }
 
-    public String classColumn() {
-        return m_classColumn;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<BoostingPredictorLoopStartNodeModel> createNodeView(
+            final int viewIndex,
+            final BoostingPredictorLoopStartNodeModel nodeModel) {
+        return null;
     }
 
-
-    public void classColumn(final String colName) {
-        m_classColumn = colName;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
     }
 
-    public int maxIterations() {
-        return m_maxIterations;
-    }
-
-    public void maxIterations(final int max) {
-        m_maxIterations = max;
-    }
-
-    public void loadSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        m_maxIterations = settings.getInt("maxIterations");
-        m_classColumn = settings.getString("classColumn");
-        m_predictionColumn = settings.getString("predictionColumn");
-    }
-
-    public void loadSettingsForDialog(final NodeSettingsRO settings) {
-        m_maxIterations = settings.getInt("maxIterations", 100);
-        m_classColumn = settings.getString("classColumn", null);
-        m_predictionColumn = settings.getString("predictionColumn", null);
-    }
-
-    public void saveSettings(final NodeSettingsWO settings) {
-        settings.addInt("maxIterations", m_maxIterations);
-        settings.addString("classColumn", m_classColumn);
-        settings.addString("predictionColumn", m_predictionColumn);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new BoostingPredictorStartNodeDialog();
     }
 }

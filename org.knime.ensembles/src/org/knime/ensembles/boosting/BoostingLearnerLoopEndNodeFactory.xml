@@ -16,7 +16,6 @@
             The loop is stopped either after the maximum number of iterations has been reached or the prediction error for a model
             is greater than 0.5. 
         </intro>
-        <option name="Model column">The column from the first input table that contains the learned model</option>
         <option name="Real class column">The column from the second input table that contains the real class values for each row
         </option>
         <option name="Predicted class column">The column from the second input table that contains the predicted class values for each row
@@ -26,7 +25,7 @@
     </fullDescription>
 
     <ports>
-        <inPort index="0" name="Model table">The trained model converted into a single-row, single-column table</inPort>
+        <inPort index="0" name="Model">The trained model</inPort>
         <inPort index="1" name="Predicted data">The data with predicted classes and also the real class values</inPort>
         <outPort index="0" name="Boosting model">The boosted model together with their weights in data table</outPort>
     </ports>

@@ -62,12 +62,12 @@ import javax.swing.border.Border;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
-import org.knime.core.data.model.PortObjectValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionComboxBox;
 
 /**
@@ -80,9 +80,6 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
 
     private final ColumnSelectionComboxBox m_predictionColumn =
             new ColumnSelectionComboxBox((Border)null, DataValue.class);
-
-    private final ColumnSelectionComboxBox m_modelColumn =
-            new ColumnSelectionComboxBox((Border)null, PortObjectValue.class);
 
     private final JSpinner m_iterations = new JSpinner(new SpinnerNumberModel(
             1000, 1, Integer.MAX_VALUE, 1));
@@ -102,12 +99,6 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
 
         c.gridx = 0;
         c.gridy = 0;
-        p.add(new JLabel("Model column   "), c);
-        c.gridx = 1;
-        p.add(m_modelColumn, c);
-
-        c.gridx = 0;
-        c.gridy++;
         p.add(new JLabel("Real class column   "), c);
         c.gridx = 1;
         p.add(m_classColumn, c);
@@ -132,12 +123,12 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
      */
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings,
-            final DataTableSpec[] specs) throws NotConfigurableException {
+            final PortObjectSpec[] specs) throws NotConfigurableException {
         m_settings.loadSettingsForDialog(settings);
 
-        m_modelColumn.update(specs[0], m_settings.modelColumn());
-        m_classColumn.update(specs[1], m_settings.classColumn());
-        m_predictionColumn.update(specs[1], m_settings.predictionColumn());
+        m_classColumn.update((DataTableSpec)specs[1], m_settings.classColumn());
+        m_predictionColumn.update((DataTableSpec)specs[1],
+                m_settings.predictionColumn());
         m_iterations.setValue(m_settings.maxIterations());
     }
 
@@ -147,8 +138,7 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings)
             throws InvalidSettingsException {
-        m_settings.maxIterations((Integer) m_iterations.getValue());
-        m_settings.modelColumn(m_modelColumn.getSelectedColumn());
+        m_settings.maxIterations((Integer)m_iterations.getValue());
         m_settings.classColumn(m_classColumn.getSelectedColumn());
         m_settings.predictionColumn(m_predictionColumn.getSelectedColumn());
         m_settings.saveSettings(settings);

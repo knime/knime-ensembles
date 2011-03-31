@@ -45,12 +45,6 @@
       <node
             category-path="/mining/ensembles/boosting"
             expert-flag="false"
-            factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
-            id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
-      </node>
-      <node
-            category-path="/mining/ensembles/boosting"
-            expert-flag="false"
             factory-class="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory"
             id="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory">
       </node>
@@ -61,7 +55,25 @@
             id="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/boosting"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles/boosting"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles/boosting"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory"
+            id="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles/boosting"
             expert-flag="false"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">

@@ -50,84 +50,35 @@
  */
 package org.knime.ensembles.boosting;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.DoubleValue;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.util.ColumnSelectionComboxBox;
 
 /**
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class BoostingPredictorNodeDialog extends NodeDialogPane {
-    private final BoostingPredictorSettings m_settings =
-            new BoostingPredictorSettings();
+public class BoostingPredictorEndSettings {
+    private String m_predictionColumn;
 
-    private final ColumnSelectionComboxBox m_predictionColumn =
-            new ColumnSelectionComboxBox((Border)null, DataValue.class);
+    public String predictionColumn() {
+        return m_predictionColumn;
+    }
 
-    private final ColumnSelectionComboxBox m_weightColumn =
-            new ColumnSelectionComboxBox((Border)null, DoubleValue.class);
-
-    /**
-     *
-     */
-    public BoostingPredictorNodeDialog() {
-        JPanel p = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.gridx = 0;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(2, 0, 2, 0);
-
-        p.add(new JLabel("Model weight column   "), c);
-        c.gridx = 1;
-        p.add(m_weightColumn, c);
-
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Prediction column   "), c);
-        c.gridx = 1;
-        p.add(m_predictionColumn, c);
-
-        addTab("Standard settings", p);
+    public void predictionColumn(final String colName) {
+        m_predictionColumn = colName;
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings,
-            final DataTableSpec[] specs) throws NotConfigurableException {
-        m_settings.loadSettingsForDialog(settings);
-
-        m_weightColumn.update(specs[0], m_settings.weightColumn());
-        m_predictionColumn.update(specs[1], m_settings.predictionColumn());
+    public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_predictionColumn = settings.getString("predictionColumn");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings)
-            throws InvalidSettingsException {
-        m_settings.predictionColumn(m_predictionColumn.getSelectedColumn());
-        m_settings.weightColumn(m_weightColumn.getSelectedColumn());
-        m_settings.saveSettings(settings);
+    public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        m_predictionColumn = settings.getString("predictionColumn", null);
+    }
+
+    public void saveSettings(final NodeSettingsWO settings) {
+        settings.addString("predictionColumn", m_predictionColumn);
     }
 }
