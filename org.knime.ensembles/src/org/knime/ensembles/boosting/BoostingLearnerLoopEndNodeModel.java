@@ -52,7 +52,10 @@ package org.knime.ensembles.boosting;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
@@ -86,6 +89,8 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
 
     private int m_iteration;
 
+    private double m_errorThreshold;
+
     private BufferedDataContainer m_container;
 
     private static final DataTableSpec OUT_SPEC;
@@ -98,12 +103,12 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
         DataColumnSpec weightSpec =
                 new DataColumnSpecCreator("Model weight", DoubleCell.TYPE)
                         .createSpec();
-        OUT_SPEC = new DataTableSpec(modelSpec, weightSpec);
+        DataColumnSpec errorSpec =
+            new DataColumnSpecCreator("Model error", DoubleCell.TYPE)
+                    .createSpec();
+        OUT_SPEC = new DataTableSpec(modelSpec, weightSpec, errorSpec);
     }
 
-    /**
-     *
-     */
     public BoostingLearnerLoopEndNodeModel() {
         super(2, 1);
     }
@@ -182,24 +187,35 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        if (m_weightModel == null) {
-            m_weightModel = new AdaBoostWeights(inData[1].getRowCount());
-            m_container = exec.createDataContainer(OUT_SPEC);
-        }
-
         int classIndex =
                 inData[1].getDataTableSpec().findColumnIndex(
                         m_settings.classColumn());
         int predictionIndex =
                 inData[1].getDataTableSpec().findColumnIndex(
                         m_settings.predictionColumn());
+        if (m_weightModel == null) {
+            Set<DataCell> domain =
+                    inData[1].getDataTableSpec().getColumnSpec(classIndex)
+                            .getDomain().getValues();
+            if (domain == null) {
+                domain = new HashSet<DataCell>();
+                for (DataRow row : inData[1]) {
+                    domain.add(row.getCell(classIndex));
+                }
+            }
+            m_weightModel =
+                    new AdaBoostWeights(inData[1].getRowCount(), domain.size());
+            m_container = exec.createDataContainer(OUT_SPEC);
+            m_errorThreshold = Math.min(0.2, Math.log(domain.size()) * 0.04) + 0.5;
+        }
+
         double[] res =
                 m_weightModel.score(inData[1], predictionIndex, classIndex);
 
         m_iteration++;
-        if (m_iteration >= m_settings.maxIterations() || res[0] > 0.5) {
-            if (res[0] > 0.5) {
-                setWarningMessage("Prediction error > 0.5. Finishing.");
+        if (m_iteration >= m_settings.maxIterations() || (res[1] <= 0.01)) {
+            if (res[1] < 0.01) {
+                setWarningMessage("Prediction error too big. Finishing.");
             }
             m_container.close();
             return new BufferedDataTable[]{m_container.getTable()};
@@ -210,7 +226,7 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
             DataRow row =
                     new DefaultRow(RowKey.createRowKey(m_iteration), inData[0]
                             .iterator().next().getCell(modelIndex),
-                            new DoubleCell(res[1]));
+                            new DoubleCell(res[1]), new DoubleCell(res[0]));
             m_container.addRowToTable(row);
 
             exec.setProgress(m_iteration / (double)m_settings.maxIterations(),

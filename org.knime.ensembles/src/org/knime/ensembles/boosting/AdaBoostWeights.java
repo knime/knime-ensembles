@@ -62,24 +62,25 @@ import org.knime.core.node.BufferedDataTable;
  * @author Thorsten Meinl, University of Konstanz
  */
 public class AdaBoostWeights implements BoostingWeights {
-    private final double[] m_probabilities;
+    private final double[] m_weights;
 
     private final double[] m_samples;
 
     private final Random m_rand = new Random();
 
+    private final double m_classCorrection;
 
-    /**
-     *
-     */
-    public AdaBoostWeights(final int numberOfRows) {
-        m_probabilities = new double[numberOfRows];
+
+    public AdaBoostWeights(final int numberOfRows, final int classCount) {
+        m_weights = new double[numberOfRows];
         m_samples = new double[numberOfRows];
 
         for (int i = 0; i < numberOfRows; i++) {
-            m_probabilities[i] = 1.0 / numberOfRows;
+            m_weights[i] = 1.0 / numberOfRows;
             m_samples[i] = i / (double)numberOfRows;
         }
+
+        m_classCorrection = Math.log(classCount - 1);
     }
 
     /**
@@ -87,7 +88,7 @@ public class AdaBoostWeights implements BoostingWeights {
      */
     @Override
     public double sampleWeight(final int rowIndex) {
-        return m_probabilities[rowIndex];
+        return m_weights[rowIndex];
     }
 
     /**
@@ -118,34 +119,32 @@ public class AdaBoostWeights implements BoostingWeights {
             DataCell predictedValue = row.getCell(predictionColIndex);
             if (realValue.equals(predictedValue)) {
                 correct[count] = true;
-                correctSum += m_probabilities[count];
+                correctSum += m_weights[count];
                 correctCount++;
             }
             count++;
         }
 
         double error = 1 - correctSum;
-        // double error = 1 - (correctCount / (double)count);
-        double modelWeight = error / (1 - error);
+        double modelWeight =
+                Math.log((1 - error) / error) + m_classCorrection;
 
         double sum = 0;
         for (int i = 0; i < correct.length; i++) {
             if (correct[i]) {
-                m_probabilities[i] *= modelWeight;
+                m_weights[i] *= Math.exp(-modelWeight);
             }
-            sum += m_probabilities[i];
+            sum += m_weights[i];
         }
 
-        sum += 0;
-
-        for (int i = 0; i < m_probabilities.length; i++) {
-            m_probabilities[i] /= sum;
+        for (int i = 0; i < m_weights.length; i++) {
+            m_weights[i] /= sum;
         }
 
         for (int i = 1; i < m_samples.length; i++) {
-            m_samples[i] = m_samples[i - 1] + m_probabilities[i - 1];
+            m_samples[i] = m_samples[i - 1] + m_weights[i - 1];
         }
 
-        return new double[] {error, Math.log(1 / modelWeight)};
+        return new double[]{error, modelWeight};
     }
 }
