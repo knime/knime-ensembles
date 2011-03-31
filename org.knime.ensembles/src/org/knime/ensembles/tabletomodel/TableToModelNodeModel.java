@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.RowKey;
 import org.knime.core.data.model.PortObjectCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -28,9 +27,6 @@ import org.knime.core.node.port.PortType;
  * @author Sebastian Peter, University of Konstanz, Germany
  */
 public class TableToModelNodeModel extends NodeModel {
-
-    /** Default row key, if no key is entered. */
-    static final RowKey DEFAULT_ROWKEY = RowKey.createRowKey(0);
 
     private final SettingsModelString m_column =
         TableToModelNodeDialog.createColumnModel();

@@ -15,6 +15,12 @@
             name="Boosting"
             path="/mining/ensembles">
       </category>
+      <category
+            icon="icons/missing.gif"
+            level-id="bagging"
+            name="Bagging"
+            path="/mining/ensembles">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -77,6 +83,12 @@
             expert-flag="false"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
+      </node>
+      <node
+            category-path="/mining/ensembles/bagging"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.bagging.ModelLoopStartNodeFactory"
+            id="org.knime.ensembles.bagging.ModelLoopStartNodeFactory">
       </node>
    </extension>
 </plugin>
