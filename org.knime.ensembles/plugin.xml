@@ -9,6 +9,12 @@
             name="Ensemble Learning"
             path="/mining">
       </category>
+      <category
+            icon="icons/missing.gif"
+            level-id="boosting"
+            name="Boosting"
+            path="/mining/ensembles">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -37,26 +43,22 @@
             id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/boosting"
             expert-flag="false"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/boosting"
             expert-flag="false"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/boosting"
             expert-flag="false"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
       </node>
    </extension>
-   <extension
-         point="org.knime.workbench.repository.metanode">
-   </extension>
-
 </plugin>
