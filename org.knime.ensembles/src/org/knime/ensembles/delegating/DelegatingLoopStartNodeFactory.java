@@ -3,7 +3,6 @@ package org.knime.ensembles.delegating;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.core.node.workflow.LoopStartNodeTerminator;
 
 /**
  * <code>NodeFactory</code> for the "TimeDelayLoopStart" Node.

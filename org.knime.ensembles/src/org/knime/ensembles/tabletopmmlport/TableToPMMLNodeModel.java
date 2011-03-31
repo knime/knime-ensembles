@@ -4,16 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.model.PortObjectCell;
 import org.knime.core.data.xml.PMMLCell;
-import org.knime.core.data.xml.PMMLCellFactory;
-import org.knime.core.data.xml.PMMLValue;
-import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -28,8 +21,6 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
-import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
-import org.knime.ensembles.tabletomodel.TableToModelNodeDialog;
 import org.w3c.dom.Document;
 
 public class TableToPMMLNodeModel extends NodeModel {
