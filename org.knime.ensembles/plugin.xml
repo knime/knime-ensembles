@@ -49,13 +49,13 @@
             id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
+            category-path="/mining/ensembles"
             expert-flag="false"
             factory-class="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory"
             id="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
+            category-path="/mining/ensembles"
             expert-flag="false"
             factory-class="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory"
             id="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory">
