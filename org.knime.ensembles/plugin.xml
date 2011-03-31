@@ -97,4 +97,25 @@
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
       </node>
    </extension>
+   <extension
+         point="org.knime.workbench.repository.metanode">
+      <PersistedMetaNode
+            category-path="/meta"
+            description="Boosting Learner"
+            expert-flag="false"
+            icon="default.png"
+            id="org.knime.ensembles.boosting_learner"
+            name="Boosting Learner"
+            workflowDir="metanode_templates/Boosting Learner/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            category-path="/meta"
+            description="Boosting Predictor"
+            expert-flag="false"
+            icon="default.png"
+            id="org.knime.ensembles.boosting_predictor"
+            name="Boosting Predictor"
+            workflowDir="metanode_templates/Boosting Predictor/">
+      </PersistedMetaNode>
+   </extension>
 </plugin>

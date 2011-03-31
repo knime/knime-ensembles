@@ -16,7 +16,7 @@
     </fullDescription>
 
     <ports>
-        <inPort index="1" name="Prediction table">The table containing the predictions from each single model</inPort>
+        <inPort index="0" name="Prediction table">The table containing the predictions from each single model</inPort>
         <outPort index="0" name="Boosting prediction">The classes predicted by the boosted model</outPort>
     </ports>
 </knimeNode>
