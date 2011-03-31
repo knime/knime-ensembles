@@ -90,5 +90,11 @@
             factory-class="org.knime.ensembles.bagging.ModelLoopStartNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopStartNodeFactory">
       </node>
+      <node
+            category-path="/mining/ensembles/bagging"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.bagging.ModelLoopEndNodeFactory"
+            id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
+      </node>
    </extension>
 </plugin>

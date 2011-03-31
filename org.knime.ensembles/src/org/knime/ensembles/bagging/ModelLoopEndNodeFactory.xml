@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./modelend.png" type="LoopEnd">
+	<name>Model Loop End</name>
+	
+	<shortDescription>
+		Collects and combines all models provided during the loop iterations.
+	</shortDescription>
+	
+	<fullDescription>
+		<intro>
+		  Collects and combines all models provided during the loop iterations
+		  into a table with one column.
+		</intro>
+		
+	</fullDescription>
+	
+	<ports>
+		<inPort index="0" name="Model port object">Model port object to be collected.</inPort>
+		<outPort index="0" name="Port object table">Table with port objects</outPort>
+	</ports>
+</knimeNode>
