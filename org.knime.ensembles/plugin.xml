@@ -34,7 +34,7 @@
             category-path="/"
             expert-flag="false"
             factory-class="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory"
-            id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
+            id="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory">
       </node>
       <node
             category-path="/mining/ensembles"
@@ -95,6 +95,12 @@
             expert-flag="false"
             factory-class="org.knime.ensembles.bagging.ModelLoopEndNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
+      </node>
+      <node
+            category-path="/"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
+            id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
    </extension>
    <extension

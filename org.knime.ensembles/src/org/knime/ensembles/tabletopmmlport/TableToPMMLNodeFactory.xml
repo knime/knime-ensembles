@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./default.png" type="Other">
+	<name>PMML Cell to port</name>
+	<shortDescription>Converts the PMML cell in the first Row to the PMML Port .</shortDescription>
+	<fullDescription>
+		<intro>.</intro>
+		<option name=""></option>
+	</fullDescription>
+	<ports>
+		<inPort name="Data Table" index="0">.</inPort>
+		<outPort name="PMML Model" index="0">.</outPort>
+	</ports>
+
+</knimeNode>
