@@ -8,7 +8,7 @@ import org.knime.core.node.NodeView;
  * <code>NodeFactory</code> for the "TimeDelayLoopStart" Node.
  * 
  *
- * @author 
+ * @author Iris Adae, University of Konstanz, Germany
  */
 public class DelegatingLoopStartNodeFactory 
         extends NodeFactory<DelegatingLoopStartNodeModel> {

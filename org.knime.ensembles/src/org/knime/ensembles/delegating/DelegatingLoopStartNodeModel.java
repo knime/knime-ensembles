@@ -17,7 +17,7 @@ import org.knime.core.node.workflow.LoopStartNode;
  * This is the model implementation of Delegating.
  * 
  *
- * @author 
+ * @author Iris Adae, University of Konstanz, Germany
  */
 public class DelegatingLoopStartNodeModel extends NodeModel
 		implements LoopStartNode{

@@ -22,7 +22,7 @@ import org.knime.core.node.workflow.LoopEndNode;
  * This is the model implementation of Delegating.
  * 
  * 
- * @author Iris Adae
+ * @author Iris Adae, University of Konstanz, Germany
  */
 public class DelegatingLoopEndNodeModel extends NodeModel 
             implements LoopEndNode {

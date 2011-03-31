@@ -56,7 +56,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 /**
  * This class is the dialog for the Table To Model node
  *
- * @author 
+ * @author Iris Adae, University of Konstanz, Germany
  */
 public class TableToPMMLNodeDialog extends DefaultNodeSettingsPane {
 

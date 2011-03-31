@@ -1,3 +1,7 @@
+/**
+ * 
+ * @author Iris Adae, University of Konstanz, Germany
+ */
 package org.knime.ensembles.tabletopmmlport;
 
 import org.knime.core.node.NodeDialogPane;

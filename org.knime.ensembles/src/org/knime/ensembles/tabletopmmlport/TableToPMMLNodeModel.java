@@ -1,3 +1,4 @@
+
 package org.knime.ensembles.tabletopmmlport;
 
 import java.io.File;
@@ -22,7 +23,11 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.w3c.dom.Document;
-
+/**
+ * 
+ * @author Iris Adae, University of Konstanz, Germany
+ *
+ */
 public class TableToPMMLNodeModel extends NodeModel {
 	
 	 private final SettingsModelString m_column =
