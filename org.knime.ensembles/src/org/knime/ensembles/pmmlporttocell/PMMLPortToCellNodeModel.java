@@ -3,9 +3,13 @@ package org.knime.ensembles.pmmlporttocell;
 import java.io.File;
 import java.io.IOException;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.xml.XMLCell;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.xml.PMMLCell;
+import org.knime.core.data.xml.PMMLCellFactory;
+import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -31,21 +35,19 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 	protected PortObject[] execute(PortObject[] inObjects, ExecutionContext exec)
 			throws Exception {
 		PMMLPortObject in = (PMMLPortObject) inObjects[0];
-//		in.
+		PMMLValue value = in.getPMMLValue();
 		
-//		System.out.println(in.getDocument());
-		  DataColumnSpecCreator colSpecCreator =
-              new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
-		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
+		DataCell cell = PMMLCellFactory.create(value.getDocument());
 		  
 		BufferedDataContainer out = exec.createDataContainer(createSpec());
+		out.addRowToTable(new DefaultRow("PMML Row", cell));
 		out.close();
 		return new PortObject[]{out.getTable()};
 	}
 	
 	private DataTableSpec createSpec(){
 		DataColumnSpecCreator colSpecCreator =
-            new DataColumnSpecCreator("PMML/XML", XMLCell.TYPE);
+            new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
 		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
 		  return spec;
 	}
