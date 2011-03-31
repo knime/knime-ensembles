@@ -53,7 +53,6 @@ public class ModelToTableNodeModel extends NodeModel {
         buf.addRowToTable(new DefaultRow(DEFAULT_ROWKEY,
                 new PortObjectCell(inObjects[0])));
         buf.close();
-        buf.getTable();
         return new PortObject[] {buf.getTable()};
     }
 
