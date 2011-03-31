@@ -61,7 +61,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataValue;
+import org.knime.core.data.NominalValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
@@ -71,15 +71,18 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionComboxBox;
 
 /**
+ * This is the dialog for the boosting learner loop's end node.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingLearnerNodeDialog extends NodeDialogPane {
+    @SuppressWarnings("unchecked")
     private final ColumnSelectionComboxBox m_classColumn =
-            new ColumnSelectionComboxBox((Border)null, DataValue.class);
+            new ColumnSelectionComboxBox((Border)null, NominalValue.class);
 
+    @SuppressWarnings("unchecked")
     private final ColumnSelectionComboxBox m_predictionColumn =
-            new ColumnSelectionComboxBox((Border)null, DataValue.class);
+            new ColumnSelectionComboxBox((Border)null, NominalValue.class);
 
     private final JSpinner m_iterations = new JSpinner(new SpinnerNumberModel(
             1000, 1, Integer.MAX_VALUE, 1));
@@ -88,7 +91,7 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
             new BoostingLearnerSettings();
 
     /**
-     *
+     * Creates a new dialog.
      */
     public BoostingLearnerNodeDialog() {
         JPanel p = new JPanel(new GridBagLayout());

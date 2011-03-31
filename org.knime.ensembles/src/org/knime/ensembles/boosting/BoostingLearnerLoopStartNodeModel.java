@@ -70,14 +70,18 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.workflow.LoopStartNode;
 
 /**
+ * This class is the model for the boosting learner loop start node. It gets the
+ * row/pattern weights from the corresponding loop end node and re-samples the
+ * training data in each iteration accordingsly.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
         LoopStartNode {
+    private static final int OVERSAMPLE_RATE = 3;
 
     /**
-     *
+     * Creates a new node model.
      */
     public BoostingLearnerLoopStartNodeModel() {
         super(1, 2);
@@ -89,7 +93,7 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[] {inSpecs[0], inSpecs[0]};
+        return new DataTableSpec[]{inSpecs[0], inSpecs[0]};
     }
 
     /**
@@ -100,27 +104,26 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
             final ExecutionContext exec) throws Exception {
         if (getLoopEndNode() == null) {
             // first iteration
-            return new BufferedDataTable[] {inData[0], inData[0]};
+            return new BufferedDataTable[]{inData[0], inData[0]};
         }
         if (!(getLoopEndNode() instanceof BoostingLearnerLoopEndNodeModel)) {
             throw new RuntimeException(
                     "Loop end node is not a boosting loop end node");
         }
 
-        BoostingWeights weightModel =
+        final BoostingStrategy strategy =
                 ((BoostingLearnerLoopEndNodeModel)getLoopEndNode())
-                        .getWeightModel();
+                        .getBoostingStrategy();
 
         final int rowCount = inData[0].getRowCount();
-        int[] distribution = new int[3 * rowCount]; // oversampling
+        final int[] distribution = new int[OVERSAMPLE_RATE * rowCount];
         for (int i = 0; i < distribution.length; i++) {
-            distribution[i] = weightModel.nextSample();
+            distribution[i] = strategy.nextSample();
         }
         Arrays.sort(distribution);
 
         final BufferedDataContainer train =
                 exec.createDataContainer(inData[0].getDataTableSpec());
-
 
         final double max = rowCount;
         int rowNo = 0, i = 0;

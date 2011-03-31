@@ -51,12 +51,15 @@
 package org.knime.ensembles.boosting;
 
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 
 /**
+ * This interface describes a certain boosting strategy, e.g. AdaBoost.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public interface BoostingWeights {
+public interface BoostingStrategy {
     /**
      * Scores the result of the current prediction and updates the weights
      * accordingly.
@@ -65,11 +68,15 @@ public interface BoostingWeights {
      *            values
      * @param predictionColIndex the prediction column's index
      * @param classColIndex the real class column's index
+     * @param exec an execution monitor for reporting progress and checking for
+     *            cancellation
      * @return the current model's error at index 0 and the corresponding model
      *         weight at index 1
+     * @throws CanceledExecutionException if the user canceled the execution
      */
     public double[] score(BufferedDataTable table, int predictionColIndex,
-            int classColIndex);
+            int classColIndex, ExecutionMonitor exec)
+            throws CanceledExecutionException;
 
     /**
      * Return the current weight for the given row index.

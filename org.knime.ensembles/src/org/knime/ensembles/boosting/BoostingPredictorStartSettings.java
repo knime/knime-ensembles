@@ -55,6 +55,8 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
 /**
+ * This class holds the settings for the start node of a boosting predictor
+ * loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
@@ -63,34 +65,70 @@ public class BoostingPredictorStartSettings {
 
     private String m_weightColumn;
 
+    /**
+     * Returns the column containing the collected models.
+     *
+     * @return a column name
+     */
     public String modelColumn() {
         return m_modelColumn;
     }
 
+    /**
+     * Sets the column containing the collected models.
+     *
+     * @param colName a column name
+     */
     public void modelColumn(final String colName) {
         m_modelColumn = colName;
     }
 
+    /**
+     * Returns the column containing the models' weights.
+     *
+     * @return a column name
+     */
     public String weightColumn() {
         return m_weightColumn;
     }
 
+    /**
+     * Sets the column containing the models' weights.
+     *
+     * @param colName a column name
+     */
     public void weightColumn(final String colName) {
         m_weightColumn = colName;
     }
 
-
+    /**
+     * Loads the settings from the given settings object.
+     *
+     * @param settings a settings object
+     * @throws InvalidSettingsException if some settings are missing
+     */
     public void loadSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_modelColumn = settings.getString("modelColumn");
         m_weightColumn = settings.getString("weightColumn");
     }
 
+    /**
+     * Loads the settings from the given settings object using default values
+     * for missing settings.
+     *
+     * @param settings a settings object
+     */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
         m_modelColumn = settings.getString("modelColumn", null);
         m_weightColumn = settings.getString("weightColumn", null);
     }
 
+    /**
+     * Saves the settings into the given settings object.
+     *
+     * @param settings a settings object
+     */
     public void saveSettings(final NodeSettingsWO settings) {
         settings.addString("modelColumn", m_modelColumn);
         settings.addString("weightColumn", m_weightColumn);

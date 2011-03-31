@@ -56,12 +56,16 @@ import java.util.Random;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 
 /**
+ * This class implements AdaBoost.SAMME, as described in "Multi-class AdaBoost"
+ * by Zhu et. al (2006).
  *
  * @author Thorsten Meinl, University of Konstanz
  */
-public class AdaBoostWeights implements BoostingWeights {
+public class AdaBoostSAMME implements BoostingStrategy {
     private final double[] m_weights;
 
     private final double[] m_samples;
@@ -70,8 +74,13 @@ public class AdaBoostWeights implements BoostingWeights {
 
     private final double m_classCorrection;
 
-
-    public AdaBoostWeights(final int numberOfRows, final int classCount) {
+    /**
+     * Creates a new boosting strategy.
+     *
+     * @param numberOfRows the total number or rows or patterns
+     * @param classCount the number of possible classes for all patterns
+     */
+    public AdaBoostSAMME(final int numberOfRows, final int classCount) {
         m_weights = new double[numberOfRows];
         m_samples = new double[numberOfRows];
 
@@ -109,12 +118,24 @@ public class AdaBoostWeights implements BoostingWeights {
      */
     @Override
     public double[] score(final BufferedDataTable table,
-            final int predictionColIndex, final int classColIndex) {
+            final int predictionColIndex, final int classColIndex,
+            final ExecutionMonitor exec) throws CanceledExecutionException {
+        if (table.getRowCount() != m_weights.length) {
+            throw new IllegalStateException(
+                    "Current table does not have the same number of rows as the previous table");
+        }
+
         int count = 0;
         boolean[] correct = new boolean[table.getRowCount()];
         int correctCount = 0;
         double correctSum = 0;
+
+        final double max = table.getRowCount();
+        ExecutionMonitor subexec = exec.createSubProgress(0.8);
+        exec.setMessage("Checking preditions");
         for (DataRow row : table) {
+            subexec.checkCanceled();
+            subexec.setProgress(count / max);
             DataCell realValue = row.getCell(classColIndex);
             DataCell predictedValue = row.getCell(predictionColIndex);
             if (realValue.equals(predictedValue)) {
@@ -125,26 +146,34 @@ public class AdaBoostWeights implements BoostingWeights {
             count++;
         }
 
+        exec.setMessage("Updating weights");
         double error = 1 - correctSum;
-        double modelWeight =
-                Math.log((1 - error) / error) + m_classCorrection;
+        double modelWeight = Math.log((1 - error) / error) + m_classCorrection;
 
+        subexec = exec.createSubProgress(0.1);
         double sum = 0;
         for (int i = 0; i < correct.length; i++) {
+            if (i % 1000 == 0) {
+                subexec.checkCanceled();
+                subexec.setProgress(i / max);
+            }
             if (correct[i]) {
                 m_weights[i] *= Math.exp(-modelWeight);
             }
             sum += m_weights[i];
         }
 
-        for (int i = 0; i < m_weights.length; i++) {
-            m_weights[i] /= sum;
-        }
-
-        for (int i = 1; i < m_samples.length; i++) {
+        subexec = exec.createSubProgress(0.1);
+        m_weights[0] /= sum;
+        for (int i = 1; i < m_weights.length; i++) {
+            if (i % 1000 == 0) {
+                subexec.checkCanceled();
+                subexec.setProgress(i / max);
+            }
             m_samples[i] = m_samples[i - 1] + m_weights[i - 1];
         }
 
+        exec.setProgress(1);
         return new double[]{error, modelWeight};
     }
 }

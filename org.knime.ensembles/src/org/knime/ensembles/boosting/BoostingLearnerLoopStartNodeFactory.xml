@@ -10,14 +10,16 @@
     <fullDescription>
         <intro>
             Together with the corresponding loop end node a boosting loop can be constructed. It repeatedly trains
-            simple models
-            and weights them according to their classification error.
-            The algorithm used is AdaBoost.M1.
+            simple models and weights them according to their classification error.
+            The algorithm used is AdaBoost.SAMME,
+            i.e. is can also cope with multi-class problems.
+            The first output contains the re- and over-sampled dataset,
+            rows that have been predicted wrong are contained more often than correctly predicted rows.
         </intro>
     </fullDescription>
 
     <ports>
-        <inPort index="0" name="Input">Any input data with class labels</inPort>
+        <inPort index="0" name="Input">Any input data with nominal class labels</inPort>
         <outPort index="0" name="Training data">Possibly re-sampled training data, must be connected to the learner node inside
             the loop</outPort>
         <outPort index="1" name="Output">Unaltered input data, must be connected to the predictor node inside the loop

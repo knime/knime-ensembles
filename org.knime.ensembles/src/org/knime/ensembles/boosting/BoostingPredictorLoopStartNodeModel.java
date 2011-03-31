@@ -53,12 +53,12 @@ package org.knime.ensembles.boosting;
 import java.io.File;
 import java.io.IOException;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.container.CloseableRowIterator;
-import org.knime.core.data.model.PortObjectCell;
 import org.knime.core.data.model.PortObjectValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -74,6 +74,10 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.LoopStartNodeTerminator;
 
 /**
+ * This is the model for the start node of a boosting prediction node. It takes
+ * the input table (with models and weights) and output a single model in each
+ * iteration. The model's weight can be queried by the corresponding loop end
+ * node.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
@@ -86,6 +90,9 @@ public class BoostingPredictorLoopStartNodeModel extends NodeModel implements
 
     private double m_currentModelWeight;
 
+    /**
+     * Creates a new node model.
+     */
     public BoostingPredictorLoopStartNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
                 new PortType[]{new PortType(PortObject.class)});
@@ -167,15 +174,22 @@ public class BoostingPredictorLoopStartNodeModel extends NodeModel implements
         DataRow row = m_iterator.next();
         int weightIndex =
                 table.getSpec().findColumnIndex(m_settings.weightColumn());
-        m_currentModelWeight =
-                ((DoubleValue)row.getCell(weightIndex)).getDoubleValue();
+        DataCell weightCell = row.getCell(weightIndex);
+        if (weightCell.isMissing()) {
+            throw new Exception("Missing values are not supported");
+        }
+        m_currentModelWeight = ((DoubleValue)weightCell).getDoubleValue();
 
         int modelIndex =
                 table.getSpec().findColumnIndex(m_settings.modelColumn());
-        PortObjectCell model = (PortObjectCell)row.getCell(modelIndex);
-        return new PortObject[]{model.getPortObject()};
+        DataCell modelCell = row.getCell(modelIndex);
+        if (modelCell.isMissing()) {
+            throw new Exception("Missing values are not supported");
+        }
+        return new PortObject[]{((PortObjectValue)modelCell).getPortObject()};
     }
 
+    /* Returns the weight of the current model. */
     double getCurrentModelWeight() {
         return m_currentModelWeight;
     }

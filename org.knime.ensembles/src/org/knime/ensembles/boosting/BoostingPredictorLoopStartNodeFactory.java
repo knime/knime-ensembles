@@ -55,12 +55,12 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * This is the factory for the start node of the boosting predictor loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingPredictorLoopStartNodeFactory extends
         NodeFactory<BoostingPredictorLoopStartNodeModel> {
-
     /**
      * {@inheritDoc}
      */

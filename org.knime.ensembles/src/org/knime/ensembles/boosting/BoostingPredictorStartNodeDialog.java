@@ -69,6 +69,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.util.ColumnSelectionComboxBox;
 
 /**
+ * This is the dialog for the start node of a boosting predictor loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
@@ -76,13 +77,18 @@ public class BoostingPredictorStartNodeDialog extends NodeDialogPane {
     private final BoostingPredictorStartSettings m_settings =
             new BoostingPredictorStartSettings();
 
+    @SuppressWarnings("unchecked")
     private final ColumnSelectionComboxBox m_modelColumn =
             new ColumnSelectionComboxBox((Border)null, PortObjectValue.class);
 
+    @SuppressWarnings("unchecked")
     private final ColumnSelectionComboxBox m_weightColumn =
         new ColumnSelectionComboxBox((Border)null, DoubleValue.class);
 
 
+    /**
+     * Creates a new dialog.
+     */
     public BoostingPredictorStartNodeDialog() {
         JPanel p = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

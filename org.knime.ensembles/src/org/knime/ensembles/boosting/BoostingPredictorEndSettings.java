@@ -55,29 +55,57 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
 /**
+ * This class holds the settings for the end node of a boosting predictor loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingPredictorEndSettings {
     private String m_predictionColumn;
 
+    /**
+     * Returns the name of the column containing the predicted class values.
+     *
+     * @return a column name
+     */
     public String predictionColumn() {
         return m_predictionColumn;
     }
 
+    /**
+     * Sets the name of the column containing the predicted class values.
+     *
+     * @param colName a column name
+     */
     public void predictionColumn(final String colName) {
         m_predictionColumn = colName;
     }
 
-
-    public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+    /**
+     * Loads the settings from the given settings object.
+     *
+     * @param settings a settings object
+     * @throws InvalidSettingsException if some settings are missing
+     */
+    public void loadSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
         m_predictionColumn = settings.getString("predictionColumn");
     }
 
+    /**
+     * Loads the settings from the given settings object using default values
+     * for missing settings.
+     *
+     * @param settings a settings object
+     */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
         m_predictionColumn = settings.getString("predictionColumn", null);
     }
 
+    /**
+     * Saves the settings into the given settings object.
+     *
+     * @param settings a settings object
+     */
     public void saveSettings(final NodeSettingsWO settings) {
         settings.addString("predictionColumn", m_predictionColumn);
     }

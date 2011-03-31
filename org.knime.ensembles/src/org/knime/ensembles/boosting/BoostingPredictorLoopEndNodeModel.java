@@ -61,6 +61,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.container.SingleCellFactory;
@@ -78,6 +79,8 @@ import org.knime.core.node.workflow.LoopStartNode;
 import org.knime.core.node.workflow.LoopStartNodeTerminator;
 
 /**
+ * This is the model for the end node of a boosting predictor loop. It collects
+ * the prediction from all models and weighs them according to the model weight.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
@@ -89,6 +92,9 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
     private Map<RowKey, Map<DataCell, Double>> m_predictions =
             new HashMap<RowKey, Map<DataCell, Double>>();
 
+    /**
+     * Creates a new node model.
+     */
     public BoostingPredictorLoopEndNodeModel() {
         super(1, 1);
     }
@@ -100,8 +106,21 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
         if (m_settings.predictionColumn() == null) {
-            m_settings.predictionColumn(inSpecs[0].getColumnSpec(
-                    inSpecs[1].getNumColumns() - 1).getName());
+            for (int i = inSpecs[0].getNumColumns() - 1; i >= 0; i--) {
+                if (inSpecs[0].getColumnSpec(i).getType()
+                        .isCompatible(NominalValue.class)) {
+                    m_settings.predictionColumn(inSpecs[0].getColumnSpec(i)
+                            .getName());
+                    setWarningMessage("Auto-selected column '"
+                            + inSpecs[0].getColumnSpec(i).getName()
+                            + "' as prediction column");
+                    break;
+                }
+            }
+            if (m_settings.predictionColumn() == null) {
+                throw new InvalidSettingsException(
+                        "No column with nominal values in input table");
+            }
         }
         DataColumnSpec pSpec =
                 inSpecs[0].getColumnSpec(m_settings.predictionColumn());
@@ -110,10 +129,16 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
                     + m_settings.predictionColumn()
                     + "' does not exist in second input table");
         }
+        if (!pSpec.getType().isCompatible(NominalValue.class)) {
+            throw new InvalidSettingsException("Prediction column '"
+                    + m_settings.predictionColumn()
+                    + "' does not contain nominal values");
+        }
 
         ColumnRearranger crea = createRearranger(inSpecs[0]);
         return new DataTableSpec[]{crea.createSpec()};
     }
+
 
     private ColumnRearranger createRearranger(final DataTableSpec inSpec) {
         ColumnRearranger crea = new ColumnRearranger(inSpec);
@@ -131,7 +156,7 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
 
         String name =
                 DataTableSpec.getUniqueColumnName(inSpec,
-                        "Predition probability");
+                        "Prediction probability");
         DataColumnSpec cs =
                 new DataColumnSpecCreator(name, DoubleCell.TYPE).createSpec();
         SingleCellFactory probabilityFactory = new SingleCellFactory(cs) {
@@ -146,6 +171,7 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
         return crea;
     }
 
+    /* Return the probability for the selected class for this row. */
     private double probability(final DataRow row) {
         Map<DataCell, Double> map = m_predictions.get(row.getKey());
         if (map == null) {
@@ -164,6 +190,7 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
         return maxProb / sum;
     }
 
+    /* Return the predicted i.e. most likely class for this row. */
     private DataCell predict(final DataRow row) {
         Map<DataCell, Double> map = m_predictions.get(row.getKey());
         if (map == null) {
@@ -188,17 +215,17 @@ public class BoostingPredictorLoopEndNodeModel extends NodeModel implements
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        LoopStartNode loopStart = getLoopStartNode();
+        final LoopStartNode loopStart = getLoopStartNode();
         if (!(loopStart instanceof BoostingPredictorLoopStartNodeModel)) {
             throw new IllegalStateException(
                     "Loop start node is not a boosting predictor node");
         }
 
-        double modelWeight =
+        final double modelWeight =
                 ((BoostingPredictorLoopStartNodeModel)loopStart)
                         .getCurrentModelWeight();
 
-        int predictionIndex =
+        final int predictionIndex =
                 inData[0].getDataTableSpec().findColumnIndex(
                         m_settings.predictionColumn());
         ExecutionContext subExec;

@@ -10,11 +10,12 @@
     <fullDescription>
         <intro>
             Together with the corresponding loop start node a boosting loop can be constructed. It repeatedly trains
-            simple models
-            and weights them according to their classification error.
-            The algorithm used is AdaBoost.M1.
-            The loop is stopped either after the maximum number of iterations has been reached or the prediction error for a model
-            is greater than 0.5. 
+            simple models and weighs them according to their classification error.
+            The algorithm used is AdaBoost.SAMME,
+            i.e. is can also cope with multi-class problems.
+            The loop is stopped either after the maximum number of
+            iterations has been reached or the weight for a model is only slightly above 0 (meaning the prediction error
+            is too big).
         </intro>
         <option name="Real class column">The column from the second input table that contains the real class values for each row
         </option>
@@ -27,6 +28,6 @@
     <ports>
         <inPort index="0" name="Model">The trained model</inPort>
         <inPort index="1" name="Predicted data">The data with predicted classes and also the real class values</inPort>
-        <outPort index="0" name="Boosting model">The boosted model together with their weights in data table</outPort>
+        <outPort index="0" name="Boosting model">The boosted models together with their weights in data table</outPort>
     </ports>
 </knimeNode>

@@ -55,6 +55,7 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * This is the factory for the end node of boosting predictor loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */

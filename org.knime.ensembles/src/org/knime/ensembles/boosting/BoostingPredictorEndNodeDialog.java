@@ -59,7 +59,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataValue;
+import org.knime.core.data.NominalValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
@@ -68,6 +68,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.util.ColumnSelectionComboxBox;
 
 /**
+ * This is the dialog for the end of of a boosting predictor loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
@@ -75,11 +76,12 @@ public class BoostingPredictorEndNodeDialog extends NodeDialogPane {
     private final BoostingPredictorEndSettings m_settings =
             new BoostingPredictorEndSettings();
 
+    @SuppressWarnings("unchecked")
     private final ColumnSelectionComboxBox m_predictionColumn =
-            new ColumnSelectionComboxBox((Border)null, DataValue.class);
+            new ColumnSelectionComboxBox((Border)null, NominalValue.class);
 
     /**
-     *
+     * Creates a new dialog.
      */
     public BoostingPredictorEndNodeDialog() {
         JPanel p = new JPanel(new GridBagLayout());

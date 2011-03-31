@@ -55,6 +55,7 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * This class is the factory for the start node of a boosting learner loop.
  *
  * @author Thorsten Meinl, University of Konstanz
  */
