@@ -8,7 +8,13 @@
     </shortDescription>
     
     <fullDescription>
-        <intro></intro>
+        <intro>
+             Converts a single table cell into a model output. 
+        </intro>
+        <option name="Select the model column">
+             Select the column that contains the cell to be translated into
+             a model output.
+        </option>
     </fullDescription>
     
     <ports>
