@@ -19,83 +19,97 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 
+/**
+*
+* @author Iris Adae, University of Konstanz, Germany
+*/
 public class PMMLPortToCellNodeModel extends NodeModel {
 
+    private final SettingsModelString m_rowKeyModel =
+        PMMLPortToCellNodeDialog.createStringModel();
+
+    /**
+     * Creates a new model with a PMML input and a data output.
+     */
 	protected PMMLPortToCellNodeModel() {
 		super(	new PortType[] {new PortType(PMMLPortObject.class)},
 				new PortType[] {new PortType(BufferedDataTable.class)});
 	}
-	
+
+	/** {@inheritDoc} */
 	@Override
-	protected PortObject[] execute(PortObject[] inObjects, ExecutionContext exec)
+	protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
 			throws Exception {
 		PMMLPortObject in = (PMMLPortObject) inObjects[0];
 		PMMLValue value = in.getPMMLValue();
-		
+
 		DataCell cell = PMMLCellFactory.create(value.getDocument());
-		  
+
 		BufferedDataContainer out = exec.createDataContainer(createSpec());
-		out.addRowToTable(new DefaultRow("PMML Row", cell));
+		out.addRowToTable(new DefaultRow(m_rowKeyModel.getStringValue(), cell));
 		out.close();
 		return new PortObject[]{out.getTable()};
 	}
-	
+
 	private DataTableSpec createSpec(){
 		DataColumnSpecCreator colSpecCreator =
             new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
 		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
 		  return spec;
 	}
-	
+
+	/** {@inheritDoc} */
 	@Override
-	protected PortObjectSpec[] configure(PortObjectSpec[] inSpecs)
+	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
 			throws InvalidSettingsException {
 		return new PortObjectSpec[]{createSpec()};
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void loadInternals(File nodeInternDir, ExecutionMonitor exec)
+	protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
 			throws IOException, CanceledExecutionException {
 		// nothing to load
 
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void saveInternals(File nodeInternDir, ExecutionMonitor exec)
+	protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
 			throws IOException, CanceledExecutionException {
-		// TODO Auto-generated method stub
-
+	    // no op
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void saveSettingsTo(NodeSettingsWO settings) {
-		// TODO Auto-generated method stub
-
+	protected void saveSettingsTo(final NodeSettingsWO settings) {
+	    m_rowKeyModel.saveSettingsTo(settings);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void validateSettings(NodeSettingsRO settings)
+	protected void validateSettings(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
-		// TODO Auto-generated method stub
-
+	    m_rowKeyModel.validateSettings(settings);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void loadValidatedSettingsFrom(NodeSettingsRO settings)
+	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
 			throws InvalidSettingsException {
-		// TODO Auto-generated method stub
-
+	    m_rowKeyModel.loadSettingsFrom(settings);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	protected void reset() {
-		// TODO Auto-generated method stub
-
+	    // no op
 	}
 
 }

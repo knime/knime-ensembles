@@ -7,8 +7,12 @@
         Converts a model input into a single table cell.
     </shortDescription>
     
+    
     <fullDescription>
-        <intro></intro>
+        <intro>Converts a model input into a single table cell.</intro>
+        <option name="Row Identifier">Specify the row key (ID) used for the 
+          single row created by this node.
+        </option>
     </fullDescription>
     
     <ports>
