@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.xml.PMMLCell;
+import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -44,7 +44,8 @@ public class TableToPMMLNodeModel extends NodeModel {
 		 BufferedDataTable table = (BufferedDataTable) inObjects[0];
 	     Iterator<DataRow> it = table.iterator();
 	     int index = table.getSpec().findColumnIndex(m_column.getStringValue());
-	     PMMLCell model = (PMMLCell) it.next().getCell(index);
+	     
+	     PMMLValue model = (PMMLValue) it.next().getCell(index);
 	     Document doc = model.getDocument();
 
 	     PMMLPortObjectSpec spec = PMMLPortObject.parseSpec(doc);
