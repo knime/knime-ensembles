@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./default.png" type="Other">
-	<name>PMML Port to Row</name>
+	<name>PMML To Cell</name>
 	<shortDescription>Converts the PMML Port to a table containing the PMML cell.</shortDescription>
 	<fullDescription>
 		<intro>Converts the PMML Port to a table containing the PMML cell.</intro>
@@ -10,8 +10,8 @@
         </option>
 	</fullDescription>
 	<ports>
-		<inPort name="PMML Model" index="0">.</inPort>
-		<outPort name="Data Table" index="0">.</outPort>
+		<inPort name="PMML Model" index="0">PMML model</inPort>
+		<outPort name="Data Table" index="0">Table with PMML cell</outPort>
 	</ports>
 
 </knimeNode>
