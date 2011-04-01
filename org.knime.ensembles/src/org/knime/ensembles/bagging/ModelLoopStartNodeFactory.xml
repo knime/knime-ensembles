@@ -4,17 +4,18 @@
 	<name>Model Loop Start</name>
 	
 	<shortDescription>
-		Node at the start of a loop
+		Provides one model from the input table at a time to the output.
 	</shortDescription>
 	
 	<fullDescription>
 		<intro>
+		  Provides one model from the input table at a time to the output.  
 		</intro>
 		
 	</fullDescription>
 	
 	<ports>
-		<inPort index="0" name="Any port object">The input data, which can be a data table or any other arbitrary port object.</inPort>
-		<outPort index="0" name="Unaltered input">The unaltered input object</outPort>
+		<inPort index="0" name="Model Table">Table with Port Objects</inPort>
+		<outPort index="0" name="Port Object">A general Port Object</outPort>
 	</ports>
 </knimeNode>
