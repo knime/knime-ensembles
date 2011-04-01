@@ -8,4 +8,11 @@ Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.knime.base;bundle-version="2.4.0",
  org.knime.workbench.repository;bundle-version="2.4.0"
-Export-Package: org.knime.ensembles.modeltotable
+Export-Package: org.knime.ensembles.bagging,
+ org.knime.ensembles.boosting,
+ org.knime.ensembles.delegating,
+ org.knime.ensembles.modeltotable,
+ org.knime.ensembles.pmmlcollector,
+ org.knime.ensembles.pmmlporttocell,
+ org.knime.ensembles.tabletomodel,
+ org.knime.ensembles.tabletopmmlport
