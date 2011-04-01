@@ -117,6 +117,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
                     ((DelegatingLoopStartNodeModel)getLoopStartNode())
                                 .getInputSpec()};
         }
+        
         return new DataTableSpec[]{null};
     }
     
