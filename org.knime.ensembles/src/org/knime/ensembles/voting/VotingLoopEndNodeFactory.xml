@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./votingend.png" type="LoopEnd">
+	<name>Voting Loop End</name>
+	
+	<shortDescription>
+		Computes the most frequent value from a collection of winner columns.
+	</shortDescription>
+	
+	<fullDescription>
+		<intro>
+		  Computes the most frequent value from a collection of winner columns.
+		  Each column is provided at the time and appended to the resulting
+		  table.
+		</intro>
+		<option name="Select the winner column">
+		  Column(s) that are used to determine the most frequent value.
+		<option>
+		
+	</fullDescription>
+	
+	<ports>
+		<inPort index="0" name="Table with winner column">Table winner column is selected from</inPort>
+		<outPort index="0" name="Table with all winner columns">Table with all winner column plus the most frequent value</outPort>
+	</ports>
+</knimeNode>

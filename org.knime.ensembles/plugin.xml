@@ -103,6 +103,12 @@
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
       <node
+            category-path="/mining/ensembles"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.voting.VotingLoopEndNodeFactory"
+            id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
+      </node>
+      <node
             category-path="/"
             expert-flag="false"
             factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
