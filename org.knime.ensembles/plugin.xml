@@ -102,6 +102,12 @@
             factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
+      <node
+            category-path="/"
+            expert-flag="false"
+            factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
+            id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">
