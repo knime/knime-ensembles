@@ -18,7 +18,7 @@
 <config key="styles">
 <config key="style_0">
 <entry key="start" type="xint" value="0"/>
-<entry key="length" type="xint" value="84"/>
+<entry key="length" type="xint" value="85"/>
 <entry key="fontname" type="xstring" value="Tahoma"/>
 <entry key="fontstyle" type="xint" value="1"/>
 <entry key="fontsize" type="xint" value="10"/>
