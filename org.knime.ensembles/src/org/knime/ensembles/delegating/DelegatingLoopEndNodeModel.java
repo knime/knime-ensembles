@@ -111,14 +111,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        // same as the input to the StartNode
-        if (getLoopStartNode() != null) {
-            return new DataTableSpec[]{
-                    ((DelegatingLoopStartNodeModel)getLoopStartNode())
-                                .getInputSpec()};
-        }
         
-        return new DataTableSpec[]{null};
+        return new DataTableSpec[]{inSpecs[0]};
     }
     
 //    private void findColumnMapping(final DataTableSpec initial,
