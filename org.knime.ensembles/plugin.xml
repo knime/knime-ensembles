@@ -25,13 +25,13 @@
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/"
+            category-path="/manipulation/pmml"
             expert-flag="false"
             factory-class="org.knime.ensembles.pmmlporttocell.PMMLPortToCellNodeFactory"
             id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
       </node>
       <node
-            category-path="/"
+            category-path="/manipulation/pmml"
             expert-flag="false"
             factory-class="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory"
             id="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory">
@@ -97,7 +97,7 @@
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
       </node>
       <node
-            category-path="/"
+            category-path="/manipulation/pmml"
             expert-flag="false"
             factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
@@ -109,7 +109,7 @@
             id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/"
+            category-path="/manipulation/pmml"
             expert-flag="false"
             factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
             id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
