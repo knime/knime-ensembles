@@ -22,8 +22,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.port.pmml.PMMLModelType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
+import org.knime.core.pmml.PMMLModelType;
 import org.w3c.dom.Node;
 
 /**
@@ -31,9 +31,9 @@ import org.w3c.dom.Node;
 * @author Iris Adae, University of Konstanz, Germany
 */
 public class PMMLPredictorNodeModel extends NodeModel {
-	
 
-	   
+
+
 	   private static final int PMML_PORT = 0;
 //	   private static final int DATA_PORT = 1;
 
@@ -53,15 +53,15 @@ public class PMMLPredictorNodeModel extends NodeModel {
 			final ExecutionContext exec)
 			throws Exception {
 		    PMMLPortObject port = (PMMLPortObject) inObjects[PMML_PORT];
-		    
+
 		   Set<PMMLModelType> types =  port.getPMMLValue().getModelTypes();
 		   if(types.size() < 1){
 			   String msg = "No PMML Model found.";
 	            throw new RuntimeException(msg);
 		   }
-		   
+
 		   PMMLModelType type = types.iterator().next();
-			
+
 		   if(types.size() > 1){
 			   setWarningMessage("More models are found, the first one is used " +
 			   		" : " + type.toString());
@@ -72,7 +72,7 @@ public class PMMLPredictorNodeModel extends NodeModel {
 	        	  String msg = "No PMML Model found.";
 		            throw new RuntimeException(msg);
 	        }
-	        
+
 	        switch (type) {
 			case ClusteringModel :
 			{
@@ -98,12 +98,12 @@ public class PMMLPredictorNodeModel extends NodeModel {
 	        	return model.execute(inObjects, exec);
 	        }
 			case SupportVectorMachineModel :
-			{				
+			{
 				SVMPredictorNodeModel model
 	        				= new SVMPredictorNodeModel();
 	        	return model.execute(inObjects, exec);
 	        }
-			case NeuralNetwork : 
+			case NeuralNetwork :
 			{
 				MLPPredictorNodeModel model
 							= new MLPPredictorNodeModel();
@@ -117,7 +117,7 @@ public class PMMLPredictorNodeModel extends NodeModel {
 			}
 	}
 
-	
+
 
 	/** {@inheritDoc} */
 	@Override
