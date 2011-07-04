@@ -12,7 +12,7 @@
       <category
             icon="icons/missing.gif"
             level-id="ensembles-util"
-            name="Utility"
+            name="Utility Nodes"
             path="/mining/ensembles">
       </category>
    </extension>
@@ -94,7 +94,7 @@
       <PersistedMetaNode
             category-path="/mining/ensembles"
             description="Boosting Learner"
-            icon="default.png"
+            icon="icons/baggingloopstart.png"
             id="org.knime.ensembles.boosting_learner"
             name="Boosting Learner"
             workflowDir="metanode_templates/Boosting Learner/">
@@ -102,10 +102,26 @@
       <PersistedMetaNode
             category-path="/mining/ensembles"
             description="Boosting Predictor"
-            icon="default.png"
+            icon="icons/baggingloopend.png"
             id="org.knime.ensembles.boosting_predictor"
             name="Boosting Predictor"
             workflowDir="metanode_templates/Boosting Predictor/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            category-path="/mining/ensembles"
+            description="Delegation"
+            icon="default.png"
+            id="org.knime.ensembles.delegated_learning"
+            name="Delegation"
+            workflowDir="metanode_templates/Delegation/">
+      </PersistedMetaNode>
+      <PersistedMetaNode
+            category-path="/mining/ensembles"
+            description="Bagging"
+            icon="default.png"
+            id="org.knime.ensembles.bagging"
+            name="Bagging"
+            workflowDir="metanode_templates/Bagging/">
       </PersistedMetaNode>
    </extension>
 </plugin>

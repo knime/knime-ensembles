@@ -14,6 +14,8 @@
         
         E.g. Port 0 is collecting the PMML cells. Port 1 contains the false predicted data points.
         </intro>
+        <option name="Maximal number of iterations">The loop will stop after these number of iterations, to ensure no endless loop is created.</option>
+        <option name="Minimal number of rows">The minimal number of rows passed back to the loop start. If the input contains less rows, the loop ends.</option>
     </fullDescription>
     
     <ports>

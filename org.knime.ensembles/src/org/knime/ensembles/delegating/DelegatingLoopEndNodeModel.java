@@ -17,6 +17,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.workflow.LoopEndNode;
 
 /**
@@ -39,7 +40,13 @@ public class DelegatingLoopEndNodeModel extends NodeModel
      */
 
     private BufferedDataTable m_inData;
-    private int m_count = 0;
+    private int m_iterationnr = 0;
+    
+    private SettingsModelIntegerBounded m_maxIterations
+            = DelegatingLoopEndNodeDialog.createIterationsModel();
+    private SettingsModelIntegerBounded m_minNumberOfRows
+            = DelegatingLoopEndNodeDialog.createNumOfRowsModel();
+    
 
     /**
      * Constructor for the node model.
@@ -67,8 +74,10 @@ public class DelegatingLoopEndNodeModel extends NodeModel
 
         BufferedDataContainer loopData = exec.createDataContainer(
                 inData[resultingIn].getDataTableSpec());
+
+
         for (DataRow row : inData[resultingIn]) {
-            loopData.addRowToTable(row);
+            loopData.addRowToTable(createNewRow(row));
         }
         loopData.close();
         m_inData  = loopData.getTable();
@@ -76,19 +85,22 @@ public class DelegatingLoopEndNodeModel extends NodeModel
         for (DataRow row : inData[collectingIn]) {
             m_outcontainer.addRowToTable(createNewRow(row));
         }
-        // stop loop if there is  no more data
-        if (m_inData.getRowCount() < 1) {
+
+        m_iterationnr++;
+        // stop loop if there are less rows than needed.
+        // or the max number of iterations is reached
+        if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
+                   || m_iterationnr >= m_maxIterations.getIntValue()) {
             m_outcontainer.close();
             return new BufferedDataTable[]{m_outcontainer.getTable()};
         }
         // else go on with loop
-        m_count++;
         super.continueLoop();
         return new BufferedDataTable[]{null};
     }
 
     private DataRow createNewRow(final DataRow row) {
-        RowKey newKey = new RowKey(row.getKey() + "#" + m_count);
+        RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
         DataCell[] cells = new DataCell[row.getNumCells()];
         for (int i = 0; i < row.getNumCells(); i++) {
             cells[i] = row.getCell(i);
@@ -101,7 +113,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
      */
     @Override
     protected void reset() {
-        m_count = 0;
+        m_iterationnr = 0;
         m_outcontainer = null;
     }
 
@@ -111,7 +123,6 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-
         return new DataTableSpec[]{inSpecs[0]};
     }
 
@@ -121,7 +132,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // nothing to save
+        m_maxIterations.saveSettingsTo(settings);
+        m_minNumberOfRows.saveSettingsTo(settings);
     }
 
     /**
@@ -130,7 +142,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // nothing to load
+        m_maxIterations.loadSettingsFrom(settings);
+        m_minNumberOfRows.loadSettingsFrom(settings);
     }
 
     /**
@@ -139,7 +152,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // nothing to validate
+        m_maxIterations.validateSettings(settings);
+        m_minNumberOfRows.validateSettings(settings);
     }
 
     /**

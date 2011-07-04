@@ -67,22 +67,44 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
             throw new IllegalStateException(
                     "Unexpected loop start node implementation");
         }
+
+        DataTableSpec inSpec = inData[0].getSpec();
+        final int firstClass = inSpec.findColumnIndex(
+                m_winner.getStringValue());
+
         // first: filter input data
-        ColumnRearranger cr = new ColumnRearranger(inData[0].getSpec());
+        ColumnRearranger cr = new ColumnRearranger(inSpec);
         String winner = m_winner.getStringValue();
-        cr.keepOnly(winner);
+        if (m_currentOutTable != null) {
+            cr.keepOnly(winner);
+        }
         BufferedDataTable data = exec.createColumnRearrangeTable(
                 inData[0], cr, exec);
         DataTableSpec spec = data.getDataTableSpec();
         // one input column needs to be handled some other time
-        DataColumnSpec winnerSpec = spec.getColumnSpec(0);
+        DataColumnSpec winnerSpec = spec.getColumnSpec(winner);
         DataColumnSpecCreator firstColCreator = new DataColumnSpecCreator(
                 winnerSpec);
         String columnName = winner + "#" + (m_iteration++);
         firstColCreator.setName(columnName);
         DataColumnSpec copyColSpecs = firstColCreator.createSpec();
-        BufferedDataContainer cont 
-                = exec.createDataContainer(new DataTableSpec(copyColSpecs));
+        final DataTableSpec newSpec;
+        if (m_currentOutTable == null) {
+            DataColumnSpec[] cspecs = new DataColumnSpec[spec.getNumColumns()];
+            for (int i = 0; i < cspecs.length; i++) {
+                DataColumnSpec cspec = spec.getColumnSpec(i);
+                if (cspec == winnerSpec) {
+                    cspecs[i] = copyColSpecs;
+                } else {
+                    cspecs[i] = cspec;
+                }
+            }
+            newSpec = new DataTableSpec(cspecs);
+        } else {
+            newSpec = new DataTableSpec(copyColSpecs);
+        }
+        BufferedDataContainer cont
+                = exec.createDataContainer(newSpec);
         ExecutionMonitor sub = exec.createSubProgress(2 / 3.0);
         int count = 0;
         exec.setMessage("Copying input data");
@@ -115,7 +137,8 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                 public DataCell getCell(final DataRow row) {
                     final HashMap<DataCell, AtomicInteger> map =
                         new HashMap<DataCell, AtomicInteger>();
-                    for (DataCell cell : row) {
+                    for (int r = firstClass; r < row.getNumCells(); r++) {
+                        final DataCell cell = row.getCell(firstClass);
                         if (map.containsKey(cell)) {
                             map.get(cell).incrementAndGet();
                         } else {
@@ -133,7 +156,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                                   @Override
                                   public int compare(
                                           final Map.Entry
-                                          <DataCell, AtomicInteger> o1, 
+                                          <DataCell, AtomicInteger> o1,
                                           final Map.Entry
                                           <DataCell, AtomicInteger> o2) {
                                       return o2.getValue().get()

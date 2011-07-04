@@ -44,7 +44,7 @@ public class DelegatingLoopEndNodeFactory
      */
     @Override
     public boolean hasDialog() {
-        return false;
+        return true;
     }
 
     /**
@@ -52,7 +52,7 @@ public class DelegatingLoopEndNodeFactory
      */
     @Override
     public NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new DelegatingLoopEndNodeDialog();
     }
 
 }
