@@ -109,11 +109,11 @@
       </PersistedMetaNode>
       <PersistedMetaNode
             category-path="/mining/ensembles"
-            description="Delegation"
+            description="Delegating"
             icon="default.png"
             id="org.knime.ensembles.delegated_learning"
-            name="Delegation"
-            workflowDir="metanode_templates/Delegation/">
+            name="Delegating"
+            workflowDir="metanode_templates/Delegating/">
       </PersistedMetaNode>
       <PersistedMetaNode
             category-path="/mining/ensembles"
