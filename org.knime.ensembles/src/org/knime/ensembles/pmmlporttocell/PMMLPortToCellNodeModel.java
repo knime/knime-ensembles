@@ -37,79 +37,84 @@ public class PMMLPortToCellNodeModel extends NodeModel {
     /**
      * Creates a new model with a PMML input and a data output.
      */
-	protected PMMLPortToCellNodeModel() {
-		super(	new PortType[] {new PortType(PMMLPortObject.class)},
-				new PortType[] {new PortType(BufferedDataTable.class)});
-	}
+    protected PMMLPortToCellNodeModel() {
+        super(new PortType[] {new PortType(PMMLPortObject.class)},
+              new PortType[] {new PortType(BufferedDataTable.class)});
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec)
-			throws Exception {
-		PMMLPortObject in = (PMMLPortObject) inObjects[0];
-		PMMLValue value = in.getPMMLValue();
+    /** {@inheritDoc} */
+    @Override
+    protected PortObject[] execute(final PortObject[] inObjects,
+            final ExecutionContext exec)
+            throws Exception {
+        PMMLPortObject in = (PMMLPortObject) inObjects[0];
+        PMMLValue value = in.getPMMLValue();
 
-		DataCell cell = PMMLCellFactory.create(value.getDocument());
+        DataCell cell = PMMLCellFactory.create(value.getDocument());
 
-		BufferedDataContainer out = exec.createDataContainer(createSpec());
-		out.addRowToTable(new DefaultRow(m_rowKeyModel.getStringValue(), cell));
-		out.close();
-		return new PortObject[]{out.getTable()};
-	}
+        BufferedDataContainer out 
+                        = exec.createDataContainer(createSpec());
+        out.addRowToTable(new DefaultRow(
+                            m_rowKeyModel.getStringValue(), cell));
+        out.close();
+        return new PortObject[]{out.getTable()};
+    }
 
-	private DataTableSpec createSpec(){
-		DataColumnSpecCreator colSpecCreator =
+    private DataTableSpec createSpec() {
+        DataColumnSpecCreator colSpecCreator =
             new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
-		  DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
-		  return spec;
-	}
+        DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
+        return spec;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
-			throws InvalidSettingsException {
-		return new PortObjectSpec[]{createSpec()};
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
+            throws InvalidSettingsException {
+        return new PortObjectSpec[]{createSpec()};
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
-		// nothing to load
+    /** {@inheritDoc} */
+    @Override
+    protected void loadInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // nothing to load
 
-	}
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
-			throws IOException, CanceledExecutionException {
-	    // no op
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected void saveInternals(final File nodeInternDir, 
+            final ExecutionMonitor exec)
+            throws IOException, CanceledExecutionException {
+        // no op
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void saveSettingsTo(final NodeSettingsWO settings) {
-	    m_rowKeyModel.saveSettingsTo(settings);
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_rowKeyModel.saveSettingsTo(settings);
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void validateSettings(final NodeSettingsRO settings)
-			throws InvalidSettingsException {
-	    m_rowKeyModel.validateSettings(settings);
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_rowKeyModel.validateSettings(settings);
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-			throws InvalidSettingsException {
-	    m_rowKeyModel.loadSettingsFrom(settings);
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        m_rowKeyModel.loadSettingsFrom(settings);
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	protected void reset() {
-	    // no op
-	}
+    /** {@inheritDoc} */
+    @Override
+    protected void reset() {
+        // no op
+    }
 
 }

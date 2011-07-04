@@ -120,7 +120,7 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
      */
     public BoostingLearnerLoopEndNodeModel() {
         super(new PortType[]{new PortType(PortObject.class),
-                BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
+           BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**
@@ -189,7 +189,8 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
             }
             if (m_settings.predictionColumn() == null) {
                 throw new InvalidSettingsException(
-                        "No suitable prediction column with nominal values in input table");
+                        "No suitable prediction column with nominal values " 
+                              + "in input table");
             }
         }
         DataColumnSpec pSpec =

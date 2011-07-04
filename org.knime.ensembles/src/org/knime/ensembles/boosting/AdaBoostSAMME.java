@@ -1,4 +1,4 @@
-/*
+/* 
  * ------------------------------------------------------------------------
  *
  *  Copyright (C) 2003 - 2011
@@ -122,7 +122,8 @@ public class AdaBoostSAMME implements BoostingStrategy {
             final ExecutionMonitor exec) throws CanceledExecutionException {
         if (table.getRowCount() != m_weights.length) {
             throw new IllegalStateException(
-                    "Current table does not have the same number of rows as the previous table");
+                    "Current table does not have the same number " 
+                   + "of rows as the previous table");
         }
 
         int count = 0;

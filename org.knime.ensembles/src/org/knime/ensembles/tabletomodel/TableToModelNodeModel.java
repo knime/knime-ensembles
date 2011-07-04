@@ -22,7 +22,7 @@ import org.knime.core.node.port.PortType;
 
 /**
  * This is the model implementation of a node model that wraps arbitrary
- * models into a table with one column
+ * models into a table with one column.
  *
  * @author Sebastian Peter, University of Konstanz, Germany
  */

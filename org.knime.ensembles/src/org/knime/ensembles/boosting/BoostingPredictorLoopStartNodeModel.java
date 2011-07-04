@@ -142,7 +142,8 @@ public class BoostingPredictorLoopStartNodeModel extends NodeModel implements
             }
             if (m_settings.weightColumn() == null) {
                 throw new InvalidSettingsException(
-                        "No double column for model weights found in first input table");
+                        "No double column for model weights "
+                        + "found in first input table");
             }
         }
         DataColumnSpec wSpec = inSpec.getColumnSpec(m_settings.weightColumn());
@@ -189,7 +190,7 @@ public class BoostingPredictorLoopStartNodeModel extends NodeModel implements
         return new PortObject[]{((PortObjectValue)modelCell).getPortObject()};
     }
 
-    /* Returns the weight of the current model. */
+    /** @return the weight of the current model. */
     double getCurrentModelWeight() {
         return m_currentModelWeight;
     }

@@ -2,7 +2,7 @@
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./pmmlpredict.png" type="Predictor">
 	<name>PMML Predictor</name>
-	<shortDescription>Can predict the data using the PMML obect.</shortDescription>
+	<shortDescription>Can predict the data using the PMML object.</shortDescription>
 	<fullDescription>
 		<intro>Can predict the following PMML models:
 		    ClusteringModel,

@@ -54,13 +54,14 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
- * This class is the dialog for the Table To Model node
+ * This class is the dialog for the Table To Model node.
  *
  * @author Thomas Gabriel, KNIME.com GmbH, Zurich
  */
 public class TableToModelNodeDialog extends DefaultNodeSettingsPane {
 
     /** Creates a new dialog. */
+    @SuppressWarnings("unchecked")
     public TableToModelNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 createColumnModel(), "Select the model column", 0,

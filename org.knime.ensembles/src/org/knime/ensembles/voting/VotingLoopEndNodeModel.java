@@ -38,12 +38,12 @@ import org.knime.core.node.workflow.LoopStartNodeTerminator;
  */
 public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
 
-	private BufferedDataTable m_currentOutTable;
+    private BufferedDataTable m_currentOutTable;
 
-	private int m_iteration = 0;
+    private int m_iteration = 0;
 
-	private final SettingsModelString m_winner
-	    = VotingLoopEndNodeDialog.createColumnModel();
+    private final SettingsModelString m_winner
+        = VotingLoopEndNodeDialog.createColumnModel();
 
     /**
      * Constructor for the node model.
@@ -58,55 +58,58 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-    	boolean isToContinueLoop;
-    	LoopStartNode startNode = getLoopStartNode();
+        boolean isToContinueLoop;
+        LoopStartNode startNode = getLoopStartNode();
         if (startNode instanceof LoopStartNodeTerminator) {
-            isToContinueLoop = !((LoopStartNodeTerminator)startNode).terminateLoop();
+            isToContinueLoop = !((LoopStartNodeTerminator)startNode)
+                        .terminateLoop();
         } else {
-            throw new IllegalStateException("Unexpected loop start node implementation");
+            throw new IllegalStateException(
+                    "Unexpected loop start node implementation");
         }
-    	// first: filter input data
+        // first: filter input data
         ColumnRearranger cr = new ColumnRearranger(inData[0].getSpec());
         String winner = m_winner.getStringValue();
         cr.keepOnly(winner);
         BufferedDataTable data = exec.createColumnRearrangeTable(
                 inData[0], cr, exec);
-    	DataTableSpec spec = data.getDataTableSpec();
-    	// one input column needs to be handled some other time
-    	DataColumnSpec winnerSpec = spec.getColumnSpec(0);
-    	DataColumnSpecCreator firstColCreator = new DataColumnSpecCreator(
-    	        winnerSpec);
-    	String columnName = winner + "#" + (m_iteration++);
-    	firstColCreator.setName(columnName);
-    	DataColumnSpec copyColSpecs = firstColCreator.createSpec();
-    	BufferedDataContainer cont = exec.createDataContainer(new DataTableSpec(copyColSpecs));
-    	ExecutionMonitor sub = exec.createSubProgress(2 / 3.0);
-    	int count = 0;
-    	exec.setMessage("Copying input data");
-    	for (DataRow r : data) {
-    		cont.addRowToTable(r);
-    		sub.checkCanceled();
-    		sub.setProgress(count / (double) data.getRowCount(),
-    				"Row " + count);
-    		count++;
-    	}
-    	cont.close();
-    	BufferedDataTable inCopy = cont.getTable();
-    	if (m_currentOutTable == null) {
-    		m_currentOutTable = inCopy;
-    	} else {
-    		exec.setMessage("Generating output table");
-    		sub = exec.createSubProgress(1 / 3.0);
-    		m_currentOutTable = exec.createJoinedTable(
-    				m_currentOutTable, inCopy, sub);
-    	}
-    	if (isToContinueLoop) {
-    		super.continueLoop();
-    		return new BufferedDataTable[]{null};
-    	} else {
-    	    ColumnRearranger cr2 = new ColumnRearranger(
-    	            m_currentOutTable.getSpec());
-    	    cr2.append(new SingleCellFactory(winnerSpec) {
+        DataTableSpec spec = data.getDataTableSpec();
+        // one input column needs to be handled some other time
+        DataColumnSpec winnerSpec = spec.getColumnSpec(0);
+        DataColumnSpecCreator firstColCreator = new DataColumnSpecCreator(
+                winnerSpec);
+        String columnName = winner + "#" + (m_iteration++);
+        firstColCreator.setName(columnName);
+        DataColumnSpec copyColSpecs = firstColCreator.createSpec();
+        BufferedDataContainer cont 
+                = exec.createDataContainer(new DataTableSpec(copyColSpecs));
+        ExecutionMonitor sub = exec.createSubProgress(2 / 3.0);
+        int count = 0;
+        exec.setMessage("Copying input data");
+        for (DataRow r : data) {
+            cont.addRowToTable(r);
+            sub.checkCanceled();
+            sub.setProgress(count / (double) data.getRowCount(),
+                    "Row " + count);
+            count++;
+        }
+        cont.close();
+        BufferedDataTable inCopy = cont.getTable();
+        if (m_currentOutTable == null) {
+            m_currentOutTable = inCopy;
+        } else {
+            exec.setMessage("Generating output table");
+            sub = exec.createSubProgress(1 / 3.0);
+            m_currentOutTable = exec.createJoinedTable(
+                    m_currentOutTable, inCopy, sub);
+        }
+        if (isToContinueLoop) {
+            super.continueLoop();
+            return new BufferedDataTable[]{null};
+        } else {
+            ColumnRearranger cr2 = new ColumnRearranger(
+                    m_currentOutTable.getSpec());
+            cr2.append(new SingleCellFactory(winnerSpec) {
                 /** {@inheritDoc} */
                 @Override
                 public DataCell getCell(final DataRow row) {
@@ -124,11 +127,17 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                     } else {
                         TreeSet<Map.Entry<DataCell, AtomicInteger>> set
                             = new TreeSet<Map.Entry<DataCell, AtomicInteger>>(
-                                  new Comparator<Map.Entry<DataCell, AtomicInteger>>() {
+                                  new Comparator
+                                  <Map.Entry<DataCell, AtomicInteger>>() {
                                   /** {@inheritDoc} */
                                   @Override
-                                  public int compare(final Map.Entry<DataCell, AtomicInteger> o1, final Map.Entry<DataCell, AtomicInteger> o2) {
-                                      return o2.getValue().get() - o1.getValue().get();
+                                  public int compare(
+                                          final Map.Entry
+                                          <DataCell, AtomicInteger> o1, 
+                                          final Map.Entry
+                                          <DataCell, AtomicInteger> o2) {
+                                      return o2.getValue().get()
+                                                  - o1.getValue().get();
                                   }
                       });
                       set.addAll(map.entrySet());
@@ -136,10 +145,10 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                     }
                 }
             });
-    	    BufferedDataTable out = exec.createColumnRearrangeTable(
-    	            m_currentOutTable, cr2, exec);
-    		return new BufferedDataTable[]{out};
-    	}
+            BufferedDataTable out = exec.createColumnRearrangeTable(
+                    m_currentOutTable, cr2, exec);
+            return new BufferedDataTable[]{out};
+        }
     }
 
     /**
@@ -147,8 +156,8 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
      */
     @Override
     protected void reset() {
-    	m_currentOutTable = null;
-    	m_iteration = 0;
+        m_currentOutTable = null;
+        m_iteration = 0;
     }
 
     /**
@@ -159,7 +168,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
             throws InvalidSettingsException {
         if (!inSpecs[0].containsName(m_winner.getStringValue())) {
             throw new InvalidSettingsException(
-            		"Winner column not selected");
+                    "Winner column not selected");
         }
         return new DataTableSpec[]{null};
     }

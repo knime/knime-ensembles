@@ -11,106 +11,80 @@
       </category>
       <category
             icon="icons/missing.gif"
-            level-id="boosting"
-            name="Boosting"
-            path="/mining/ensembles">
-      </category>
-      <category
-            icon="icons/missing.gif"
-            level-id="bagging"
-            name="Bagging"
+            level-id="ensembles-util"
+            name="Utility"
             path="/mining/ensembles">
       </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/manipulation/pmml"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.pmmlporttocell.PMMLPortToCellNodeFactory"
             id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
       </node>
       <node
-            category-path="/manipulation/pmml"
-            expert-flag="false"
-            factory-class="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory"
-            id="org.knime.ensembles.pmmlcollector.PMMLCollectorNodeFactory">
-      </node>
-      <node
-            category-path="/mining/ensembles"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.modeltotable.ModelToTableNodeFactory"
             id="org.knime.ensembles.modeltotable.ModelToTableNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.tabletomodel.TableToModelNodeFactory"
             id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory"
             id="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory"
             id="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/boosting"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/bagging"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.bagging.ModelLoopStartNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/bagging"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.bagging.ModelLoopEndNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
       </node>
       <node
-            category-path="/manipulation/pmml"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.voting.VotingLoopEndNodeFactory"
             id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/manipulation/pmml"
-            expert-flag="false"
+            category-path="/mining/ensembles/ensembles-util"
             factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
             id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
       </node>
@@ -118,18 +92,16 @@
    <extension
          point="org.knime.workbench.repository.metanode">
       <PersistedMetaNode
-            category-path="/meta"
+            category-path="/mining/ensembles"
             description="Boosting Learner"
-            expert-flag="false"
             icon="default.png"
             id="org.knime.ensembles.boosting_learner"
             name="Boosting Learner"
             workflowDir="metanode_templates/Boosting Learner/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/meta"
+            category-path="/mining/ensembles"
             description="Boosting Predictor"
-            expert-flag="false"
             icon="default.png"
             id="org.knime.ensembles.boosting_predictor"
             name="Boosting Predictor"

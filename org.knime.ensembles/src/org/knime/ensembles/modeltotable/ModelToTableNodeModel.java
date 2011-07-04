@@ -25,13 +25,13 @@ import org.knime.core.node.port.PortType;
 
 /**
  * This is the model implementation of a node model that wraps arbitrary
- * models into a table with one column
+ * models into a table with one column.
  *
  * @author Sebastian Peter, University of Konstanz, Germany
  */
 public class ModelToTableNodeModel extends NodeModel {
 
-    private final static DataColumnSpec SPEC = new DataColumnSpecCreator(
+    private static final DataColumnSpec SPEC = new DataColumnSpecCreator(
             "PortObject", PortObjectCell.TYPE).createSpec();
 
     private final SettingsModelString m_rowKeyModel =

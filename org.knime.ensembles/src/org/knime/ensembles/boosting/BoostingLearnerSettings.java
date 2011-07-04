@@ -60,7 +60,7 @@ import org.knime.core.node.NodeSettingsWO;
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingLearnerSettings {
-    private int m_maxIterations = 100;
+    private int m_maxIterations = 100; 
 
     private String m_classColumn;
 

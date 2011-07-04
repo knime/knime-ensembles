@@ -1,5 +1,8 @@
-/*
- * ------------------------------------------------------------------------
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+========================================================================
  *
  *  Copyright (C) 2003 - 2011
  *  University of Konstanz, Germany and
@@ -43,37 +46,10 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * -------------------------------------------------------------------
- *
- */
-package org.knime.ensembles.bagging;
-
-import org.knime.core.data.model.PortObjectValue;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelString;
-
-/**
- * This class is the dialog for the looper model start node.
- *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich 
- */
-public class ModelLoopStartNodeDialog extends DefaultNodeSettingsPane {
-
-    /**
-     * Creates a new dialog for the looper node.
-     */
-    @SuppressWarnings("unchecked")
-    public ModelLoopStartNodeDialog() {
-        addDialogComponent(new DialogComponentColumnNameSelection(
-                createColumnModel(), "Select the model column", 0,
-                PortObjectValue.class));
-    }
-
-    /** @return settings model for the port object column selection
-     */
-    static final SettingsModelString createColumnModel() {
-        return new SettingsModelString("model-column", null);
-    }
-
-}
+====================================================================
+-->
+</head>
+<body>
+	Contains classes for the  bagging nodes (loop end and start).
+</body>
+</html>

@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="./" type="LoopStart">
+<knimeNode icon="./delegateloopstart.png" type="LoopStart">
     <name>Delegating Loop Start</name>
     
     <shortDescription>
+    This is the loop start for performing delegating, a version of meta learning.
     </shortDescription>
     
     <fullDescription>
-        <intro> </intro>
+        <intro> The idea of delegating is to built a new model only for data points
+        being incorrect classified/predicted by the model. 
+        Hence, a collection of models is achieved. 
+        
+        The loop start therefore is initialized with the whole data.
+        The loop end node receives only wrong classified data in each iteration.
+        This will be passed back to the loop start, which outputs the data again, until
+        no more data points are inserted to the loop end.
+        
+        </intro>
         
         
     </fullDescription>
     
     <ports>
-        <inPort index="0" name="Initialisation table">.</inPort>
-        <outPort index="0" name="Learning Table">. </outPort>
+        <inPort index="0" name="Initialisation table">The data table.</inPort>
+        <outPort index="0" name="Learning Table">The data passed to the loop end. </outPort>
     </ports>   
 </knimeNode>

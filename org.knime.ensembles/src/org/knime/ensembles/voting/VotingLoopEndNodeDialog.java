@@ -63,6 +63,7 @@ public class VotingLoopEndNodeDialog extends DefaultNodeSettingsPane {
     /**
      * Creates a new dialog for the looper node.
      */
+    @SuppressWarnings("unchecked")
     public VotingLoopEndNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
            createColumnModel(), "Select the winner column", 0,

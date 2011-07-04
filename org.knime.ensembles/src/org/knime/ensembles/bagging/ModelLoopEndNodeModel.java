@@ -80,7 +80,7 @@ import org.knime.core.node.workflow.LoopStartNodeTerminator;
 public class ModelLoopEndNodeModel extends NodeModel
         implements LoopEndNode {
 
-    private final static DataColumnSpec SPEC = new DataColumnSpecCreator(
+    private static final DataColumnSpec SPEC = new DataColumnSpecCreator(
             "PortObject", PortObjectCell.TYPE).createSpec();
 
     private BufferedDataContainer m_container;

@@ -83,7 +83,8 @@ public class BoostingLearnerLoopEndNodeFactory extends
      */
     @Override
     public NodeView<BoostingLearnerLoopEndNodeModel> createNodeView(
-            final int viewIndex, final BoostingLearnerLoopEndNodeModel nodeModel) {
+            final int viewIndex, 
+            final BoostingLearnerLoopEndNodeModel nodeModel) {
         return null;
     }
 

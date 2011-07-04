@@ -20,7 +20,7 @@ import org.knime.core.node.workflow.LoopStartNode;
  * @author Iris Adae, University of Konstanz, Germany
  */
 public class DelegatingLoopStartNodeModel extends NodeModel
-		implements LoopStartNode{
+        implements LoopStartNode {
  
     private int m_currentiteration;
 
@@ -39,21 +39,20 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-    	
+        
         m_currentiteration++;
 
         m_inSpec = inData[0].getDataTableSpec();
 
         if (m_currentiteration == 1) {
             // just output the complete data table.
-        	 return new BufferedDataTable[]{inData[0]};
+             return new BufferedDataTable[]{inData[0]};
         } 
 
         //otherwise we get the data from the loop end node
         DelegatingLoopEndNodeModel end =
                     (DelegatingLoopEndNodeModel)getLoopEndNode();
         BufferedDataTable fromend = end.getInData();
-        System.out.println(fromend.getRowCount());
 
         return new BufferedDataTable[]{fromend};
     }

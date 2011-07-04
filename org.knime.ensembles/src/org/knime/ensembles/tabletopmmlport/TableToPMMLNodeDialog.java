@@ -1,4 +1,4 @@
-/*
+/* 
  * ------------------------------------------------------------------------
  *
  *  Copyright (C) 2003 - 2011
@@ -54,7 +54,7 @@ import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelectio
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
- * This class is the dialog for the Table To Model node
+ * This class is the dialog for the Table To Model node.
  *
  * @author Iris Adae, University of Konstanz, Germany
  */
@@ -62,7 +62,7 @@ public class TableToPMMLNodeDialog extends DefaultNodeSettingsPane {
 
     /** Creates a new dialog. */
     @SuppressWarnings("unchecked")
-	public TableToPMMLNodeDialog() {
+    public TableToPMMLNodeDialog() {
         addDialogComponent(new DialogComponentColumnNameSelection(
                 createColumnModel(), "Select the model column", 0,
                 PMMLValue.class));
