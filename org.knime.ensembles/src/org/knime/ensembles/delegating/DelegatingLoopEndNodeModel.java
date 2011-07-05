@@ -77,13 +77,14 @@ public class DelegatingLoopEndNodeModel extends NodeModel
 
 
         for (DataRow row : inData[resultingIn]) {
-            loopData.addRowToTable(createNewRow(row));
+            loopData.addRowToTable(createNewRow(row, row.getKey()));
         }
         loopData.close();
         m_inData  = loopData.getTable();
 
         for (DataRow row : inData[collectingIn]) {
-            m_outcontainer.addRowToTable(createNewRow(row));
+            RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
+            m_outcontainer.addRowToTable(createNewRow(row, newKey));
         }
 
         m_iterationnr++;
@@ -99,8 +100,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
         return new BufferedDataTable[]{null};
     }
 
-    private DataRow createNewRow(final DataRow row) {
-        RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
+    private DataRow createNewRow(final DataRow row, final RowKey newKey) {
         DataCell[] cells = new DataCell[row.getNumCells()];
         for (int i = 0; i < row.getNumCells(); i++) {
             cells[i] = row.getCell(i);
