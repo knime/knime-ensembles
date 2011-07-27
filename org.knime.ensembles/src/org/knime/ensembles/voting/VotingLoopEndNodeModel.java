@@ -2,10 +2,8 @@ package org.knime.ensembles.voting;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.knime.core.data.DataCell;
@@ -25,6 +23,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.workflow.LoopEndNode;
 import org.knime.core.node.workflow.LoopStartNode;
@@ -45,9 +44,10 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     private final SettingsModelString m_winner
         = VotingLoopEndNodeDialog.createColumnModel();
 
-    /**
-     * Constructor for the node model.
-     */
+    private final SettingsModelBoolean m_removedWinners
+        = VotingLoopEndNodeDialog.createRemoveWinnersModel();
+
+    /** Constructor for the node model. */
     protected VotingLoopEndNodeModel() {
         super(1, 1);
     }
@@ -68,16 +68,11 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                     "Unexpected loop start node implementation");
         }
 
-        DataTableSpec inSpec = inData[0].getSpec();
-        final int firstClass = inSpec.findColumnIndex(
-                m_winner.getStringValue());
-
         // first: filter input data
+        DataTableSpec inSpec = inData[0].getSpec();
         ColumnRearranger cr = new ColumnRearranger(inSpec);
         String winner = m_winner.getStringValue();
-        if (m_currentOutTable != null) {
-            cr.keepOnly(winner);
-        }
+        cr.keepOnly(winner);
         BufferedDataTable data = exec.createColumnRearrangeTable(
                 inData[0], cr, exec);
         DataTableSpec spec = data.getDataTableSpec();
@@ -88,21 +83,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
         String columnName = winner + "#" + (m_iteration++);
         firstColCreator.setName(columnName);
         DataColumnSpec copyColSpecs = firstColCreator.createSpec();
-        final DataTableSpec newSpec;
-        if (m_currentOutTable == null) {
-            DataColumnSpec[] cspecs = new DataColumnSpec[spec.getNumColumns()];
-            for (int i = 0; i < cspecs.length; i++) {
-                DataColumnSpec cspec = spec.getColumnSpec(i);
-                if (cspec == winnerSpec) {
-                    cspecs[i] = copyColSpecs;
-                } else {
-                    cspecs[i] = cspec;
-                }
-            }
-            newSpec = new DataTableSpec(cspecs);
-        } else {
-            newSpec = new DataTableSpec(copyColSpecs);
-        }
+        final DataTableSpec newSpec = new DataTableSpec(copyColSpecs);
         BufferedDataContainer cont
                 = exec.createDataContainer(newSpec);
         ExecutionMonitor sub = exec.createSubProgress(2 / 3.0);
@@ -135,10 +116,10 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                 /** {@inheritDoc} */
                 @Override
                 public DataCell getCell(final DataRow row) {
-                    final HashMap<DataCell, AtomicInteger> map =
-                        new HashMap<DataCell, AtomicInteger>();
-                    for (int r = firstClass; r < row.getNumCells(); r++) {
-                        final DataCell cell = row.getCell(firstClass);
+                    final Map<DataCell, AtomicInteger> map =
+                        new LinkedHashMap<DataCell, AtomicInteger>();
+                    for (int r = 0; r < row.getNumCells(); r++) {
+                        final DataCell cell = row.getCell(r);
                         if (map.containsKey(cell)) {
                             map.get(cell).incrementAndGet();
                         } else {
@@ -148,28 +129,29 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                     if (map.isEmpty()) {
                         return DataType.getMissingCell();
                     } else {
-                        TreeSet<Map.Entry<DataCell, AtomicInteger>> set
-                            = new TreeSet<Map.Entry<DataCell, AtomicInteger>>(
-                                  new Comparator
-                                  <Map.Entry<DataCell, AtomicInteger>>() {
-                                  /** {@inheritDoc} */
-                                  @Override
-                                  public int compare(
-                                          final Map.Entry
-                                          <DataCell, AtomicInteger> o1,
-                                          final Map.Entry
-                                          <DataCell, AtomicInteger> o2) {
-                                      return o2.getValue().get()
-                                                  - o1.getValue().get();
-                                  }
-                      });
-                      set.addAll(map.entrySet());
-                      return set.first().getKey();
+                        DataCell maxWinner = null;
+                        int maxOccurrence = Integer.MIN_VALUE;
+                        for (Map.Entry<DataCell, AtomicInteger> entry
+                                : map.entrySet()) {
+                            int occurrence = entry.getValue().get();
+                            if (occurrence > maxOccurrence) {
+                                maxOccurrence = occurrence;
+                                maxWinner = entry.getKey();
+                            }
+                        }
+                        assert maxWinner != null : "Map can't be empty";
+                        return maxWinner;
                     }
                 }
             });
             BufferedDataTable out = exec.createColumnRearrangeTable(
                     m_currentOutTable, cr2, exec);
+            // remove individual winner columns
+            if (m_removedWinners.getBooleanValue()) {
+                ColumnRearranger cr3 = new ColumnRearranger(out.getSpec());
+                cr3.keepOnly(m_winner.getStringValue());
+                out = exec.createColumnRearrangeTable(out, cr3, exec);
+            }
             return new BufferedDataTable[]{out};
         }
     }
@@ -189,9 +171,16 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        if (!inSpecs[0].containsName(m_winner.getStringValue())) {
+        final String winner = m_winner.getStringValue();
+        if (!inSpecs[0].containsName(winner)) {
             throw new InvalidSettingsException(
                     "Winner column not selected");
+        }
+        // if all individual winner columns are removed, the final table
+        // structure contains only the single winner column
+        if (m_removedWinners.getBooleanValue()) {
+            DataColumnSpec cspec = inSpecs[0].getColumnSpec(winner);
+            return new DataTableSpec[] {new DataTableSpec(cspec)};
         }
         return new DataTableSpec[]{null};
     }
@@ -202,6 +191,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_winner.saveSettingsTo(settings);
+        m_removedWinners.saveSettingsTo(settings);
     }
 
     /**
@@ -211,6 +201,11 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_winner.loadSettingsFrom(settings);
+        try {
+            m_removedWinners.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException ise) {
+            // ignored: new with v2.4.1
+        }
     }
 
     /**
