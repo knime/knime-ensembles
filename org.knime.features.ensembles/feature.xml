@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ensembles"
       label="KNIME Ensemble Learning Methods"
-      version="1.0.0.qualifier">
+      version="2.5.0.qualifier">
 
    <description>
       This feature contains templates for building classifier ensembles e.g. with bagging or boosting.
