@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns="http://www.knime.org/2008/09/XMLConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.knime.org/2008/09/XMLConfig http://www.knime.org/XMLConfig_2008_09.xsd" key="settings.xml">
-<entry key="name" type="xstring" value="Column Filter"/>
+<entry key="name" type="xstring" value="Reference Column Filter"/>
 <config key="model">
-<entry key="selectionOption" type="xstring" value="EnforceInclusion"/>
-<config key="exclude">
-<entry key="array-size" type="xint" value="5"/>
-<entry key="0" type="xstring" value="Universe_0_0"/>
-<entry key="1" type="xstring" value="Universe_0_1"/>
-<entry key="2" type="xstring" value="Universe_1_0"/>
-<entry key="3" type="xstring" value="Universe_1_1"/>
-<entry key="4" type="xstring" value="Cluster Membership"/>
+<config key="inexclude_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_string"/>
+<entry key="EnabledStatus" type="xboolean" value="true"/>
 </config>
+<entry key="inexclude" type="xstring" value="Include columns from reference table"/>
+<config key="type_compatibility_Internals">
+<entry key="SettingsModelID" type="xstring" value="SMID_boolean"/>
+<entry key="EnabledStatus" type="xboolean" value="true"/>
+</config>
+<entry key="type_compatibility" type="xboolean" value="false"/>
 </config>
 <entry key="hasContent" type="xboolean" value="false"/>
 <entry key="isInactive" type="xboolean" value="false"/>

@@ -50,7 +50,9 @@ package org.knime.ensembles.voting;
 
 import org.knime.core.data.DataValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
@@ -68,12 +70,18 @@ public class VotingLoopEndNodeDialog extends DefaultNodeSettingsPane {
         addDialogComponent(new DialogComponentColumnNameSelection(
            createColumnModel(), "Select the winner column", 0,
            new Class[] {DataValue.class}));
+        addDialogComponent(new DialogComponentBoolean(
+           createRemoveWinnersModel(), "Remove individual predictions"));
     }
 
-    /** @return settings model for the port object column selection
-     */
+    /** @return settings model for the port object column selection */
     static final SettingsModelString createColumnModel() {
         return new SettingsModelString("winner-column", null);
+    }
+
+    /** @return settings model for include/exclude winner columns */
+    static final SettingsModelBoolean createRemoveWinnersModel() {
+        return new SettingsModelBoolean("remove-prediction", false);
     }
 
 }
