@@ -128,7 +128,6 @@ public class AdaBoostSAMME implements BoostingStrategy {
 
         int count = 0;
         boolean[] correct = new boolean[table.getRowCount()];
-        int correctCount = 0;
         double correctSum = 0;
 
         final double max = table.getRowCount();
@@ -142,7 +141,6 @@ public class AdaBoostSAMME implements BoostingStrategy {
             if (realValue.equals(predictedValue)) {
                 correct[count] = true;
                 correctSum += m_weights[count];
-                correctCount++;
             }
             count++;
         }
