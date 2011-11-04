@@ -106,7 +106,13 @@ public class TableToPMMLNodeModel extends NodeModel {
             if (!dc.isMissing()) {
                 if (rowCount > 0) {
                     setWarningMessage(
-                            "Found missing PMML cell(s); skipping them.");
+                            "Found missing PMML cell(s); skipping them and"
+                            + " use row \"" + row.getKey() + "\".");
+                } else {
+                    if (table.getRowCount() > 1) {
+                        setWarningMessage("Table has more than one row; "
+                                + "taking first row \"" + row.getKey() + "\".");
+                    }
                 }
                 PMMLValue model = (PMMLValue) dc;
                 PMMLImport pmmlImport = new PMMLImport(model.getDocument());
@@ -114,7 +120,8 @@ public class TableToPMMLNodeModel extends NodeModel {
             }
             rowCount++;
         }
-        throw new Exception("Found only missing PMML cells in input table.");
+        throw new Exception("Found only missing cells in input table, "
+                + "column \"" + m_column.getStringValue() + "\".");
     }
 
 

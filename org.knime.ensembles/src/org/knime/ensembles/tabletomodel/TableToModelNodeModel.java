@@ -51,14 +51,21 @@ public class TableToModelNodeModel extends NodeModel {
             final DataCell dc = row.getCell(index);
             if (!dc.isMissing()) {
                 if (rowCount > 0) {
-                    setWarningMessage("Found missing cell(s); skipping them.");
+                    setWarningMessage("Found missing cell(s); skipping them and"
+                            + " use row \"" + row.getKey() + "\".");
+                } else {
+                    if (table.getRowCount() > 1) {
+                        setWarningMessage("Table has more than one row; "
+                                + "taking first row \"" + row.getKey() + "\".");
+                    }
                 }
                 final PortObjectCell model = (PortObjectCell) dc;
                 return new PortObject[] {model.getPortObject()}; 
             }
             rowCount++;
         }
-        throw new Exception("Found only missing cells in input table.");
+        throw new Exception("Found only missing cells in input table, "
+                + "column \"" + m_column.getStringValue() + "\".");
     }
 
     /**
