@@ -50,9 +50,9 @@ package org.knime.ensembles.tabletopmmlport;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.knime.base.node.io.pmml.read.PMMLImport;
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.xml.PMMLValue;
@@ -69,7 +69,6 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
-import org.w3c.dom.Document;
 /**
  * The node model for the table to pmml node.
  * 
@@ -95,16 +94,27 @@ public class TableToPMMLNodeModel extends NodeModel {
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, 
             final ExecutionContext exec) throws Exception {
-         BufferedDataTable table = (BufferedDataTable) inObjects[0];
-         Iterator<DataRow> it = table.iterator();
-         int index = table.getSpec().findColumnIndex(
-               m_column.getStringValue());
-
-         PMMLValue model = (PMMLValue) it.next().getCell(index);
-         Document doc = model.getDocument();
-
-         PMMLImport pmmlImport = new PMMLImport(doc);
-         return new PortObject[] {pmmlImport.getPortObject()};
+        BufferedDataTable table = (BufferedDataTable) inObjects[0];
+        if (table.getRowCount() == 0) {
+            throw new Exception(
+                    "Empty input table; can't provide any PMML model.");
+        }
+        int index = table.getSpec().findColumnIndex(m_column.getStringValue());
+        int rowCount = 0;
+        for (DataRow row : table) {
+            final DataCell dc = row.getCell(index);
+            if (!dc.isMissing()) {
+                if (rowCount > 0) {
+                    setWarningMessage(
+                            "Found missing PMML cell(s); skipping them.");
+                }
+                PMMLValue model = (PMMLValue) dc;
+                PMMLImport pmmlImport = new PMMLImport(model.getDocument());
+                return new PortObject[] {pmmlImport.getPortObject()}; 
+            }
+            rowCount++;
+        }
+        throw new Exception("Found only missing PMML cells in input table.");
     }
 
 

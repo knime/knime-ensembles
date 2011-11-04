@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.model.PortObjectCell;
@@ -99,7 +100,12 @@ public class ModelLoopStartNodeModel extends NodeModel
             m_it = table.iterator();
         }
         int index = table.getSpec().findColumnIndex(m_column.getStringValue());
-        PortObjectCell model = (PortObjectCell) m_it.next().getCell(index);
+        final DataCell cell = m_it.next().getCell(index);
+        if (cell.isMissing()) {
+            throw new Exception(
+                    "Missing cells can't be converted into a model.");
+        }
+        PortObjectCell model = (PortObjectCell) cell;
         return new PortObject[] {model.getPortObject()};
     }
 

@@ -2,8 +2,8 @@ package org.knime.ensembles.tabletomodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.model.PortObjectCell;
@@ -42,10 +42,23 @@ public class TableToModelNodeModel extends NodeModel {
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
         BufferedDataTable table = (BufferedDataTable) inObjects[0];
-        Iterator<DataRow> it = table.iterator();
+        if (table.getRowCount() == 0) {
+            throw new Exception("Empty input table; can't provide any model.");
+        }
         int index = table.getSpec().findColumnIndex(m_column.getStringValue());
-        PortObjectCell model = (PortObjectCell) it.next().getCell(index);
-        return new PortObject[] {model.getPortObject()};
+        int rowCount = 0;
+        for (DataRow row : table) {
+            final DataCell dc = row.getCell(index);
+            if (!dc.isMissing()) {
+                if (rowCount > 0) {
+                    setWarningMessage("Found missing cell(s); skipping them.");
+                }
+                final PortObjectCell model = (PortObjectCell) dc;
+                return new PortObject[] {model.getPortObject()}; 
+            }
+            rowCount++;
+        }
+        throw new Exception("Found only missing cells in input table.");
     }
 
     /**
