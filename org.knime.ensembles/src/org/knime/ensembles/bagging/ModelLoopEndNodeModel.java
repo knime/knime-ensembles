@@ -75,7 +75,7 @@ import org.knime.core.node.workflow.LoopStartNodeTerminator;
 /**
  * This model is the tail for a model loop end.
  *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich
+ * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class ModelLoopEndNodeModel extends NodeModel
         implements LoopEndNode {

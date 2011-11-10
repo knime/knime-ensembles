@@ -55,7 +55,7 @@ import org.knime.core.node.NodeView;
 /**
  * This factory create all necessary classes for the model loop start node.
  *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich
+ * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class VotingLoopEndNodeFactory extends
         NodeFactory<VotingLoopEndNodeModel> {

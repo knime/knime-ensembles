@@ -58,7 +58,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 /**
  * This class is the dialog for the looper model start node.
  *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich
+ * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class VotingLoopEndNodeDialog extends DefaultNodeSettingsPane {
 

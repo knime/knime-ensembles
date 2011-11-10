@@ -33,7 +33,7 @@ import org.knime.core.node.workflow.LoopStartNodeTerminator;
  * This is the model implementation of LoopEndColumnCollector.
  * End node for the column collector loop example
  *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich
+ * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
 

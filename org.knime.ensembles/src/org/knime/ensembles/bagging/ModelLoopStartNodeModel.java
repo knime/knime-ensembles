@@ -73,7 +73,7 @@ import org.knime.core.node.workflow.LoopStartNodeTerminator;
 /**
  * This model is the head node of model loop start.
  *
- * @author Thomas Gabriel, KNIME.com GmbH, Zurich
+ * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class ModelLoopStartNodeModel extends NodeModel
         implements LoopStartNodeTerminator {
