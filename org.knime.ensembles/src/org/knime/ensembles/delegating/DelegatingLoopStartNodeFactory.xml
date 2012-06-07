@@ -8,12 +8,12 @@
     </shortDescription>
     
     <fullDescription>
-        <intro> The idea of delegating is to built a new model only for data points
-        being incorrect classified/predicted by the model. 
+        <intro> The idea of delegating is to build a new model only for data points
+        being incorrectly classified/predicted by the model. 
         Hence, a collection of models is achieved. 
         
         The loop start therefore is initialized with the whole data.
-        The loop end node receives only wrong classified data in each iteration.
+        The loop end node receives only wrongly classified data in each iteration.
         This will be passed back to the loop start, which outputs the data again, until
         no more data points are inserted to the loop end.
         
