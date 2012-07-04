@@ -40,11 +40,10 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
         
-        m_currentiteration++;
 
         m_inSpec = inData[0].getDataTableSpec();
 
-        if (m_currentiteration == 1) {
+        if (m_currentiteration == 0) {
             // just output the complete data table.
              return new BufferedDataTable[]{inData[0]};
         } 
@@ -54,6 +53,8 @@ public class DelegatingLoopStartNodeModel extends NodeModel
                     (DelegatingLoopEndNodeModel)getLoopEndNode();
         BufferedDataTable fromend = end.getInData();
 
+
+        m_currentiteration++;
         return new BufferedDataTable[]{fromend};
     }
     
@@ -80,6 +81,9 @@ public class DelegatingLoopStartNodeModel extends NodeModel
             throws InvalidSettingsException {
 
         m_inSpec = inSpecs[0];
+
+        pushFlowVariableInt("currentIteration", m_currentiteration);
+        
         return new DataTableSpec[]{m_inSpec};
     }
 
