@@ -56,14 +56,14 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
- * This class is the dialog for the looper model start node.
+ * This class is the dialog for the voting loop end.
  *
  * @author Thomas Gabriel, KNIME.com AG, Zurich
  */
 public class VotingLoopEndNodeDialog extends DefaultNodeSettingsPane {
 
     /**
-     * Creates a new dialog for the looper node.
+     * Creates a new dialog for the loop end node.
      */
     @SuppressWarnings("unchecked")
     public VotingLoopEndNodeDialog() {
@@ -74,12 +74,12 @@ public class VotingLoopEndNodeDialog extends DefaultNodeSettingsPane {
            createRemoveWinnersModel(), "Remove individual predictions"));
     }
 
-    /** @return settings model for the port object column selection */
+    /** @return settings model for the prediction column selection */
     static final SettingsModelString createColumnModel() {
         return new SettingsModelString("winner-column", null);
     }
 
-    /** @return settings model for include/exclude winner columns */
+    /** @return settings model for include/exclude prediction columns */
     static final SettingsModelBoolean createRemoveWinnersModel() {
         return new SettingsModelBoolean("remove-prediction", false);
     }

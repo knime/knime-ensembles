@@ -53,7 +53,7 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * This factory create all necessary classes for the model loop start node.
+ * This factory creates all necessary classes for the voting loop end.
  *
  * @author Thomas Gabriel, KNIME.com AG, Zurich
  */

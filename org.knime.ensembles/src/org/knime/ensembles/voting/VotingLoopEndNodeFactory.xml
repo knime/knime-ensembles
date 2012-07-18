@@ -9,17 +9,17 @@
 	<fullDescription>
 		<intro>
 		  This node defines the loop end in a sequence of models that are 
-		  applied to a test dataset. In each iteration the selected winner 
+		  applied to a test dataset. In each iteration the selected prediction 
 		  column is stored and the most frequent value is determined 
-		  from this collection of winner columns. A new column with the name of
+		  from this collection of prediction columns. A new column with the name of
 		  the selected column containing the majority class of all predictions
 		  is appended to the output table.
-          The selected winner columns are appended (depending on 'Remove 
+          The selected prediction columns are appended (depending on 'Remove 
           individual prediction' option) to the resulting table; all other 
           columns are not part of the output table.
 		</intro>
 		<option name="Select the winner column">
-		  Columns that are used to determine the most frequent value.
+		  Column that is used to determine the most frequent value.
 		</option>
 		<option name="Remove individual predictions">
           Removes all prediction columns generated during the loop iterations;
@@ -29,7 +29,7 @@
 	</fullDescription>
 	
 	<ports>
-		<inPort index="0" name="Table with winner column">Table winner column is selected from</inPort>
-		<outPort index="0" name="Table with all winner columns">Table with all winner column plus the most frequent value</outPort>
+		<inPort index="0" name="Table with prediction column">Table winner column is selected from</inPort>
+		<outPort index="0" name="Table with all/aggregated predictions">Table with all prediction column plus the most frequent value</outPort>
 	</ports>
 </knimeNode>
