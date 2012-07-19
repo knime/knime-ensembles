@@ -17,6 +17,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.StringValue;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.node.BufferedDataContainer;
@@ -55,6 +56,9 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     private final SettingsModelBoolean m_removedWinners
         = VotingLoopEndNodeDialog.createRemoveWinnersModel();
 
+    // the selected columnIndex is needed for the autoguessing.
+    private int m_columnIndex;
+
     /** Constructor for the node model. */
     protected VotingLoopEndNodeModel() {
         super(1, 1);
@@ -77,7 +81,9 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                      + " are trying to create an infinite loop!");
         }
 
-       String predictColumn = m_winner.getStringValue();
+        // we use the autoguessed value contained in m_columnIndes
+       String predictColumn = inData[0].getSpec()
+                                       .getColumnSpec(m_columnIndex).getName();
         
         // first step, if there is no outtable we create one using the
         // selected prediction column only
@@ -142,7 +148,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
             // remove individual winner columns
             if (m_removedWinners.getBooleanValue()) {
                 ColumnRearranger cr3 = new ColumnRearranger(out.getSpec());
-                cr3.keepOnly(m_winner.getStringValue());
+                cr3.keepOnly(predictColumn);
                 out = exec.createColumnRearrangeTable(out, cr3, exec);
             }
             return new BufferedDataTable[]{out};
@@ -216,6 +222,47 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
           container.close();
           return container.getTable();
     }
+    
+    private String autoguessing(final DataTableSpec inSpecs) {
+        if (inSpecs.getNumColumns() == 0) {
+            m_columnIndex = -1;
+            return "Input table has no columns";
+        }
+        int i = 0;
+
+        //warning user that we decided to select the column
+        String warning = "";
+        
+        m_columnIndex = inSpecs.findColumnIndex(m_winner.getStringValue());
+        
+        while (i < inSpecs.getNumColumns() && m_columnIndex < 0 && warning.isEmpty()) {
+            // we can only proceed, if our input table contains 
+            // at least one column of type Double
+             
+             if (inSpecs.getColumnSpec(i).getType().isCompatible(StringValue.class)) {
+                 //assign internal variable
+                 m_columnIndex = i;
+             }
+             i++;   
+        }
+        if (warning.isEmpty() && m_columnIndex < 0) {
+                // special case, we just use the first column
+            m_columnIndex = 0;
+        }
+        
+        if (m_columnIndex != inSpecs.findColumnIndex(m_winner.getStringValue())) {
+                
+            if (m_winner.getStringValue() == null || m_winner.getStringValue().length() <= 0) {
+                  warning += "Autoguessing: ";
+                  m_winner.setStringValue(inSpecs.getColumnSpec(m_columnIndex).getName());
+            } else {
+                  warning += "column '" + m_winner.getStringValue() + "' not found, instead ";
+            }
+                
+            warning += " column '" + inSpecs.getColumnSpec(m_columnIndex).getName() + "' is used."; 
+        }
+        return warning;
+    }
 
     /**
      * {@inheritDoc}
@@ -223,15 +270,24 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        final String winner = m_winner.getStringValue();
-        if (!inSpecs[0].containsName(winner)) {
-            throw new InvalidSettingsException(
-                    "Winner column not selected");
+        DataColumnSpec colSpec = inSpecs[0].getColumnSpec(m_winner.getStringValue());
+        if (colSpec == null) {
+            //column specified in settings is not valid. 
+            String warning = autoguessing(inSpecs[0]);
+            if (m_columnIndex < 0) {
+                throw new InvalidSettingsException(warning);
+            }
+            if (warning != null && !warning.trim().isEmpty()) {
+                setWarningMessage(warning);
+            }
+        } else {
+            m_columnIndex = inSpecs[0].findColumnIndex(m_winner.getStringValue());
         }
+
         // if all individual winner columns are removed, the final table
         // structure contains only the single winner column
         if (m_removedWinners.getBooleanValue()) {
-            DataColumnSpec cspec = inSpecs[0].getColumnSpec(winner);
+            DataColumnSpec cspec = inSpecs[0].getColumnSpec(m_columnIndex);
             return new DataTableSpec[] {new DataTableSpec(cspec)};
         }
         return new DataTableSpec[]{null};
