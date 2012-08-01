@@ -2,6 +2,7 @@ package org.knime.ensembles.delegating;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -15,17 +16,17 @@ import org.knime.core.node.workflow.LoopStartNode;
 
 /**
  * This is the model implementation of Delegating.
- * 
+ *
  *
  * @author Iris Adae, University of Konstanz, Germany
  */
 public class DelegatingLoopStartNodeModel extends NodeModel
         implements LoopStartNode {
- 
+
     private int m_currentiteration;
 
     private DataTableSpec m_inSpec;
-    
+
     /**
      * Constructor for the node model.
      */
@@ -39,25 +40,26 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        
 
         m_inSpec = inData[0].getDataTableSpec();
 
+        BufferedDataTable result;
         if (m_currentiteration == 0) {
             // just output the complete data table.
-             return new BufferedDataTable[]{inData[0]};
-        } 
+            result = inData[0];
+        } else {
 
-        //otherwise we get the data from the loop end node
-        DelegatingLoopEndNodeModel end =
-                    (DelegatingLoopEndNodeModel)getLoopEndNode();
-        BufferedDataTable fromend = end.getInData();
-
+            //otherwise we get the data from the loop end node
+            DelegatingLoopEndNodeModel end =
+                        (DelegatingLoopEndNodeModel)getLoopEndNode();
+            BufferedDataTable fromend = end.getInData();
+            result = fromend;
+        }
 
         m_currentiteration++;
-        return new BufferedDataTable[]{fromend};
+        return new BufferedDataTable[]{result};
     }
-    
+
     /**
      * @return the input spec as inserted to the loop start.
      */
@@ -83,7 +85,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
         m_inSpec = inSpecs[0];
 
         pushFlowVariableInt("currentIteration", m_currentiteration);
-        
+
         return new DataTableSpec[]{m_inSpec};
     }
 
@@ -109,7 +111,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -119,7 +121,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
             CanceledExecutionException {
         // TODO: generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
