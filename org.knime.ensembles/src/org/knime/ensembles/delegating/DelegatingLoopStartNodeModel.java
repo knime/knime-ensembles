@@ -55,6 +55,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
             BufferedDataTable fromend = end.getInData();
             result = fromend;
         }
+        pushFlowVariableInt("currentIteration", m_currentiteration);
 
         m_currentiteration++;
         return new BufferedDataTable[]{result};
