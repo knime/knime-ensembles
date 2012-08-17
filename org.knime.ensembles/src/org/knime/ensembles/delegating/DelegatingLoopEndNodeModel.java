@@ -17,6 +17,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.workflow.LoopEndNode;
 
@@ -46,7 +47,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
             = DelegatingLoopEndNodeDialog.createIterationsModel();
     private SettingsModelIntegerBounded m_minNumberOfRows
             = DelegatingLoopEndNodeDialog.createNumOfRowsModel();
-    
+    private SettingsModelBoolean m_onlyLastResult 
+            = DelegatingLoopEndNodeDialog.createOnlyLastModel();
 
     /**
      * Constructor for the node model.
@@ -64,14 +66,8 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
             final ExecutionContext exec) throws Exception {
-        // outport 0 wird gesammelt und hinten ausgegeben
-        // outport 1 wird an loop start zur�ck gegeben
-
-        if (m_outcontainer == null) {
-            m_outcontainer = exec.createDataContainer(
-                    inData[collectingIn].getDataTableSpec());
-        }
-
+        // in port 0: collects the data provided at the output port
+        // in port 1: is fed back to loop start node
         BufferedDataContainer loopData = exec.createDataContainer(
                 inData[resultingIn].getDataTableSpec());
 
@@ -81,21 +77,34 @@ public class DelegatingLoopEndNodeModel extends NodeModel
         }
         loopData.close();
         m_inData  = loopData.getTable();
-
-        for (DataRow row : inData[collectingIn]) {
-            RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
-            m_outcontainer.addRowToTable(createNewRow(row, newKey));
-        }
-
         m_iterationnr++;
-        // stop loop if there are less rows than needed.
-        // or the max number of iterations is reached
-        if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
-                   || m_iterationnr >= m_maxIterations.getIntValue()) {
-            m_outcontainer.close();
-            return new BufferedDataTable[]{m_outcontainer.getTable()};
+
+        if (m_onlyLastResult.getBooleanValue()) {
+            if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
+                       || m_iterationnr >= m_maxIterations.getIntValue()) {
+                return new BufferedDataTable[]{inData[collectingIn]};
+            }
+        } else {
+            if (m_outcontainer == null) {
+                m_outcontainer = exec.createDataContainer(
+                        inData[collectingIn].getDataTableSpec());
+            }
+    
+    
+            for (DataRow row : inData[collectingIn]) {
+                RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
+                m_outcontainer.addRowToTable(createNewRow(row, newKey));
+            }
+    
+            // stop loop if there are less rows than needed.
+            // or the max number of iterations is reached
+            if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
+                       || m_iterationnr >= m_maxIterations.getIntValue()) {
+                m_outcontainer.close();
+                return new BufferedDataTable[]{m_outcontainer.getTable()};
+            }
         }
-        // else go on with loop
+        // go on with loop
         super.continueLoop();
         return new BufferedDataTable[]{null};
     }
@@ -134,6 +143,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_maxIterations.saveSettingsTo(settings);
         m_minNumberOfRows.saveSettingsTo(settings);
+        m_onlyLastResult.saveSettingsTo(settings);
     }
 
     /**
@@ -144,6 +154,11 @@ public class DelegatingLoopEndNodeModel extends NodeModel
             throws InvalidSettingsException {
         m_maxIterations.loadSettingsFrom(settings);
         m_minNumberOfRows.loadSettingsFrom(settings);
+        try {
+            m_onlyLastResult.loadSettingsFrom(settings);
+        } catch (InvalidSettingsException ise) {
+            // introduced in KNIME 2.6.1            
+        }
     }
 
     /**

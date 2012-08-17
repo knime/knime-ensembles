@@ -16,6 +16,7 @@
         </intro>
         <option name="Maximal number of iterations">The loop will stop after these number of iterations, to ensure no endless loop is created.</option>
         <option name="Minimal number of rows">The minimal number of rows passed back to the loop start. If the input contains less rows, the loop ends.</option>
+        <option name="Output only last result">If this option is checked only the last input to the Collecting data port is passed through to the outport. Hence, the data of earlier iterations is discarded.</option>     
     </fullDescription>
     
     <ports>
