@@ -49,7 +49,9 @@
 package org.knime.ensembles.delegating;
 
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 
 /**
@@ -76,6 +78,9 @@ public class DelegatingLoopEndNodeDialog extends DefaultNodeSettingsPane {
         super.addDialogComponent(new DialogComponentNumber(iterations, 
                 "Maximal number of iterations :", 1));
         closeCurrentGroup();
+        
+        addDialogComponent(new DialogComponentBoolean(createOnlyLastModel(), 
+                "Output only last result"));
     }
 
 
@@ -95,6 +100,13 @@ public class DelegatingLoopEndNodeDialog extends DefaultNodeSettingsPane {
     static  SettingsModelIntegerBounded createNumOfRowsModel() {
         return new SettingsModelIntegerBounded("CFG_MINROWS", 1, 1,
                 Integer.MAX_VALUE);
+    }
+
+    /**
+     * @return the settings model that contains the only last result flag
+     */
+    static SettingsModelBoolean createOnlyLastModel() {
+        return new SettingsModelBoolean("CFG_onlyLastResult", false);
     }
     
     
