@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="pmmlensembleloopend.png" type="LoopEnd">
+    <name>PMML Ensemble Loop End</name>
+    
+    <shortDescription>
+        Collects PMML from a loop and outputs a pmml ensemble.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        This node collects PMML models that are generated in a loop and puts them together in one
+        ensemble PMML Mining Model. This model consists of a segmentation with one segment for each model.
+        </intro>
+        
+        
+        <option name="multiple model method">Determines how the results of the models in the ensemble are combined</option>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="PMML In">PMML model to be included in the ensemble</inPort>
+        <outPort index="0" name="PMML ensemble">A PMML ensemble</outPort>
+    </ports>    
+</knimeNode>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="tabletopmmlensemble.png" type="Other">
+    <name>Table to PMML Ensemble</name>
+    
+    <shortDescription>
+        Transforms a table of PMML documents with a tree model into a single PMML document.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        Transforms a table of PMML documents with a tree model into a single
+        PMML document with a mining model that contains all tree models from the input.
+        If the input table contains a column with double values,
+        these are used for weighting the models.
+        </intro>
+        <option name="PMML column">The column that contains the PMML</option>
+        <option name="Weight column">The column that contains weights for the models</option>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="PMML Table">Table containing PMML models</inPort>
+        <outPort index="0" name="PMML">A PMML ensemble model</outPort>
+    </ports>
+</knimeNode>
