@@ -15,6 +15,12 @@
             name="Utility Nodes"
             path="/mining/ensembles">
       </category>
+      
+      <category 
+            icon="icons/missing.gif" 
+            level-id="ensembles-combine" 
+            name="PMML Ensembles" 
+            path="/mining/ensembles"/>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
@@ -88,6 +94,11 @@
             factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
             id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
       </node>
+      
+        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" id="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory"/>
+        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
+        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor.PMMLEnsemblePredictorNodeFactory" id="org.knime.ensembles.pmml.predictor.PMMLEnsemblePredictorNodeFactory"/>
+        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">
