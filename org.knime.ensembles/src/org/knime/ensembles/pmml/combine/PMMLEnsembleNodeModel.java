@@ -228,20 +228,21 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                 throw new InvalidSettingsException("No suitable pmml column found");
             }
         }
-        if (weightColName == null || weightColName.length() == 0) {
-            weightColName = getColumnCompatibleWith(inSpec, DoubleValue.class);
-            m_weightColumn.setStringValue(weightColName);
-        } else {
-            DataColumnSpec s = inSpec.getColumnSpec(weightColName);
-            if (s == null || !s.getType().isCompatible(DoubleValue.class)) {
+        if (m_weightAvailable.getBooleanValue()) {
+            if (weightColName == null || weightColName.length() == 0) {
                 weightColName = getColumnCompatibleWith(inSpec, DoubleValue.class);
-                if (weightColName != null) {
-                    LOGGER.warn("Cannot use the given column for weights. Using column " + weightColName);
+                m_weightColumn.setStringValue(weightColName);
+            } else {
+                DataColumnSpec s = inSpec.getColumnSpec(weightColName);
+                if (s == null || !s.getType().isCompatible(DoubleValue.class)) {
+                    weightColName = getColumnCompatibleWith(inSpec, DoubleValue.class);
+                    if (weightColName != null) {
+                        LOGGER.warn("Cannot use the given column for weights. Using column " + weightColName);
+                    }
+                    throw new InvalidSettingsException("No suitable double column found for weights");
                 }
-                throw new InvalidSettingsException("No suitable double column found for weights");
             }
         }
-
         List<PMMLModelWrapper> wrappers =
             PMMLEnsembleHelpers.getModelListFromInput(inTable, pmmlColumnName);
         PMMLEnsembleHelpers.checkInputTablePMML(wrappers);

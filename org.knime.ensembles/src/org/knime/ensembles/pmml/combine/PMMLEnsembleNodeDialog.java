@@ -84,7 +84,6 @@ public class PMMLEnsembleNodeDialog extends DefaultNodeSettingsPane {
                 PMMLEnsembleNodeModel.createWeightAvailableSettingsModel(),
                 "Weight available");
         
-        
         weightColumnAvailable.getModel().addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent arg0) {

@@ -45,6 +45,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
+
 package org.knime.ensembles.pmml.loopend;
 
 import java.io.File;
@@ -72,6 +73,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -123,21 +125,37 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     /** The name of the settings tag which holds the name for the weight flow variable. */
     public static final String WEIGHT_FLOW_VARIABLE_NAME = "weightFlowVarName";
     
+    /** The name of the settings tag which holds the information whether a flow variable for weights is available. */
+    public static final String WEIGHT_AVAILABLE = "weightAvailable";
+    
     /**
      * Creates a SettingsModelString for storing the method used for treating multiple models.
-     * @return Returns the created SettingsModel
+     * @return the created SettingsModel
      */
     public static SettingsModelString createMultiModelMethodSettingsModel() {
-        return new SettingsModelString(MULTIMODELMETHOD, "Majority vote");
+        return new SettingsModelString(MULTIMODELMETHOD, MULTIMODELMETHOD_CHOICES[0]);
     }
     
     /**
-     * Creates a SettingsModelString for storing the name of the flow varibale that is used for weights.
-     * @return Returns the created SettingsModel
+     * Creates a SettingsModelString for storing the name of the flow variable that is used for weights.
+     * @return the created SettingsModel
      */
     public static SettingsModelString createWeightFlowVarNameSettingsModel() {
-        return new SettingsModelString(WEIGHT_FLOW_VARIABLE_NAME, "");
+        SettingsModelString sm = new SettingsModelString(WEIGHT_FLOW_VARIABLE_NAME, null);
+        sm.setEnabled(false);
+        return sm;
     }
+    
+    /**
+     * Creates a SettingsModelBoolean for storing a value that determines
+     * whether a flow variable for weights is available.
+     * @return the created SettingsModel
+     */
+    public static SettingsModelBoolean createWeightAvailableSettingsModel() {
+        return new SettingsModelBoolean(WEIGHT_AVAILABLE, false);
+    }
+    
+    private SettingsModelBoolean m_weightAvailable = createWeightAvailableSettingsModel();
     
     private SettingsModelString m_multiModelMethod = createMultiModelMethodSettingsModel();
     
@@ -171,8 +189,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     };
     
     private DataTableSpec createInternalSpec(final boolean useWeights) {
-        DataColumnSpecCreator pmml =
-            new DataColumnSpecCreator(PMML_COLUMN_NAME, PMMLCell.TYPE);
+        DataColumnSpecCreator pmml = new DataColumnSpecCreator(PMML_COLUMN_NAME, PMMLCell.TYPE);
         if (useWeights) {
             DataColumnSpecCreator weight = new DataColumnSpecCreator(WEIGHT_COLUMN_NAME, DoubleCell.TYPE);
             return new DataTableSpec(pmml.createSpec(), weight.createSpec());
@@ -261,7 +278,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                     }
                 }
                 
-                trans = new PMMLMiningModelTranslator(table, PMML_COLUMN_NAME, WEIGHT_COLUMN_NAME,
+                trans = new PMMLMiningModelTranslator(table, PMML_COLUMN_NAME, useWeights ? WEIGHT_COLUMN_NAME : null,
                         MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
                 
                 outPMMLPort.addModelTranslater(trans);
@@ -298,6 +315,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_multiModelMethod.saveSettingsTo(settings);
         m_weightFlowVarName.saveSettingsTo(settings);
+        m_weightAvailable.saveSettingsTo(settings);
     }
 
     /**
@@ -308,6 +326,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             throws InvalidSettingsException {
         m_multiModelMethod.loadSettingsFrom(settings);
         m_weightFlowVarName.loadSettingsFrom(settings);
+        m_weightAvailable.loadSettingsFrom(settings);
     }
 
     /**
@@ -318,6 +337,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             throws InvalidSettingsException {
         m_multiModelMethod.validateSettings(settings);
         m_weightFlowVarName.validateSettings(settings);
+        m_weightAvailable.validateSettings(settings);
     }
     
     /**

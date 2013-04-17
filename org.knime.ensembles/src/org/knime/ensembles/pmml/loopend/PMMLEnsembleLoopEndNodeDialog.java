@@ -50,13 +50,18 @@ package org.knime.ensembles.pmml.loopend;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFlowVariableNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.workflow.FlowVariable;
@@ -73,8 +78,8 @@ import org.knime.ensembles.pmml.combine.PMMLEnsembleNodeModel;
 public class PMMLEnsembleLoopEndNodeDialog extends DefaultNodeSettingsPane {
 
     private static final NodeLogger LOGGER =
-        NodeLogger.getLogger(PMMLEnsembleLoopEndNodeDialog.class);
-
+        NodeLogger.getLogger(PMMLEnsembleLoopEndNodeDialog.class);    
+    
     private SettingsModelString m_flowVarSettingsModel;
     private DialogComponentFlowVariableNameSelection m_flowVarSelection;
     /**
@@ -83,27 +88,38 @@ public class PMMLEnsembleLoopEndNodeDialog extends DefaultNodeSettingsPane {
      * components.
      */
     protected PMMLEnsembleLoopEndNodeDialog() {
-        super();
+        super();        
 
         Collection<FlowVariable> flowVars = getAvailableFlowVariables().values();
+        
+        DialogComponentBoolean weightAvailable = new DialogComponentBoolean(
+                PMMLEnsembleLoopEndNodeModel.createWeightAvailableSettingsModel(), "Weight available");
 
         m_flowVarSettingsModel = PMMLEnsembleLoopEndNodeModel.createWeightFlowVarNameSettingsModel();
         m_flowVarSelection = new DialogComponentFlowVariableNameSelection(
                 m_flowVarSettingsModel, "Weight flow variable",
                 flowVars, FlowVariable.Type.DOUBLE);
-
+        
+        weightAvailable.getModel().addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent arg0) {
+                m_flowVarSelection.getModel().setEnabled(((SettingsModelBoolean)arg0.getSource()).getBooleanValue());
+            }
+        });
+        
         DialogComponentStringSelection multModelSelection = new DialogComponentStringSelection(
                 PMMLEnsembleNodeModel.createMultiModelMethodSettingsModel(),
                 "Multiple models method", PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES);
-
+        
+        addDialogComponent(weightAvailable);
         addDialogComponent(m_flowVarSelection);
         addDialogComponent(multModelSelection);
     }
-
+    
     /**
      * List of available string flow variables must be updated since it could
      * have changed.
-     *
+     * 
      * {@inheritDoc}
      */
     @Override
@@ -111,7 +127,7 @@ public class PMMLEnsembleLoopEndNodeDialog extends DefaultNodeSettingsPane {
             final PortObjectSpec[] specs) throws NotConfigurableException {
         super.loadAdditionalSettingsFrom(settings, specs);
         Map<String, FlowVariable> flowVars = getAvailableFlowVariables();
-
+        
         // check for selected value
         String flowVar = "";
         try {
@@ -119,8 +135,7 @@ public class PMMLEnsembleLoopEndNodeDialog extends DefaultNodeSettingsPane {
                             .createCloneWithValidatedValue(settings))
                             .getStringValue();
         } catch (InvalidSettingsException e) {
-            LOGGER.debug("Settings model could not be cloned with given "
-                    + "settings!");
+            LOGGER.debug("Settings model could not be cloned with given settings!");
         } finally {
             m_flowVarSelection.replaceListItems(flowVars.values(), flowVar);
         }
