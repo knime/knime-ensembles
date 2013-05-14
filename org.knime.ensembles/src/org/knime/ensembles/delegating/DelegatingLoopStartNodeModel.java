@@ -120,7 +120,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     protected void loadInternals(final File internDir,
             final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        // TODO: generated method stub
+        // nothing to load
     }
 
     /**
@@ -130,7 +130,7 @@ public class DelegatingLoopStartNodeModel extends NodeModel
     protected void saveInternals(final File internDir,
             final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        // TODO: generated method stub
+        // nothing to save
     }
 
 }

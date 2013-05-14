@@ -52,7 +52,7 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 
         DataCell cell = PMMLCellFactory.create(value.getDocument());
 
-        BufferedDataContainer out 
+        BufferedDataContainer out
                         = exec.createDataContainer(createSpec());
         out.addRowToTable(new DefaultRow(
                             m_rowKeyModel.getStringValue(), cell));
@@ -61,10 +61,8 @@ public class PMMLPortToCellNodeModel extends NodeModel {
     }
 
     private DataTableSpec createSpec() {
-        DataColumnSpecCreator colSpecCreator =
-            new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
-        DataTableSpec spec = new DataTableSpec(colSpecCreator.createSpec());
-        return spec;
+        DataColumnSpecCreator colSpecCreator = new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
+        return new DataTableSpec(colSpecCreator.createSpec());
     }
 
     /** {@inheritDoc} */
@@ -76,7 +74,7 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // nothing to load
@@ -85,7 +83,7 @@ public class PMMLPortToCellNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // no op

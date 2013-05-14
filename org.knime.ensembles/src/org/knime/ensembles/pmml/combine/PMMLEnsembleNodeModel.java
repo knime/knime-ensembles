@@ -89,10 +89,10 @@ import org.knime.ensembles.pmml.PMMLMiningModelTranslator;
  * @since 2.8
  */
 public class PMMLEnsembleNodeModel extends NodeModel {
-    
+
     private static final NodeLogger LOGGER =
         NodeLogger.getLogger(PMMLEnsembleNodeModel.class);
-    
+
     /**
      * Constructor for the node model.
      */
@@ -100,23 +100,23 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         super(new PortType[]{new PortType(BufferedDataTable.class)},
               new PortType[]{new PortType(PMMLPortObject.class)});
     }
-    
+
     /**The name of the settings tag which holds the name of the PMML
      * column the user has entered in the dialog as <code>String</code>.*/
     public static final String PMML_COL_NAME = "pmmlCol";
-    
+
     /**The name of the settings tag which holds the name of the model weight
      * column the user has entered in the dialog as <code>String</code>.*/
     public static final String WEIGHT_COL_NAME = "weightCol";
-    
+
     /**The name of the settings tag which determines whether a weight column should be used.*/
     public static final String WEIGHT_AVAILABLE = "weightAvailable";
 
     /**The name of the settings tag which determines how multiple models should be treated. */
     public static final String MULTIMODELMETHOD = "multiModelMethod";
-    
+
     /**The choices a user has for determining how multiple models are treated. */
-    public static final String[] MULTIMODELMETHOD_CHOICES = new String[]{
+    protected static final String[] MULTIMODELMETHOD_CHOICES = new String[]{
         "Majority vote",
         "Average",
         "Maximum",
@@ -128,43 +128,43 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         "Weighted Average",
         "Weighted Majority Vote"
     };
-    
+
 
 
     private SettingsModelColumnName m_pmmlColumn = createPMMLColumnSettingsModel();
-    
+
     private SettingsModelBoolean m_weightAvailable = createWeightAvailableSettingsModel();
-    
+
     private SettingsModelColumnName m_weightColumn = createWeightColumnSettingsModel();
-    
+
     private SettingsModelString m_multiModelMethod = createMultiModelMethodSettingsModel();
-    
-    /**Corresponding Enum values for Strings in MULTIMODELMETHOD_CHOICES. 
+
+    /**Corresponding Enum values for Strings in MULTIMODELMETHOD_CHOICES.
      * http://www.dmg.org/v4-0-1/MultipleModels.html
      * */
-    public static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] MULTIMODELMETHOD_CHOICES_ENUM
-    = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MAX,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SUM,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN,
-        //org.dmg.pmml.MULTIPLEMODELMETHOD.MODEL_CHAIN, -> currently not supported
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE
+    protected static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] MULTIMODELMETHOD_CHOICES_ENUM
+            = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
+                org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.MAX,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.SUM,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN,
+                //org.dmg.pmml.MULTIPLEMODELMETHOD.MODEL_CHAIN, -> currently not supported
+                org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE,
+                org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE
     };
-    
+
     /**
      * Creates a SettingsModelColumnName for storing the column name of the pmml clolumn.
-     * 
+     *
      * @return Returns the created SettingsModel
      */
     public static SettingsModelColumnName createPMMLColumnSettingsModel() {
         return new SettingsModelColumnName(PMML_COL_NAME, "PMML");
     }
-    
+
     /**
      * Creates a SettingsModelColumnName for storing the column name of the weight column.
      * @return Returns the created SettingsModel
@@ -174,7 +174,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         model.setEnabled(false);
         return model;
     }
-    
+
     /**
      *  Creates a SettingsModelBoolean for storing if a weight column is available in the input table.
      * @return Returns the created SettingsModel
@@ -182,7 +182,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
     public static SettingsModelBoolean createWeightAvailableSettingsModel() {
         return new SettingsModelBoolean(WEIGHT_AVAILABLE, false);
     }
-    
+
     /**
      * Creates a SettingsModelString for storing the method used for treating multiple models.
      * @return Returns the created SettingsModel
@@ -190,7 +190,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
     public static SettingsModelString createMultiModelMethodSettingsModel() {
         return new SettingsModelString(MULTIMODELMETHOD, "Majority vote");
     }
-    
+
     private String getColumnCompatibleWith(final DataTableSpec inSpec, final Class<? extends DataValue> valueClass) {
         for (int c = 0; c < inSpec.getNumColumns(); c++) {
             DataColumnSpec colSpec = inSpec.getColumnSpec(c);
@@ -200,20 +200,20 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
-        
+
         BufferedDataTable inTable = (BufferedDataTable)inData[0];
-        
+
         // Autoconfigure & autoguess
         String pmmlColumnName = m_pmmlColumn.getColumnName();
         String weightColName = m_weightColumn.getColumnName();
-        
+
         DataTableSpec inSpec = inTable.getDataTableSpec();
         if (pmmlColumnName == null || pmmlColumnName.length() == 0) {
             pmmlColumnName = getColumnCompatibleWith(inSpec, PMMLValue.class);
@@ -246,7 +246,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         List<PMMLModelWrapper> wrappers =
             PMMLEnsembleHelpers.getModelListFromInput(inTable, pmmlColumnName);
         PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
-        
+
         /*
          * Learning and target columns are lost when PMML is written in a table.
          * Here we retrieve it from the mining schema and put it in our output pmml port.
@@ -264,16 +264,16 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                 }
             }
         }
-        
+
         // A fake spec created from the data dictionary
         DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(inTable, pmmlColumnName);
-        
+
         PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(fakeSpec);
         creator.setTargetColsNames(new ArrayList<String>(targetCols));
         creator.setLearningColsNames(new ArrayList<String>(learningCols));
         PMMLPortObject outPMMLPort = new PMMLPortObject(creator.createSpec());
         PMMLMiningModelTranslator trans;
-        
+
         //Find the corresponding MultiModelMethod value for the selected string
         int multimodelchoice = -1;
         for (int i = 0; i < MULTIMODELMETHOD_CHOICES.length; i++) {
@@ -291,10 +291,10 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                     MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
         }
         outPMMLPort.addModelTranslater(trans);
-        
+
         return new PortObject[]{outPMMLPort};
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -318,7 +318,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                 throw new InvalidSettingsException("The column with the given name does not contain PMML values");
             }
         }
-        
+
         if (m_weightAvailable.getBooleanValue()) {
             if (!inSpec.containsName(m_weightColumn.getColumnName())) {
                 throw
@@ -368,7 +368,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         m_weightAvailable.validateSettings(settings);
         m_multiModelMethod.validateSettings(settings);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -378,7 +378,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             CanceledExecutionException {
         //Nothing to do
     }
-    
+
     /**
      * {@inheritDoc}
      */

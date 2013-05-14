@@ -175,13 +175,13 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                     try {
                         pmmlCell = PMMLCellFactory.create(model.createPMMLDocument(dataDict).toString());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.warn(e);
                     } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
+                        LOGGER.warn(e);
                     } catch (SAXException e) {
-                        e.printStackTrace();
+                        LOGGER.warn(e);
                     } catch (XMLStreamException e) {
-                        e.printStackTrace();
+                        LOGGER.warn(e);
                     }
                     double w = s.getWeight();
                     DataCell weightCell = new DoubleCell(w);
@@ -199,7 +199,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
      * @return an array of pmml cells
      */
     public PMMLCell[] getPmmlCells() {
-        return m_pmmlCells;
+        return m_pmmlCells.clone();
     }
 
     /**
@@ -207,7 +207,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
      * @return an array of weights
      */
     public DoubleCell[] getWeightCells() {
-        return m_weightCells;
+        return m_weightCells.clone();
     }
 
     @Override
@@ -325,7 +325,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         for (MiningField mf1 : s.getMiningFieldList()) {
             boolean match = false;
             for (MiningField mf2 : original.getMiningFieldList()) {
-                if (mf1.getName() == mf2.getName()) {
+                if (mf1.getName().equals(mf2.getName())) {
                     match = true;
                     if (miningFieldsAreEqual(mf1, mf2)) {
                         fields.add(mf1);
@@ -353,7 +353,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                 && f1.getLowValue() == f2.getLowValue()
                 && f1.getImportance() == f2.getImportance()
                 && f1.getInvalidValueTreatment() == f2.getInvalidValueTreatment()
-                && f1.getMissingValueReplacement() == f2.getMissingValueReplacement()
+                && f1.getMissingValueReplacement().equals(f2.getMissingValueReplacement())
                 && f1.getMissingValueTreatment() == f2.getMissingValueTreatment()
                 && f1.getOptype() == f2.getOptype()
                 && f1.getOutliers() == f2.getOutliers()

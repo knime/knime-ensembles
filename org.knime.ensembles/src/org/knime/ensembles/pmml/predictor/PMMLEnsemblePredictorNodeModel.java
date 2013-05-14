@@ -54,6 +54,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.dmg.pmml.MININGFUNCTION;
 import org.dmg.pmml.MULTIPLEMODELMETHOD;
@@ -214,7 +216,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         List<PMMLModelWrapper> wrappers = PMMLModelWrapper.getModelListFromMiningModel(usedModel);
 
         // Predict with each model in the mining model
-        HashMap<RowKey, ArrayList<DataCell>> results = calculateAllPredictions(wrappers, inData, pmmldoc,
+        Map<RowKey, ArrayList<DataCell>> results = calculateAllPredictions(wrappers, inData, pmmldoc,
                 usedModel.getFunctionName(), exec);
 
         // Calculate the aggregated result depending on the MultipleModelsMethod
@@ -231,26 +233,16 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             throws InvalidSettingsException {
         // We cannot know from the specs how many columns will be added because we don't know the number of models
         // in the ensemble
-        /*if (m_returnIndividualPredictions.getBooleanValue()) {
-            return new DataTableSpec[]{null};
-        } else {
-            DataTableSpec inTableSpec = (DataTableSpec)inSpecs[0];
-            return new PortObjectSpec[]{ createOutSpecs(inTableSpec) };
-        }*/
         return new DataTableSpec[]{null};
     }
 
-    /*DataTableSpec createOutSpecs(DataTableSpec inSpec) {
-        DataTableSpec newColSpec = new DataTableSpec();
-        DataColumnSpecCreator c = new DataColumnSpecCreator("Prediction", )
-    }*/
 
-    private HashMap<RowKey, ArrayList<DataCell>> calculateAllPredictions(final List<PMMLModelWrapper> wrappers,
+    private Map<RowKey, ArrayList<DataCell>> calculateAllPredictions(final List<PMMLModelWrapper> wrappers,
                                                   final PortObject[] inData, final PMMLDocument pmmldoc,
                                                   final MININGFUNCTION.Enum funcName, final ExecutionContext exec)
                                                   throws Exception {
         BufferedDataTable inTable = (BufferedDataTable)inData[1];
-        HashMap<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
+        Map<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
         int count = 0;
         for (PMMLModelWrapper modelwrapper : wrappers) {
             count++;
@@ -328,7 +320,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
     }
 
     private BufferedDataTable combine(final BufferedDataTable inTable,
-                                    final HashMap<RowKey, ArrayList<DataCell>> results,
+                                    final Map<RowKey, ArrayList<DataCell>> results,
                                     final MiningModel usedModel,
                                     final int numModels,
                                     final ExecutionContext exec)
@@ -355,13 +347,14 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         if (m_returnIndividualPredictions.getBooleanValue()) {
             names = new String[numModels + 1];
             types = new DataType[numModels + 1];
-            for (RowKey key : results.keySet()) {
-                for (DataCell c : results.get(key)) {
+            for (Entry<RowKey, ArrayList<DataCell>> entry : results.entrySet()) {
+                for (DataCell c : entry.getValue()) {
                     names[counter] = "result" + counter;
                     types[counter] = c.getType();
                     counter++;
                 }
                 break;
+
             }
         } else {
             names = new String[1];
@@ -452,24 +445,24 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
          return (BufferedDataTable) cont.getTable();
     }
 
-    private StringCell selectAll(final ArrayList<DataCell> cells) {
+    private StringCell selectAll(final List<DataCell> cells) {
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < cells.size(); i++) {
-            buffer.append("\"");
+            buffer.append('\"');
             buffer.append(cells.get(i).toString());
-            buffer.append("\"");
+            buffer.append('\"');
             if (i != cells.size() - 1) {
-                buffer.append(";");
+                buffer.append(';');
             }
         }
         return new StringCell(buffer.toString());
     }
 
-    private DataCell median(final ArrayList<DataCell> cells) {
+    private DataCell median(final List<DataCell> cells) {
         if (cells.size() == 1) {
             return cells.get(0);
         }
-        ArrayList<DataCell> sortedCells = new ArrayList<DataCell>(cells);
+        List<DataCell> sortedCells = new ArrayList<DataCell>(cells);
         Collections.sort(sortedCells, new Comparator<DataCell>() {
             @Override
             public int compare(final DataCell arg0, final DataCell arg1) {
@@ -499,7 +492,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         }
     }
 
-    private DoubleCell sum(final ArrayList<DataCell> cells) {
+    private DoubleCell sum(final List<DataCell> cells) {
         double sum = 0.0;
         for (DataCell c : cells) {
             if (c instanceof DoubleCell) {
@@ -509,7 +502,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         return new DoubleCell(sum);
     }
 
-    private DoubleCell max(final ArrayList<DataCell> cells) {
+    private DoubleCell max(final List<DataCell> cells) {
         Double max = Double.NaN;
         for (DataCell c : cells) {
             if (c instanceof DoubleCell) {
@@ -522,15 +515,15 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         return new DoubleCell(max);
     }
 
-    private DataCell majorityVote(final ArrayList<DataCell> cells) {
+    private DataCell majorityVote(final List<DataCell> cells) {
         return vote(cells, new double[0], false);
     }
 
-    private DataCell weightedMajorityVote(final ArrayList<DataCell> cells, final double[] weights) {
+    private DataCell weightedMajorityVote(final List<DataCell> cells, final double[] weights) {
         return vote(cells, weights, true);
     }
 
-    private DataCell vote(final ArrayList<DataCell> cells, final double[] weights, final boolean useWeights) {
+    private DataCell vote(final List<DataCell> cells, final double[] weights, final boolean useWeights) {
         HashMap<String, Double> catCount = new HashMap<String, Double>();
         int index = 0;
         ArrayList<String> mostFreq = new ArrayList<String>();
@@ -568,7 +561,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         return new StringCell(winner);
     }
 
-    private DoubleCell average(final ArrayList<DataCell> cells) {
+    private DoubleCell average(final List<DataCell> cells) {
         double sum = 0;
         for (DataCell c : cells) {
             sum += ((DoubleCell)c).getDoubleValue();
@@ -576,7 +569,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         return new DoubleCell(sum / cells.size());
     }
 
-    private DoubleCell weightedAverage(final ArrayList<DataCell> cells, final double[] weights) {
+    private DoubleCell weightedAverage(final List<DataCell> cells, final double[] weights) {
         double sum = 0;
         int counter = 0;
         for (DataCell c : cells) {

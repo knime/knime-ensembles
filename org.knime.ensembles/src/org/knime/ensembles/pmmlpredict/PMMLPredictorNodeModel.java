@@ -104,22 +104,20 @@ public class PMMLPredictorNodeModel extends NodeModel {
 
            Set<PMMLModelType> types =  port.getPMMLValue().getModelTypes();
            if (types.size() < 1) {
-               String msg = "No PMML Model found.";
-                throw new RuntimeException(msg);
+                throw new InvalidSettingsException("No PMML Model found.");
            }
 
            PMMLModelType type = types.iterator().next();
 
            if (types.size() > 1) {
                setWarningMessage(
-                    "More models are found, the first one is used " 
+                    "More models are found, the first one is used "
                        + " : " + type.toString());
            }
 
             List<Node> models = port.getPMMLValue().getModels(type);
             if (models.isEmpty()) {
-                  String msg = "No PMML Model found.";
-                    throw new RuntimeException(msg);
+                throw new InvalidSettingsException("No PMML Model found.");
             }
 
         switch (type) {
@@ -128,12 +126,12 @@ public class PMMLPredictorNodeModel extends NodeModel {
             return model.execute(inObjects, exec);
         }
         case GeneralRegressionModel: {
-            GeneralRegressionPredictorNodeModel model 
+            GeneralRegressionPredictorNodeModel model
                         = new GeneralRegressionPredictorNodeModel();
             return model.execute(inObjects, exec);
         }
         case RegressionModel: {
-            RegressionPredictorNodeModel model 
+            RegressionPredictorNodeModel model
                         = new RegressionPredictorNodeModel();
             return model.execute(inObjects, exec);
         }
@@ -149,11 +147,9 @@ public class PMMLPredictorNodeModel extends NodeModel {
             MLPPredictorNodeModel model = new MLPPredictorNodeModel();
             return model.execute(inObjects, exec);
         }
-
         default:
             // this should never happen.
-            String msg = "No suitable predictor found for these model types.";
-            throw new RuntimeException(msg);
+            throw new InvalidSettingsException("No suitable predictor found for these model types.");
         }
     }
 
@@ -168,7 +164,7 @@ public class PMMLPredictorNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // nothing to load

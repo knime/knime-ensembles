@@ -107,7 +107,7 @@ public class BoostingLearnerLoopStartNodeModel extends NodeModel implements
             return new BufferedDataTable[]{inData[0], inData[0]};
         }
         if (!(getLoopEndNode() instanceof BoostingLearnerLoopEndNodeModel)) {
-            throw new RuntimeException(
+            throw new InvalidSettingsException(
                     "Loop end node is not a boosting loop end node");
         }
 
