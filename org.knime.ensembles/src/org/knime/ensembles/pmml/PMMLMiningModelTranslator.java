@@ -73,7 +73,6 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.xml.PMMLCell;
 import org.knime.core.data.xml.PMMLCellFactory;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.NodeLogger;
@@ -93,7 +92,7 @@ import org.xml.sax.SAXException;
  */
 public class PMMLMiningModelTranslator implements PMMLTranslator {
 
-    private PMMLCell[] m_pmmlCells;
+    private DataCell[] m_pmmlCells;
     private DoubleCell[] m_weightCells;
     private boolean m_weightAvailable = false;
     private org.dmg.pmml.MULTIPLEMODELMETHOD.Enum m_multModelMethod;
@@ -130,11 +129,11 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         int weightColIndex = weightAvailable ? dtspec.findColumnIndex(weightColumnName) : -1;
         int pmmlColIndex = dtspec.findColumnIndex(pmmlColumnName);
 
-        ArrayList<PMMLCell> pmmls = new ArrayList<PMMLCell>();
+        ArrayList<DataCell> pmmls = new ArrayList<DataCell>();
         ArrayList<DoubleCell> weights = new ArrayList<DoubleCell>();
 
         for (DataRow row : treeModelsTable) {
-             PMMLCell pmmlCell = (PMMLCell)row.getCell(pmmlColIndex);
+             DataCell pmmlCell = row.getCell(pmmlColIndex);
              pmmls.add(pmmlCell);
              if (weightAvailable) {
                  DoubleCell weightCell = (DoubleCell)row.getCell(weightColIndex);
@@ -142,7 +141,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
              }
         }
 
-        m_pmmlCells = pmmls.toArray(new PMMLCell[0]);
+        m_pmmlCells = pmmls.toArray(new DataCell[0]);
         if (weightAvailable) {
             m_weightCells = weights.toArray(new DoubleCell[0]);
         }
@@ -164,7 +163,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
     public void initializeFrom(final PMMLDocument pmmldoc) {
         DataDictionary dataDict = pmmldoc.getPMML().getDataDictionary();
         List<MiningModel> miningModels = pmmldoc.getPMML().getMiningModelList();
-        ArrayList<PMMLCell> pmmlCells = new ArrayList<PMMLCell>();
+        ArrayList<DataCell> pmmlCells = new ArrayList<DataCell>();
         ArrayList<DoubleCell> weightCells = new ArrayList<DoubleCell>();
 
         if (miningModels.size() > 0) {
@@ -185,12 +184,12 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                     }
                     double w = s.getWeight();
                     DataCell weightCell = new DoubleCell(w);
-                    pmmlCells.add((PMMLCell)pmmlCell);
+                    pmmlCells.add(pmmlCell);
                     weightCells.add((DoubleCell)weightCell);
                 }
             }
         }
-        m_pmmlCells = pmmlCells.toArray(new PMMLCell[0]);
+        m_pmmlCells = pmmlCells.toArray(new DataCell[0]);
         m_weightCells = weightCells.toArray(new DoubleCell[0]);
     }
 
@@ -198,7 +197,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
      * Returns an array of pmml cells that are used for building the pmml document.
      * @return an array of pmml cells
      */
-    public PMMLCell[] getPmmlCells() {
+    public DataCell[] getPmmlCells() {
         return m_pmmlCells.clone();
     }
 
@@ -233,7 +232,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         pmml.setDataDictionary(null);
         //Each row contains one mining model
         for (int i = 0; i < m_pmmlCells.length; i++) {
-            PMMLValue val = m_pmmlCells[i];
+            PMMLValue val = (PMMLValue)m_pmmlCells[i];
             PMMLDocument pmmldoc = null;
             PMML sourcePMML = null;
 
@@ -353,7 +352,11 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                 && f1.getLowValue() == f2.getLowValue()
                 && f1.getImportance() == f2.getImportance()
                 && f1.getInvalidValueTreatment() == f2.getInvalidValueTreatment()
-                && f1.getMissingValueReplacement().equals(f2.getMissingValueReplacement())
+                && (
+                        (f1.getMissingValueReplacement() == null && f2.getMissingValueReplacement() == null)
+                        || (f1.getMissingValueReplacement() != null
+                        && f1.getMissingValueReplacement().equals(f2.getMissingValueReplacement()))
+                   )
                 && f1.getMissingValueTreatment() == f2.getMissingValueTreatment()
                 && f1.getOptype() == f2.getOptype()
                 && f1.getOutliers() == f2.getOutliers()

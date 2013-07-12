@@ -50,18 +50,13 @@ package org.knime.ensembles.pmml.loopend;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentFlowVariableNameSelection;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.workflow.FlowVariable;
@@ -92,26 +87,15 @@ public class PMMLEnsembleLoopEndNodeDialog extends DefaultNodeSettingsPane {
 
         Collection<FlowVariable> flowVars = getAvailableFlowVariables().values();
 
-        DialogComponentBoolean weightAvailable = new DialogComponentBoolean(
-                PMMLEnsembleLoopEndNodeModel.createWeightAvailableSettingsModel(), "Weight available");
-
         m_flowVarSettingsModel = PMMLEnsembleLoopEndNodeModel.createWeightFlowVarNameSettingsModel();
         m_flowVarSelection = new DialogComponentFlowVariableNameSelection(
                 m_flowVarSettingsModel, "Weight flow variable",
-                flowVars, FlowVariable.Type.DOUBLE);
-
-        weightAvailable.getModel().addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent arg0) {
-                m_flowVarSelection.getModel().setEnabled(((SettingsModelBoolean)arg0.getSource()).getBooleanValue());
-            }
-        });
+                flowVars, true, FlowVariable.Type.DOUBLE, FlowVariable.Type.INTEGER);
 
         DialogComponentStringSelection multModelSelection = new DialogComponentStringSelection(
-                PMMLEnsembleNodeModel.createMultiModelMethodSettingsModel(),
-                "Multiple models method", PMMLEnsembleLoopEndNodeModel.MULTIMODELMETHOD_CHOICES);
+                PMMLEnsembleLoopEndNodeModel.createMultiModelMethodSettingsModel(),
+                "Multiple models method", PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES);
 
-        addDialogComponent(weightAvailable);
         addDialogComponent(m_flowVarSelection);
         addDialogComponent(multModelSelection);
     }

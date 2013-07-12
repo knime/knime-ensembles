@@ -73,18 +73,20 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.flowvariable.FlowVariablePortObject;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
+import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.LoopEndNode;
 import org.knime.core.node.workflow.LoopStartNodeTerminator;
 import org.knime.ensembles.pmml.PMMLEnsembleHelpers;
 import org.knime.ensembles.pmml.PMMLMiningModelTranslator;
+import org.knime.ensembles.pmml.combine.PMMLEnsembleNodeModel;
 
 
 
@@ -105,7 +107,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
      * Constructor for the node model.
      */
     protected PMMLEnsembleLoopEndNodeModel() {
-        super(new PortType[]{new PortType(PMMLPortObject.class)},
+        super(new PortType[]{new PortType(FlowVariablePortObject.class, true) , new PortType(PMMLPortObject.class)},
                 new PortType[]{new PortType(PMMLPortObject.class)});
     }
 
@@ -125,15 +127,12 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     /** The name of the settings tag which holds the name for the weight flow variable. */
     public static final String WEIGHT_FLOW_VARIABLE_NAME = "weightFlowVarName";
 
-    /** The name of the settings tag which holds the information whether a flow variable for weights is available. */
-    public static final String WEIGHT_AVAILABLE = "weightAvailable";
-
     /**
      * Creates a SettingsModelString for storing the method used for treating multiple models.
      * @return the created SettingsModel
      */
     public static SettingsModelString createMultiModelMethodSettingsModel() {
-        return new SettingsModelString(MULTIMODELMETHOD, MULTIMODELMETHOD_CHOICES[0]);
+        return new SettingsModelString(MULTIMODELMETHOD, PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES[0]);
     }
 
     /**
@@ -141,52 +140,12 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
      * @return the created SettingsModel
      */
     public static SettingsModelString createWeightFlowVarNameSettingsModel() {
-        SettingsModelString sm = new SettingsModelString(WEIGHT_FLOW_VARIABLE_NAME, null);
-        sm.setEnabled(false);
-        return sm;
+        return new SettingsModelString(WEIGHT_FLOW_VARIABLE_NAME, null);
     }
-
-    /**
-     * Creates a SettingsModelBoolean for storing a value that determines
-     * whether a flow variable for weights is available.
-     * @return the created SettingsModel
-     */
-    public static SettingsModelBoolean createWeightAvailableSettingsModel() {
-        return new SettingsModelBoolean(WEIGHT_AVAILABLE, false);
-    }
-
-    private SettingsModelBoolean m_weightAvailable = createWeightAvailableSettingsModel();
 
     private SettingsModelString m_multiModelMethod = createMultiModelMethodSettingsModel();
 
     private SettingsModelString m_weightFlowVarName = createWeightFlowVarNameSettingsModel();
-
-    /**The choices a user has for determining how multiple models are treated. */
-    protected static final String[] MULTIMODELMETHOD_CHOICES = new String[]{
-        "Majority vote",
-        "Average",
-        "Maximum",
-        "Sum",
-        "Median",
-        "Select all",
-        "Select first",
-        "Weighted Average",
-        "Weighted Majority Vote"
-    };
-
-    /**Corresponding Enum values for Strings in MULTIMODELMETHOD_CHOICES. */
-    protected static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] MULTIMODELMETHOD_CHOICES_ENUM
-                = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.MAX,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.SUM,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE,
-                    org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE
-                };
 
     private DataTableSpec createInternalSpec(final boolean useWeights) {
         DataColumnSpecCreator pmml = new DataColumnSpecCreator(PMML_COLUMN_NAME, PMMLCell.TYPE);
@@ -214,14 +173,22 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
         boolean useWeights = flowVarName != null && flowVarName.length() > 0;
         double weight = 0;
         if (useWeights) {
-            weight = getAvailableFlowVariables().get(flowVarName).getDoubleValue();
+            FlowVariable fv = getAvailableFlowVariables().get(flowVarName);
+            if (fv == null) {
+                useWeights = false;
+            } else {
+                weight = fv.getDoubleValue();
+                if (Double.isNaN(weight)) {
+                    weight = fv.getIntValue();
+                }
+            }
         }
 
         if (m_resultContainer == null) {
             m_resultContainer = exec.createDataContainer(createInternalSpec(useWeights));
             m_count = 0;
         }
-        PMMLDocument pmmldoc = PMMLDocument.Factory.parse(((PMMLPortObject)inData[0]).getPMMLValue().getDocument());
+        PMMLDocument pmmldoc = PMMLDocument.Factory.parse(((PMMLPortObject)inData[1]).getPMMLValue().getDocument());
         DataCell pmmlCell = PMMLCellFactory.create(pmmldoc.toString());
 
         DefaultRow row = null;
@@ -232,18 +199,15 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
         }
         m_resultContainer.addRowToTable(row);
 
-         boolean terminateLoop =
-             ((LoopStartNodeTerminator)this.getLoopStartNode())
-                     .terminateLoop();
+         boolean terminateLoop = ((LoopStartNodeTerminator)this.getLoopStartNode()).terminateLoop();
          if (terminateLoop) {
              // this was the last iteration - close container and continue
              m_resultContainer.close();
              BufferedDataTable table = m_resultContainer.getTable();
              DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(table, PMML_COLUMN_NAME);
 
-             List<PMMLModelWrapper> wrappers =
-                    PMMLEnsembleHelpers.getModelListFromInput(table, PMML_COLUMN_NAME);
-                PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
+             List<PMMLModelWrapper> wrappers = PMMLEnsembleHelpers.getModelListFromInput(table, PMML_COLUMN_NAME);
+             PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
 
                 /*
                  * Learning and target columns are lost when PMML is written in a table.
@@ -271,15 +235,15 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
 
               //Find the corresponding MultiModelMethod value for the selected string
                 int multimodelchoice = -1;
-                for (int i = 0; i < MULTIMODELMETHOD_CHOICES.length; i++) {
-                    if (MULTIMODELMETHOD_CHOICES[i].equals(m_multiModelMethod.getStringValue())) {
+                for (int i = 0; i < PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES.length; i++) {
+                    if (PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES[i].equals(m_multiModelMethod.getStringValue())) {
                         multimodelchoice = i;
                         break;
                     }
                 }
 
                 trans = new PMMLMiningModelTranslator(table, PMML_COLUMN_NAME, useWeights ? WEIGHT_COLUMN_NAME : null,
-                        MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
+                    PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
 
                 outPMMLPort.addModelTranslater(trans);
                 return new PortObject[]{outPMMLPort};
@@ -315,7 +279,6 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_multiModelMethod.saveSettingsTo(settings);
         m_weightFlowVarName.saveSettingsTo(settings);
-        m_weightAvailable.saveSettingsTo(settings);
     }
 
     /**
@@ -326,7 +289,6 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             throws InvalidSettingsException {
         m_multiModelMethod.loadSettingsFrom(settings);
         m_weightFlowVarName.loadSettingsFrom(settings);
-        m_weightAvailable.loadSettingsFrom(settings);
     }
 
     /**
@@ -337,7 +299,6 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             throws InvalidSettingsException {
         m_multiModelMethod.validateSettings(settings);
         m_weightFlowVarName.validateSettings(settings);
-        m_weightAvailable.validateSettings(settings);
     }
 
     /**

@@ -18,7 +18,8 @@
     </fullDescription>
     
     <ports>
-        <inPort index="0" name="PMML In">PMML model to be included in the ensemble</inPort>
+        <inPort index="0" name="FlowVariable In">Flow Variable for the weight</inPort>
+        <inPort index="1" name="PMML In">PMML model to be included in the ensemble</inPort>
         <outPort index="0" name="PMML ensemble">A PMML ensemble</outPort>
     </ports>    
 </knimeNode>

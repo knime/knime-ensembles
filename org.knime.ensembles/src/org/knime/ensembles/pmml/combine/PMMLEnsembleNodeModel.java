@@ -116,7 +116,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
     public static final String MULTIMODELMETHOD = "multiModelMethod";
 
     /**The choices a user has for determining how multiple models are treated. */
-    protected static final String[] MULTIMODELMETHOD_CHOICES = new String[]{
+    public static final String[] MULTIMODELMETHOD_CHOICES = new String[]{
         "Majority vote",
         "Average",
         "Maximum",
@@ -142,7 +142,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
     /**Corresponding Enum values for Strings in MULTIMODELMETHOD_CHOICES.
      * http://www.dmg.org/v4-0-1/MultipleModels.html
      * */
-    protected static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] MULTIMODELMETHOD_CHOICES_ENUM
+    public static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] MULTIMODELMETHOD_CHOICES_ENUM
             = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
                 org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
                 org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,

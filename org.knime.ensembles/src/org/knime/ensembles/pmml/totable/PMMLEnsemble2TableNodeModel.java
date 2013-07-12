@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.dmg.pmml.PMMLDocument;
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DefaultRow;
@@ -103,7 +104,7 @@ public class PMMLEnsemble2TableNodeModel extends NodeModel {
         trans.initializeFrom(pmmldoc);
 
         BufferedDataContainer cont = exec.createDataContainer(createSpec(true));
-        PMMLCell[] pmmlCells = trans.getPmmlCells();
+        DataCell[] pmmlCells = trans.getPmmlCells();
         DoubleCell[] weightCells = trans.getWeightCells();
 
         for (int i = 0; i < pmmlCells.length; i++) {
