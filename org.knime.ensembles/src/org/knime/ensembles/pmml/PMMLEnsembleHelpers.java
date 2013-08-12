@@ -51,10 +51,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlException;
-import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.DataFieldDocument.DataField;
 import org.dmg.pmml.MiningFieldDocument.MiningField;
 import org.dmg.pmml.MiningSchemaDocument.MiningSchema;
+import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.PMMLDocument.PMML;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
@@ -65,6 +65,8 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.xml.PMMLValue;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 
 /**
@@ -72,7 +74,7 @@ import org.knime.core.node.port.pmml.PMMLModelWrapper;
  *
  * @author Alexander Fillbrunn, Universitaet Konstanz
  * @since 2.8
- * 
+ *
  */
 public final class PMMLEnsembleHelpers {
 
@@ -84,19 +86,24 @@ public final class PMMLEnsembleHelpers {
      * Creates a list of model wrappers from a table with pmml content.
      * @param inputTable The table containing a column with pmml documents
      * @param pmmlCol The index of the column that contains pmml documents
+     * @param exec the execution context to check for cancellation of the operation
      * @return A list of model wrappers
      * @throws XmlException if the XML document in a cell cannot be parsed as a pmml document
+     * @throws CanceledExecutionException Thrown when execution is canceled by the user
      */
     public static List<PMMLModelWrapper> getModelListFromInput(
-            final DataTable inputTable, final String pmmlCol) throws XmlException {
+            final DataTable inputTable, final String pmmlCol, final ExecutionContext exec)
+                    throws XmlException, CanceledExecutionException {
         DataTableSpec dtspec = inputTable.getDataTableSpec();
         int pmmlColIndex = dtspec.findColumnIndex(pmmlCol);
         ArrayList<PMMLModelWrapper> wrappers = new ArrayList<PMMLModelWrapper>();
         // Go through table and add all models we can find
         for (DataRow r : inputTable) {
+            if (exec != null) {
+                exec.checkCanceled();
+            }
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory
-                    .parse(val.getDocument());
+            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
             PMML sourcePMML = pmmldoc.getPMML();
             wrappers.addAll(PMMLModelWrapper.getModelListFromPMML(sourcePMML));
         }
@@ -119,8 +126,7 @@ public final class PMMLEnsembleHelpers {
 
         for (DataRow r : inputTable) {
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory
-                    .parse(val.getDocument());
+            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
             PMML sourcePMML = pmmldoc.getPMML();
 
             for (DataField field : sourcePMML.getDataDictionary().getDataFieldList()) {
@@ -181,7 +187,7 @@ public final class PMMLEnsembleHelpers {
         for (MiningField mf1 : s1.getMiningFieldList()) {
             for (MiningField mf2 : s2.getMiningFieldList()) {
                 if (mf1.getName().equals(mf2.getName())) {
-                    
+
                     if (mf1.getOptype() != mf2.getOptype()) {
                         throwModelMismatchException(mf1.getName(), "optypes", mf1.getOptype().toString(),
                                 mf2.getOptype().toString());

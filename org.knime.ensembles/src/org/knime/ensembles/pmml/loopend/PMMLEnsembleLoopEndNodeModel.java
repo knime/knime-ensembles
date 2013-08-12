@@ -201,12 +201,13 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
 
          boolean terminateLoop = ((LoopStartNodeTerminator)this.getLoopStartNode()).terminateLoop();
          if (terminateLoop) {
+             exec.setMessage("Generating output ensemble");
              // this was the last iteration - close container and continue
              m_resultContainer.close();
              BufferedDataTable table = m_resultContainer.getTable();
              DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(table, PMML_COLUMN_NAME);
 
-             List<PMMLModelWrapper> wrappers = PMMLEnsembleHelpers.getModelListFromInput(table, PMML_COLUMN_NAME);
+             List<PMMLModelWrapper> wrappers = PMMLEnsembleHelpers.getModelListFromInput(table, PMML_COLUMN_NAME, exec);
              PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
 
                 /*
@@ -233,7 +234,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                 PMMLPortObject outPMMLPort = new PMMLPortObject(creator.createSpec());
                 PMMLMiningModelTranslator trans;
 
-              //Find the corresponding MultiModelMethod value for the selected string
+                //Find the corresponding MultiModelMethod value for the selected string
                 int multimodelchoice = -1;
                 for (int i = 0; i < PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES.length; i++) {
                     if (PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES[i].equals(m_multiModelMethod.getStringValue())) {
