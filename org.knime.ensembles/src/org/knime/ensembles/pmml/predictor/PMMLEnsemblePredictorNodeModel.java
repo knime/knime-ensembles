@@ -203,7 +203,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
     @Override
     protected PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
-
+        exec.setMessage("Starting with PMML Ensemble Prediction...");
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
         PMMLDocument pmmldoc = PMMLDocument.Factory.parse(pmmlIn.getPMMLValue().getDocument());
         List<MiningModel> models = pmmldoc.getPMML().getMiningModelList();
@@ -214,11 +214,9 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
 
         // Retrieve a list of all models in the mining model
         List<PMMLModelWrapper> wrappers = PMMLModelWrapper.getModelListFromMiningModel(usedModel);
-
         // Predict with each model in the mining model
         Map<RowKey, ArrayList<DataCell>> results = calculateAllPredictions(wrappers, inData, pmmldoc,
                 usedModel.getFunctionName(), exec);
-
         // Calculate the aggregated result depending on the MultipleModelsMethod
         BufferedDataTable output = combine((BufferedDataTable)inData[1], results, usedModel, wrappers.size(), exec);
 
@@ -243,7 +241,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                                                   throws Exception {
         BufferedDataTable inTable = (BufferedDataTable)inData[1];
         Map<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
-        int count = 0;
+        double count = 0;
         for (PMMLModelWrapper modelwrapper : wrappers) {
             count++;
             if (exec != null) {
@@ -257,36 +255,39 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             creator.setLearningCols(((PMMLPortObject)inData[0]).getSpec().getLearningCols());
             PMMLPortObject fakePMMLPort = new PMMLPortObject(creator.createSpec(), modelDoc);
             DataTable result = null;
-
+            ExecutionContext subexec = null;
+            if (exec != null) {
+                subexec = exec.createSubExecutionContext(count / wrappers.size());
+            }
             switch (modelwrapper.getModelType()) {
                 case TreeModel:
                     DecTreePredictorNodeModel dectreeModel = new DecTreePredictorNodeModel();
                     result = (DataTable)dectreeModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case NeuralNetwork:
                     MLPPredictorNodeModel mlpModel = new MLPPredictorNodeModel();
-                    result = (DataTable)mlpModel.execute(new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                    result = (DataTable)mlpModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case RegressionModel:
                     RegressionPredictorNodeModel regrModel = new RegressionPredictorNodeModel();
-                    result = (DataTable)regrModel.execute(new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                    result = (DataTable)regrModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case GeneralRegressionModel:
                     GeneralRegressionPredictorNodeModel genregrModel =
                         new GeneralRegressionPredictorNodeModel();
                     result = (DataTable)genregrModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case ClusteringModel:
                     ClusterAssignerNodeModel clusterModel = new ClusterAssignerNodeModel();
                     result = (DataTable)clusterModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case SupportVectorMachineModel:
                     SVMPredictorNodeModel svmModel = new SVMPredictorNodeModel();
                     result = (DataTable)svmModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, exec)[0];
+                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 default:
                     throw new ModelNotSupportedException("Model of type "
@@ -313,7 +314,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                 }
             }
             if (exec != null) {
-                exec.getProgressMonitor().setProgress((double)count / wrappers.size());
+                exec.setProgress(count / wrappers.size());
             }
         }
         return results;

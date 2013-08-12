@@ -12,8 +12,6 @@
         This node collects PMML models that are generated in a loop and puts them together in one
         ensemble PMML Mining Model. This model consists of a segmentation with one segment for each model.
         </intro>
-        
-        
         <option name="multiple model method">Determines how the results of the models in the ensemble are combined</option>
     </fullDescription>
     

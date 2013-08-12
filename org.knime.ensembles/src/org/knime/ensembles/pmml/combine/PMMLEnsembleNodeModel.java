@@ -244,7 +244,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             }
         }
         List<PMMLModelWrapper> wrappers =
-            PMMLEnsembleHelpers.getModelListFromInput(inTable, pmmlColumnName);
+            PMMLEnsembleHelpers.getModelListFromInput(inTable, pmmlColumnName, exec);
         PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
 
         /*
