@@ -203,7 +203,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
     @Override
     protected PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
-        exec.setMessage("Starting with PMML Ensemble Prediction...");
+        exec.setMessage("PMML Ensemble Prediction");
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
         PMMLDocument pmmldoc = PMMLDocument.Factory.parse(pmmlIn.getPMMLValue().getDocument());
         List<MiningModel> models = pmmldoc.getPMML().getMiningModelList();
