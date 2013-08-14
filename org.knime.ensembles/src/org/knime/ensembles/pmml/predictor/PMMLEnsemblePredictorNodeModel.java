@@ -243,10 +243,8 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         Map<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
         double count = 0;
         for (PMMLModelWrapper modelwrapper : wrappers) {
-            count++;
-            if (exec != null) {
-                exec.checkCanceled();
-            }
+            exec.checkCanceled();
+            exec.setProgress(count++ / wrappers.size());
             // Create a new document with only one model
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
             // Create a fake pmml port for using the predictors
@@ -255,10 +253,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             creator.setLearningCols(((PMMLPortObject)inData[0]).getSpec().getLearningCols());
             PMMLPortObject fakePMMLPort = new PMMLPortObject(creator.createSpec(), modelDoc);
             DataTable result = null;
-            ExecutionContext subexec = null;
-            if (exec != null) {
-                subexec = exec.createSubExecutionContext(count / wrappers.size());
-            }
+            final ExecutionContext subexec = exec.createSubExecutionContext(1.0 / wrappers.size());
             switch (modelwrapper.getModelType()) {
                 case TreeModel:
                     DecTreePredictorNodeModel dectreeModel = new DecTreePredictorNodeModel();
@@ -313,9 +308,6 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                     list.add(row.getCell(row.getNumCells() - 1));
                 }
             }
-            if (exec != null) {
-                exec.setProgress(count / wrappers.size());
-            }
         }
         return results;
     }
@@ -325,7 +317,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                                     final MiningModel usedModel,
                                     final int numModels,
                                     final ExecutionContext exec)
-                  throws ModelNotSupportedException {
+                  throws ModelNotSupportedException, CanceledExecutionException {
 
         MULTIPLEMODELMETHOD.Enum method = usedModel.getSegmentation().getMultipleModelMethod();
         MININGFUNCTION.Enum funcName = usedModel.getFunctionName();
@@ -396,52 +388,51 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         }
 
         // Combine the cells in the results to one final result according to the multiple model method
-        DataContainer cont = exec.createDataContainer(
+        final DataContainer cont = exec.createDataContainer(
                 new DataTableSpec(inTable.getDataTableSpec(), new DataTableSpec(names, types)));
         for (DataRow row : inTable) {
-            RowKey key = row.getKey();
-             ArrayList<DataCell> list = results.get(key);
-             if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE) {
-                 list.add(average(list));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE) {
-                 list.add(weightedAverage(list, weights));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE) {
-                 list.add(majorityVote(list));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE) {
-                 list.add(weightedMajorityVote(list, weights));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MAX) {
-                 list.add(max(list));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN) {
-                 list.add(median(list));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SUM) {
-                 list.add(sum(list));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST) {
-                 list.add(list.get(0));
-             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL) {
-                 list.add(selectAll(list));
-             } else {
-                 throw new ModelNotSupportedException("Multiple model method "
-                         + method.toString() +  " is not supported");
-             }
-             int numCols = inTable.getDataTableSpec().getNumColumns();
-             DataCell[] cells = new DataCell[
-                          (m_returnIndividualPredictions.getBooleanValue()) ? numCols + numModels + 1 : numCols + 1];
+            exec.checkCanceled();
+            final RowKey key = row.getKey();
+            ArrayList<DataCell> list = results.get(key);
+            if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE) {
+                list.add(average(list));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE) {
+                list.add(weightedAverage(list, weights));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE) {
+                list.add(majorityVote(list));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE) {
+                list.add(weightedMajorityVote(list, weights));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MAX) {
+                list.add(max(list));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN) {
+                list.add(median(list));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SUM) {
+                list.add(sum(list));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST) {
+                list.add(list.get(0));
+            } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL) {
+                list.add(selectAll(list));
+            } else {
+                throw new ModelNotSupportedException("Multiple model method "
+                        + method.toString() +  " is not supported");
+            }
+            int numCols = inTable.getDataTableSpec().getNumColumns();
+            DataCell[] cells = new DataCell[
+                         (m_returnIndividualPredictions.getBooleanValue()) ? numCols + numModels + 1 : numCols + 1];
 
-             counter = 0;
-             for (DataCell c : row) {
-                 cells[counter++] = c;
-             }
-             if (m_returnIndividualPredictions.getBooleanValue()) {
-                 for (DataCell c : list) {
-                     cells[counter++] = c;
-                 }
-             } else {
-                 cells[counter++] = list.get(list.size() - 1);
-             }
-             DataRow newRow = new DefaultRow(key, cells);
-             cont.addRowToTable(newRow);
+            counter = 0;
+            for (DataCell c : row) {
+                cells[counter++] = c;
+            }
+            if (m_returnIndividualPredictions.getBooleanValue()) {
+                for (DataCell c : list) {
+                    cells[counter++] = c;
+                }
+            } else {
+                cells[counter++] = list.get(list.size() - 1);
+            }
+            cont.addRowToTable(new DefaultRow(key, cells));
          }
-
          cont.close();
          return (BufferedDataTable) cont.getTable();
     }

@@ -99,9 +99,7 @@ public final class PMMLEnsembleHelpers {
         ArrayList<PMMLModelWrapper> wrappers = new ArrayList<PMMLModelWrapper>();
         // Go through table and add all models we can find
         for (DataRow r : inputTable) {
-            if (exec != null) {
-                exec.checkCanceled();
-            }
+            exec.checkCanceled();
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
             PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
             PMML sourcePMML = pmmldoc.getPMML();

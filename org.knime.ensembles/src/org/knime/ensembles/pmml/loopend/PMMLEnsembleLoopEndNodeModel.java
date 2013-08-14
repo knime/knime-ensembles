@@ -217,6 +217,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                 Set<String> targetCols = new HashSet<String>();
                 Set<String> learningCols = new HashSet<String>();
                 for (PMMLModelWrapper model : wrappers) {
+                    exec.checkCanceled();
                     if (model.getMiningSchema() != null) {
                         for (MiningField field : model.getMiningSchema().getMiningFieldList()) {
                             if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED) {
