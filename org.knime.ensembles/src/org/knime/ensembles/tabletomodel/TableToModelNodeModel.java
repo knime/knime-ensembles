@@ -48,6 +48,7 @@ public class TableToModelNodeModel extends NodeModel {
         int index = table.getSpec().findColumnIndex(m_column.getStringValue());
         int rowCount = 0;
         for (DataRow row : table) {
+            exec.checkCanceled();
             final DataCell dc = row.getCell(index);
             if (!dc.isMissing()) {
                 if (rowCount > 0) {
@@ -60,7 +61,7 @@ public class TableToModelNodeModel extends NodeModel {
                     }
                 }
                 final PortObjectCell model = (PortObjectCell) dc;
-                return new PortObject[] {model.getPortObject()}; 
+                return new PortObject[] {model.getPortObject()};
             }
             rowCount++;
         }

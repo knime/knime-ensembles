@@ -119,16 +119,14 @@ public class PMMLEnsemble2TableNodeModel extends NodeModel {
     private DataTableSpec createSpec(final boolean weightAvailable) {
         DataColumnSpecCreator pmmlColSpecCreator =
             new DataColumnSpecCreator("PMML", PMMLCell.TYPE);
-        DataTableSpec spec = null;
         // If weights are available, another column for the weights is added
         if (weightAvailable) {
             DataColumnSpecCreator weightColSpecCreator =
                 new DataColumnSpecCreator("Weight", DoubleCell.TYPE);
-            spec = new DataTableSpec(pmmlColSpecCreator.createSpec(), weightColSpecCreator.createSpec());
+            return new DataTableSpec(pmmlColSpecCreator.createSpec(), weightColSpecCreator.createSpec());
         } else {
-            spec = new DataTableSpec(pmmlColSpecCreator.createSpec());
+            return new DataTableSpec(pmmlColSpecCreator.createSpec());
         }
-        return spec;
     }
 
     /**
