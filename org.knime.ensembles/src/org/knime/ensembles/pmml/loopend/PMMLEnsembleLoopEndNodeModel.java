@@ -157,7 +157,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
         }
 
         String flowVarName = m_weightFlowVarName.getStringValue();
-        boolean useWeights = flowVarName != null && flowVarName.length() > 0;
+        boolean useWeights = flowVarName != null && !flowVarName.equals("NONE") && flowVarName.length() > 0;
         double weight = 0;
         if (useWeights) {
             if (m_weights == null) {
