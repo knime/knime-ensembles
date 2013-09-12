@@ -55,10 +55,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.dmg.pmml.MiningFieldDocument.MiningField;
+import org.dmg.pmml.PMMLDocument;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -243,8 +246,31 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                 }
             }
         }
+        ArrayList<PMMLDocument> documents = new ArrayList<PMMLDocument>();
+        ArrayList<Double> weights = null;
+        if (m_weightAvailable.getBooleanValue()) {
+            weights = new ArrayList<Double>();
+        }
+        DataTableSpec dtspec = inTable.getDataTableSpec();
+        int pmmlColIndex = dtspec.findColumnIndex(pmmlColumnName);
+        int weightColIndex = dtspec.findColumnIndex(m_weightColumn.getColumnName());
+        exec.setMessage("Parsing models");
+        exec.setProgress(0.1);
+        for (DataRow r : inTable) {
+            exec.checkCanceled();
+            PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
+            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
+            documents.add(pmmldoc);
+
+            if (weights != null) {
+                Double w = ((DoubleCell)r.getCell(weightColIndex)).getDoubleValue();
+                weights.add(w);
+            }
+        }
+
+        ExecutionContext getModelsCtx = exec.createSubExecutionContext(0.4);
         List<PMMLModelWrapper> wrappers =
-            PMMLEnsembleHelpers.getModelListFromInput(inTable, pmmlColumnName, exec);
+            PMMLEnsembleHelpers.getModelListFromDocuments(documents, getModelsCtx);
         PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
 
         /*
@@ -266,8 +292,9 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             }
         }
 
+        ExecutionContext createTableSpecCtx = exec.createSubExecutionContext(0.8);
         // A fake spec created from the data dictionary
-        DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(inTable, pmmlColumnName);
+        DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(documents, createTableSpecCtx);
 
         PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(fakeSpec);
         creator.setTargetColsNames(new ArrayList<String>(targetCols));
@@ -283,14 +310,10 @@ public class PMMLEnsembleNodeModel extends NodeModel {
                 break;
             }
         }
-        if (m_weightAvailable.getBooleanValue()) {
-            trans = new PMMLMiningModelTranslator(inTable, pmmlColumnName,
-                    weightColName,
+
+        trans = new PMMLMiningModelTranslator(documents, weights,
                     MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
-        } else {
-            trans = new PMMLMiningModelTranslator(inTable, pmmlColumnName,
-                    MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
-        }
+
         outPMMLPort.addModelTranslater(trans);
 
         return new PortObject[]{outPMMLPort};
