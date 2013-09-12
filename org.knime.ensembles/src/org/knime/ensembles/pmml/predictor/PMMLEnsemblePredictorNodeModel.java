@@ -153,7 +153,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
     /**
      * Constructor for the node model.
      */
-    protected PMMLEnsemblePredictorNodeModel() {
+    public PMMLEnsemblePredictorNodeModel() {
         super(new PortType[]{new PortType(PMMLPortObject.class), new PortType(BufferedDataTable.class)},
                 new PortType[]{new PortType(BufferedDataTable.class)});
     }
@@ -201,7 +201,7 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inData,
+    public PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
         exec.setMessage("PMML Ensemble Prediction");
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
