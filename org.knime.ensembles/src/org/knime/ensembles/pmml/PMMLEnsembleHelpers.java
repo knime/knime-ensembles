@@ -48,6 +48,7 @@
 package org.knime.ensembles.pmml;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlException;
@@ -83,25 +84,48 @@ public final class PMMLEnsembleHelpers {
     }
 
     /**
-     * Creates a list of model wrappers from a table with pmml content.
-     * @param inputTable The table containing a column with pmml documents
-     * @param pmmlCol The index of the column that contains pmml documents
+     * Returns all PMMLDocuments from a table.
+     * @param inputTable the table with the documents
+     * @param pmmlCol the column where the PMMLDocuments are stored
+     * @param exec the execution context to check for cancellation
+     * @return a list of all PMMLDocuments in the table
+     * @throws CanceledExecutionException when the user cancels the execution
+     * @throws XmlException when a document cannot be parsed
+     */
+    public static List<PMMLDocument> getPMMLDocumentsFromTable(final DataTable inputTable,
+        final String pmmlCol, final ExecutionContext exec) throws CanceledExecutionException, XmlException {
+        ArrayList<PMMLDocument> docs = new ArrayList<PMMLDocument>();
+        DataTableSpec dtspec = inputTable.getDataTableSpec();
+        int pmmlColIndex = dtspec.findColumnIndex(pmmlCol);
+        for (DataRow r : inputTable) {
+            if (exec != null) {
+                exec.checkCanceled();
+            }
+            PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
+            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
+            docs.add(pmmldoc);
+        }
+        return docs;
+    }
+
+    /**
+     * Creates a list of model wrappers from a list of PMML documents.
+     * @param docs List of pmml documents
      * @param exec the execution context to check for cancellation of the operation
      * @return A list of model wrappers
      * @throws XmlException if the XML document in a cell cannot be parsed as a pmml document
      * @throws CanceledExecutionException Thrown when execution is canceled by the user
      */
-    public static List<PMMLModelWrapper> getModelListFromInput(
-            final DataTable inputTable, final String pmmlCol, final ExecutionContext exec)
+    public static List<PMMLModelWrapper> getModelListFromDocuments(
+            final List<PMMLDocument> docs, final ExecutionContext exec)
                     throws XmlException, CanceledExecutionException {
-        DataTableSpec dtspec = inputTable.getDataTableSpec();
-        int pmmlColIndex = dtspec.findColumnIndex(pmmlCol);
         ArrayList<PMMLModelWrapper> wrappers = new ArrayList<PMMLModelWrapper>();
-        // Go through table and add all models we can find
-        for (DataRow r : inputTable) {
-            exec.checkCanceled();
-            PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
+        double progressCount = 0;
+        for (PMMLDocument pmmldoc : docs) {
+            if (exec != null) {
+                exec.checkCanceled();
+                exec.setProgress(++progressCount / docs.size());
+            }
             PMML sourcePMML = pmmldoc.getPMML();
             wrappers.addAll(PMMLModelWrapper.getModelListFromPMML(sourcePMML));
         }
@@ -110,42 +134,49 @@ public final class PMMLEnsembleHelpers {
 
     /**
      * Creates a tables spec from a pmml data dictionary.
-     * @param inputTable The input table containing a column with pmml documents
-     * @param pmmlCol The name of the pmml column
+     * @param docs the list of PMMLDocuments
+     * @param exec the execution context to check for cancellation
      * @return Specs created from the data dictionaries of the models in the input table
      * @throws XmlException if the XML document in a cell cannot be parsed as a pmml document
+     * @throws CanceledExecutionException when the user cancels the operation
      */
-    public static DataTableSpec createTableSpec(final DataTable inputTable, final String pmmlCol) throws XmlException {
-        DataTableSpec dtspec = inputTable.getDataTableSpec();
-        int pmmlColIndex = dtspec.findColumnIndex(pmmlCol);
+    public static DataTableSpec createTableSpec(final List<PMMLDocument> docs, final ExecutionContext exec)
+                throws XmlException, CanceledExecutionException {
 
-        ArrayList<String> names = new ArrayList<String>();
-        ArrayList<DataType> dataTypes = new ArrayList<DataType>();
-
-        for (DataRow r : inputTable) {
-            PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
+        LinkedHashMap<String, DataType> cols = new LinkedHashMap<String, DataType>();
+        double progressCount = 0;
+        for (PMMLDocument pmmldoc : docs) {
+            if (exec != null) {
+                exec.checkCanceled();
+                exec.setProgress(++progressCount / docs.size());
+            }
             PMML sourcePMML = pmmldoc.getPMML();
-
             for (DataField field : sourcePMML.getDataDictionary().getDataFieldList()) {
                 // If field has not already been added, we create a new column for it in the specs
-                if (!names.contains(field.getName())) {
-                    names.add(field.getName());
+                if (!cols.containsKey((field.getName()))) {
                     if (field.getDataType() == org.dmg.pmml.DATATYPE.BOOLEAN) {
-                        dataTypes.add(DataType.getType(BooleanCell.class));
+                        cols.put(field.getName(), DataType.getType(BooleanCell.class));
                     } else if (field.getDataType() == org.dmg.pmml.DATATYPE.DOUBLE
                             || field.getDataType() == org.dmg.pmml.DATATYPE.FLOAT) {
-                        dataTypes.add(DataType.getType(DoubleCell.class));
+                        cols.put(field.getName(), DataType.getType(DoubleCell.class));
                     } else if (field.getDataType() == org.dmg.pmml.DATATYPE.INTEGER) {
-                        dataTypes.add(DataType.getType(IntCell.class));
+                        cols.put(field.getName(), DataType.getType(IntCell.class));
                     } else if (field.getDataType() == org.dmg.pmml.DATATYPE.STRING) {
-                        dataTypes.add(DataType.getType(StringCell.class));
+                        cols.put(field.getName(), DataType.getType(StringCell.class));
                     }
                 }
             }
         }
-        return new DataTableSpec(names.toArray(new String[0]),
-                dataTypes.toArray(new DataType[0]));
+        String[] names = new String[cols.size()];
+        DataType[] types = new DataType[cols.size()];
+        int count = 0;
+        for (String name : cols.keySet()) {
+            names[count] = name;
+            types[count] = cols.get(name);
+            count++;
+        }
+
+        return new DataTableSpec(names, types);
     }
 
     /**
@@ -158,7 +189,6 @@ public final class PMMLEnsembleHelpers {
             throws XmlException, ModelMismatchException {
         MiningSchema schema = null;
         org.dmg.pmml.MININGFUNCTION.Enum miningFunction = null;
-
         for (PMMLModelWrapper model : wrappers) {
             if (schema == null) {
                 schema = model.getMiningSchema();
@@ -182,49 +212,56 @@ public final class PMMLEnsembleHelpers {
      */
     public static void miningSchemesAreCompatible(final MiningSchema s1,
             final MiningSchema s2) throws ModelMismatchException {
+
+        LinkedHashMap<String, MiningField> fields2 = new LinkedHashMap<String, MiningField>();
+
+        for (MiningField mf : s2.getMiningFieldList()) {
+            fields2.put(mf.getName(), mf);
+        }
+
         for (MiningField mf1 : s1.getMiningFieldList()) {
-            for (MiningField mf2 : s2.getMiningFieldList()) {
-                if (mf1.getName().equals(mf2.getName())) {
+            MiningField mf2 = fields2.get(mf1.getName());
+            if (mf2 == null) {
+                continue;
+            }
+            if (mf1.getOptype() != mf2.getOptype()) {
+                throwModelMismatchException(mf1.getName(), "optypes", mf1.getOptype().toString(),
+                        mf2.getOptype().toString());
+            }
+            if (mf1.getOutliers() != mf2.getOutliers()) {
+                throwModelMismatchException(mf1.getName(),
+                        "outlier treatment", mf1.getOutliers().toString(), mf2.getOutliers().toString());
+            }
+            if (mf1.getUsageType() != mf2.getUsageType()) {
+                throwModelMismatchException(mf1.getName(), "usage type", mf1.getUsageType().toString(),
+                        mf2.getUsageType().toString());
+            }
+            if (mf1.getInvalidValueTreatment() != mf2
+                    .getInvalidValueTreatment()) {
+                throwModelMismatchException(mf1.getName(),
+                        "invalid value treatment", mf1.getInvalidValueTreatment().toString(),
+                        mf2.getInvalidValueTreatment().toString());
+            }
+            if (mf1.getMissingValueTreatment() != mf2
+                    .getMissingValueTreatment()) {
+                throwModelMismatchException(mf1.getName(),
+                        "missing value treatment", mf1.getMissingValueTreatment().toString(),
+                        mf2.getMissingValueTreatment().toString());
+            }
+            boolean mf1HasMissValRepl = mf1.getMissingValueReplacement() != null;
+            boolean mf2HasMissValRepl = mf2.getMissingValueReplacement() != null;
 
-                    if (mf1.getOptype() != mf2.getOptype()) {
-                        throwModelMismatchException(mf1.getName(), "optypes", mf1.getOptype().toString(),
-                                mf2.getOptype().toString());
-                    }
-                    if (mf1.getOutliers() != mf2.getOutliers()) {
-                        throwModelMismatchException(mf1.getName(),
-                                "outlier treatment", mf1.getOutliers().toString(), mf2.getOutliers().toString());
-                    }
-                    if (mf1.getUsageType() != mf2.getUsageType()) {
-                        throwModelMismatchException(mf1.getName(), "usage type", mf1.getUsageType().toString(),
-                                mf2.getUsageType().toString());
-                    }
-                    if (mf1.getInvalidValueTreatment() != mf2
-                            .getInvalidValueTreatment()) {
-                        throwModelMismatchException(mf1.getName(),
-                                "invalid value treatment", mf1.getInvalidValueTreatment().toString(),
-                                mf2.getInvalidValueTreatment().toString());
-                    }
-                    if (mf1.getMissingValueTreatment() != mf2
-                            .getMissingValueTreatment()) {
-                        throwModelMismatchException(mf1.getName(),
-                                "missing value treatment", mf1.getMissingValueTreatment().toString(),
-                                mf2.getMissingValueTreatment().toString());
-                    }
-                    boolean mf1HasMissValRepl = mf1
-                            .getMissingValueReplacement() != null;
-                    boolean mf2HasMissValRepl = mf2
-                            .getMissingValueReplacement() != null;
-
-                    if ((mf1HasMissValRepl || mf2HasMissValRepl)
-                            && (!mf1HasMissValRepl && mf2HasMissValRepl
-                                    || mf1HasMissValRepl && !mf2HasMissValRepl || (!mf1
-                                    .getMissingValueReplacement().equals(
-                                            mf2.getMissingValueReplacement())))) {
-                        throwModelMismatchException(mf1.getName(),
-                                "missing value replacement", mf1.getMissingValueReplacement(),
-                                mf2.getMissingValueReplacement());
-                    }
-                }
+            if ((mf1HasMissValRepl || mf2HasMissValRepl)
+                    && (!mf1HasMissValRepl && mf2HasMissValRepl
+                            || mf1HasMissValRepl && !mf2HasMissValRepl
+                            || (!mf1.getMissingValueReplacement().equals(
+                                    mf2.getMissingValueReplacement())
+                               )
+                       )
+                ) {
+                throwModelMismatchException(mf1.getName(),
+                        "missing value replacement", mf1.getMissingValueReplacement(),
+                        mf2.getMissingValueReplacement());
             }
         }
     }

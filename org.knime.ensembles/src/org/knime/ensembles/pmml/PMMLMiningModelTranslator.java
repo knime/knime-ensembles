@@ -48,17 +48,14 @@
 
 package org.knime.ensembles.pmml;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.xmlbeans.SchemaType;
-import org.apache.xmlbeans.XmlException;
 import org.dmg.pmml.DataDictionaryDocument.DataDictionary;
+import org.dmg.pmml.DataFieldDocument;
 import org.dmg.pmml.DataFieldDocument.DataField;
 import org.dmg.pmml.MiningFieldDocument.MiningField;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
@@ -69,18 +66,11 @@ import org.dmg.pmml.SegmentDocument.Segment;
 import org.dmg.pmml.SegmentationDocument.Segmentation;
 import org.dmg.pmml.TaxonomyDocument.Taxonomy;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataRow;
-import org.knime.core.data.DataTable;
-import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.xml.PMMLCellFactory;
-import org.knime.core.data.xml.PMMLValue;
-import org.knime.core.node.NodeLogger;
-import org.knime.core.node.port.pmml.PMMLMiningSchemaTranslator;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLTranslator;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -92,23 +82,19 @@ import org.xml.sax.SAXException;
  */
 public class PMMLMiningModelTranslator implements PMMLTranslator {
 
-    private DataCell[] m_pmmlCells;
-    private DoubleCell[] m_weightCells;
+    private List<PMMLDocument> m_docs;
+    private List<Double> m_weights;
     private boolean m_weightAvailable = false;
     private org.dmg.pmml.MULTIPLEMODELMETHOD.Enum m_multModelMethod;
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(
-            PMMLMiningSchemaTranslator.class);
-
     /**
      * Constructor for a PMMLSegmentedMiningModelTranslator that does not use a weight column.
-     * @param treeModelsTable The table with the models to be inserted into the final aggregated model
-     * @param pmmlColumnName The name of the column that contains the pmml data
+     * @param docs the PMMLDocuments
      * @param multimodelmethod The method used for combining the multiple models
      */
-    public PMMLMiningModelTranslator(final DataTable treeModelsTable, final String pmmlColumnName,
+    public PMMLMiningModelTranslator(final List<PMMLDocument> docs,
             final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum multimodelmethod) {
-        this(treeModelsTable, pmmlColumnName, null, false, multimodelmethod);
+        this(docs, null, false, multimodelmethod);
     }
 
     /**
@@ -117,80 +103,46 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
     public PMMLMiningModelTranslator() { }
 
     private PMMLMiningModelTranslator(
-            final DataTable treeModelsTable,
-            final String pmmlColumnName,
-            final String weightColumnName,
+            final List<PMMLDocument> docs,
+            final List<Double> weights,
             final boolean weightAvailable,
             final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum multimodelmethod) {
         m_weightAvailable = weightAvailable;
         m_multModelMethod = multimodelmethod;
-
-        DataTableSpec dtspec = treeModelsTable.getDataTableSpec();
-        int weightColIndex = weightAvailable ? dtspec.findColumnIndex(weightColumnName) : -1;
-        int pmmlColIndex = dtspec.findColumnIndex(pmmlColumnName);
-
-        ArrayList<DataCell> pmmls = new ArrayList<DataCell>();
-        ArrayList<DoubleCell> weights = new ArrayList<DoubleCell>();
-
-        for (DataRow row : treeModelsTable) {
-             DataCell pmmlCell = row.getCell(pmmlColIndex);
-             pmmls.add(pmmlCell);
-             if (weightAvailable) {
-                 DoubleCell weightCell = (DoubleCell)row.getCell(weightColIndex);
-                 weights.add(weightCell);
-             }
-        }
-
-        m_pmmlCells = pmmls.toArray(new DataCell[0]);
-        if (weightAvailable) {
-            m_weightCells = weights.toArray(new DoubleCell[0]);
-        }
+        m_docs = docs;
+        m_weights = weights;
     }
 
     /**
      * Constructor for a PMMLSegmentedMiningModelTranslator that uses a weight column.
-     * @param treeModelsTable The table with the models to be inserted into the final aggregated model
-     * @param pmmlColumnName The name of the column that contains the pmml data
-     * @param weightColumnName The name of the column that contains the weights for the models
+     * @param docs the PMMLDocuments
+     * @param weights the weights of the documents or null
      * @param multimodelmethod The method used for combining the multiple models
      */
-    public PMMLMiningModelTranslator(final DataTable treeModelsTable, final String pmmlColumnName,
-            final String weightColumnName, final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum multimodelmethod) {
-        this(treeModelsTable, pmmlColumnName, weightColumnName, weightColumnName != null, multimodelmethod);
+    public PMMLMiningModelTranslator(final List<PMMLDocument> docs,
+            final List<Double> weights, final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum multimodelmethod) {
+        this(docs, weights, weights != null, multimodelmethod);
     }
 
     @Override
     public void initializeFrom(final PMMLDocument pmmldoc) {
         DataDictionary dataDict = pmmldoc.getPMML().getDataDictionary();
         List<MiningModel> miningModels = pmmldoc.getPMML().getMiningModelList();
-        ArrayList<DataCell> pmmlCells = new ArrayList<DataCell>();
-        ArrayList<DoubleCell> weightCells = new ArrayList<DoubleCell>();
+
+        m_docs = new ArrayList<PMMLDocument>();
+        m_weights = new ArrayList<Double>();
 
         if (miningModels.size() > 0) {
             for (MiningModel mmodel : miningModels) {
                 for (Segment s : mmodel.getSegmentation().getSegmentList()) {
                     PMMLModelWrapper model = PMMLModelWrapper.getSegmentContent(s);
-                    DataCell pmmlCell = null;
-                    try {
-                        pmmlCell = PMMLCellFactory.create(model.createPMMLDocument(dataDict).toString());
-                    } catch (IOException e) {
-                        LOGGER.warn(e);
-                    } catch (ParserConfigurationException e) {
-                        LOGGER.warn(e);
-                    } catch (SAXException e) {
-                        LOGGER.warn(e);
-                    } catch (XMLStreamException e) {
-                        LOGGER.warn(e);
-                    }
+                    PMMLDocument doc = model.createPMMLDocument(dataDict);
+                    m_docs.add(doc);
                     double w = s.getWeight();
-                    DataCell weightCell = new DoubleCell(w);
-                    pmmlCells.add(pmmlCell);
-                    weightCells.add((DoubleCell)weightCell);
+                    m_weights.add(w);
                 }
             }
         }
-        m_pmmlCells = pmmlCells.toArray(new DataCell[0]);
-        m_weightCells = weightCells.toArray(new DoubleCell[0]);
     }
 
     /**
@@ -198,7 +150,17 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
      * @return an array of pmml cells
      */
     public DataCell[] getPmmlCells() {
-        return m_pmmlCells.clone();
+        DataCell[] cells = new DataCell[m_docs.size()];
+        int count = 0;
+        for (PMMLDocument doc : m_docs) {
+            try {
+                cells[count] = PMMLCellFactory.create(doc.toString());
+            } catch (Exception e) {
+                cells[count] = null;
+            }
+            count++;
+        }
+        return cells;
     }
 
     /**
@@ -206,7 +168,11 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
      * @return an array of weights
      */
     public DoubleCell[] getWeightCells() {
-        return m_weightCells.clone();
+        DoubleCell[] cells = new DoubleCell[m_weights.size()];
+        for (int i = 0; i < m_weights.size(); i++) {
+            cells[i] = new DoubleCell(m_weights.get(i));
+        }
+        return cells;
     }
 
     @Override
@@ -230,20 +196,10 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         Segmentation segm = miningModel.addNewSegmentation();
         segm.setMultipleModelMethod(m_multModelMethod);
         pmml.setDataDictionary(null);
-        //Each row contains one mining model
-        for (int i = 0; i < m_pmmlCells.length; i++) {
-            PMMLValue val = (PMMLValue)m_pmmlCells[i];
-            PMMLDocument pmmldoc = null;
-            PMML sourcePMML = null;
-
-            try {
-                pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
-            } catch (XmlException e) {
-                LOGGER.error("Error parsing the PMML document");
-                return null;
-            }
-
-            sourcePMML = pmmldoc.getPMML();
+        //Each row contains one model that needs to be added to the mining model
+        for (int i = 0; i < m_docs.size(); i++) {
+            PMMLDocument pmmldoc = m_docs.get(i);
+            PMML sourcePMML = pmmldoc.getPMML();
             MiningSchema schema = mergeSchemes(sourcePMML);
             pmml.setDataDictionary(mergeDictionaries(pmml.getDataDictionary(), sourcePMML.getDataDictionary()));
 
@@ -257,7 +213,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                 if (miningModel.getFunctionName() == null) {
                     miningModel.setFunctionName(model.getFunctionName());
                 }
-                model.addToSegment(createSegment(segm, m_weightAvailable ? m_weightCells[i].getDoubleValue() : 0));
+                model.addToSegment(createSegment(segm, m_weightAvailable ? m_weights.get(i) : 0));
             }
         }
         return MiningModel.type;
@@ -274,37 +230,32 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         }
 
         DataDictionary output = DataDictionary.Factory.newInstance();
-        List<DataField> fields = dict1.getDataFieldList();
-        List<Taxonomy> tax = dict1.getTaxonomyList();
+        HashMap<String, DataField> fields = new HashMap<String, DataFieldDocument.DataField>();
 
-        for (DataField df1 : dict2.getDataFieldList()) {
-            boolean exists = false;
-            for (DataField df2 : fields) {
-                if (df2.getName().equals(df1.getName())) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                fields.add(df1);
+        for (DataField df : dict1.getDataFieldList()) {
+            fields.put(df.getName(), df);
+        }
+
+        for (DataField df : dict2.getDataFieldList()) {
+            if (!fields.containsKey(df.getName())) {
+                fields.put(df.getName(), df);
             }
         }
-        for (Taxonomy tax1 : dict2.getTaxonomyList()) {
-            boolean exists = false;
-            for (Taxonomy tax2 : tax) {
-                if (tax2.getName().equals(tax1.getName())) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                tax.add(tax1);
+
+        HashMap<String, Taxonomy> taxons = new HashMap<String, Taxonomy>();
+        for (Taxonomy tax : dict1.getTaxonomyList()) {
+            taxons.put(tax.getName(), tax);
+        }
+
+        for (Taxonomy tax : dict2.getTaxonomyList()) {
+            if (!taxons.containsKey(tax.getName())) {
+                taxons.put(tax.getName(), tax);
             }
         }
 
         output.setNumberOfFields(BigInteger.valueOf(fields.size()));
-        output.setDataFieldArray(fields.toArray(new DataField[0]));
-        output.setTaxonomyArray(tax.toArray(new Taxonomy[0]));
+        output.setDataFieldArray(fields.values().toArray(new DataField[0]));
+        output.setTaxonomyArray(taxons.values().toArray(new Taxonomy[0]));
         return output;
     }
 
@@ -321,21 +272,24 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
     // This method is used to merge two mining schemes from two different models
     private MiningSchema mergeSchemes(final MiningSchema original, final MiningSchema s) {
         ArrayList<MiningField> fields = new ArrayList<MiningField>();
+        HashMap<String, MiningField> orgFields = new HashMap<String, MiningField>();
+        for (MiningField mf2 : original.getMiningFieldList()) {
+            orgFields.put(mf2.getName(), mf2);
+        }
         for (MiningField mf1 : s.getMiningFieldList()) {
             boolean match = false;
-            for (MiningField mf2 : original.getMiningFieldList()) {
-                if (mf1.getName().equals(mf2.getName())) {
-                    match = true;
-                    if (miningFieldsAreEqual(mf1, mf2)) {
-                        fields.add(mf1);
-                    } else {
-                        MiningField merged = (MiningField) mf1.copy();
-                        merged.setHighValue(Math.max(mf1.getHighValue(), mf2.getHighValue()));
-                        merged.setLowValue(Math.min(mf1.getLowValue(), mf2.getLowValue()));
-                        merged.setImportance((mf1.getImportance().compareTo(mf2.getImportance()) == -1)
-                                                ? mf1.getImportance() : mf2.getImportance());
-                        fields.add(merged);
-                    }
+            MiningField mf2 = orgFields.get(mf1.getName());
+            if (mf2 != null) {
+                match = true;
+                if (miningFieldsAreEqual(mf1, mf2)) {
+                    fields.add(mf1);
+                } else {
+                    MiningField merged = (MiningField) mf1.copy();
+                    merged.setHighValue(Math.max(mf1.getHighValue(), mf2.getHighValue()));
+                    merged.setLowValue(Math.min(mf1.getLowValue(), mf2.getLowValue()));
+                    merged.setImportance((mf1.getImportance().compareTo(mf2.getImportance()) == -1)
+                                            ? mf1.getImportance() : mf2.getImportance());
+                    fields.add(merged);
                 }
             }
             if (!match) {

@@ -72,6 +72,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.pmml.PMMLModelType;
+import org.knime.ensembles.pmml.predictor.PMMLEnsemblePredictorNodeModel;
 import org.w3c.dom.Node;
 
 /**
@@ -81,9 +82,7 @@ import org.w3c.dom.Node;
 */
 public class PMMLPredictorNodeModel extends NodeModel {
 
-
-
-       private static final int PMML_PORT = 0;
+    private static final int PMML_PORT = 0;
 
     /**
      * Creates a new model with a PMML input and a data output.
@@ -145,6 +144,10 @@ public class PMMLPredictorNodeModel extends NodeModel {
         }
         case NeuralNetwork: {
             MLPPredictorNodeModel model = new MLPPredictorNodeModel();
+            return model.execute(inObjects, exec);
+        }
+        case MiningModel: {
+            PMMLEnsemblePredictorNodeModel model = new PMMLEnsemblePredictorNodeModel();
             return model.execute(inObjects, exec);
         }
         default:

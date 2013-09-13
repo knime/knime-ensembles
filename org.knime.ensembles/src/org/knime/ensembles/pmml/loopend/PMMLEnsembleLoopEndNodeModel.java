@@ -57,15 +57,7 @@ import java.util.Set;
 
 import org.dmg.pmml.MiningFieldDocument.MiningField;
 import org.dmg.pmml.PMMLDocument;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.def.DefaultRow;
-import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.xml.PMMLCell;
-import org.knime.core.data.xml.PMMLCellFactory;
-import org.knime.core.node.BufferedDataContainer;
-import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -99,9 +91,8 @@ import org.knime.ensembles.pmml.combine.PMMLEnsembleNodeModel;
  */
 public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNode {
 
-    private BufferedDataContainer m_resultContainer;
-
-    private int m_count;
+    private List<PMMLDocument> m_documents;
+    private List<Double> m_weights;
 
     /**
      * Constructor for the node model.
@@ -109,6 +100,8 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     protected PMMLEnsembleLoopEndNodeModel() {
         super(new PortType[]{new PortType(FlowVariablePortObject.class, true) , new PortType(PMMLPortObject.class)},
                 new PortType[]{new PortType(PMMLPortObject.class)});
+        m_documents = null;
+        m_weights = null;
     }
 
     /**
@@ -147,16 +140,6 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
 
     private SettingsModelString m_weightFlowVarName = createWeightFlowVarNameSettingsModel();
 
-    private DataTableSpec createInternalSpec(final boolean useWeights) {
-        DataColumnSpecCreator pmml = new DataColumnSpecCreator(PMML_COLUMN_NAME, PMMLCell.TYPE);
-        if (useWeights) {
-            DataColumnSpecCreator weight = new DataColumnSpecCreator(WEIGHT_COLUMN_NAME, DoubleCell.TYPE);
-            return new DataTableSpec(pmml.createSpec(), weight.createSpec());
-        } else {
-            return new DataTableSpec(pmml.createSpec());
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -169,10 +152,17 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                     + " are trying to create an infinite loop!");
         }
 
+        if (m_documents == null) {
+            m_documents = new ArrayList<PMMLDocument>();
+        }
+
         String flowVarName = m_weightFlowVarName.getStringValue();
-        boolean useWeights = flowVarName != null && flowVarName.length() > 0;
+        boolean useWeights = flowVarName != null && !flowVarName.equals("NONE") && flowVarName.length() > 0;
         double weight = 0;
         if (useWeights) {
+            if (m_weights == null) {
+                m_weights = new ArrayList<Double>();
+            }
             FlowVariable fv = getAvailableFlowVariables().get(flowVarName);
             if (fv == null) {
                 useWeights = false;
@@ -184,30 +174,19 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             }
         }
 
-        if (m_resultContainer == null) {
-            m_resultContainer = exec.createDataContainer(createInternalSpec(useWeights));
-            m_count = 0;
-        }
         PMMLDocument pmmldoc = PMMLDocument.Factory.parse(((PMMLPortObject)inData[1]).getPMMLValue().getDocument());
-        DataCell pmmlCell = PMMLCellFactory.create(pmmldoc.toString());
 
-        DefaultRow row = null;
-        if (useWeights) {
-            row = new DefaultRow("Row" + (m_count++), pmmlCell, new DoubleCell(weight));
-        } else {
-            row = new DefaultRow("Row" + (m_count++), pmmlCell);
-        }
-        m_resultContainer.addRowToTable(row);
+         m_documents.add(pmmldoc);
+         if (useWeights) {
+             m_weights.add(weight);
+         }
 
          boolean terminateLoop = ((LoopStartNodeTerminator)this.getLoopStartNode()).terminateLoop();
          if (terminateLoop) {
              exec.setMessage("Generating output ensemble");
-             // this was the last iteration - close container and continue
-             m_resultContainer.close();
-             BufferedDataTable table = m_resultContainer.getTable();
-             DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(table, PMML_COLUMN_NAME);
 
-             List<PMMLModelWrapper> wrappers = PMMLEnsembleHelpers.getModelListFromInput(table, PMML_COLUMN_NAME, exec);
+             DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(m_documents, exec);
+             List<PMMLModelWrapper> wrappers = PMMLEnsembleHelpers.getModelListFromDocuments(m_documents, exec);
              PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
 
                 /*
@@ -244,12 +223,15 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                     }
                 }
 
-                trans = new PMMLMiningModelTranslator(table, PMML_COLUMN_NAME, useWeights ? WEIGHT_COLUMN_NAME : null,
+                trans = new PMMLMiningModelTranslator(m_documents, m_weights,
                     PMMLEnsembleNodeModel.MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
 
                 outPMMLPort.addModelTranslater(trans);
-                return new PortObject[]{outPMMLPort};
 
+                m_weights = null;
+                m_documents = null;
+
+                return new PortObject[]{outPMMLPort};
          } else {
              continueLoop();
              return new PMMLPortObject[1];
@@ -261,8 +243,8 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
      */
     @Override
     protected void reset() {
-        m_resultContainer = null;
-        m_count = 0;
+        m_documents = null;
+        m_weights = null;
     }
 
     /**
@@ -271,7 +253,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[]{null};
+        return new PortObjectSpec[]{inSpecs[0]};
     }
 
     /**
