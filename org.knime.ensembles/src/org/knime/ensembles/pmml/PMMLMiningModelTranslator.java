@@ -71,6 +71,7 @@ import org.knime.core.data.xml.PMMLCellFactory;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLTranslator;
+import org.knime.core.pmml.PMMLFormatter;
 
 
 /**
@@ -154,7 +155,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         int count = 0;
         for (PMMLDocument doc : m_docs) {
             try {
-                cells[count] = PMMLCellFactory.create(doc.toString());
+                cells[count] = PMMLCellFactory.create(PMMLFormatter.xmlText(doc));
             } catch (Exception e) {
                 cells[count] = null;
             }
