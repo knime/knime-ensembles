@@ -42,13 +42,10 @@ public class DelegatingLoopEndNodeModel extends NodeModel
 
     private BufferedDataTable m_inData;
     private int m_iterationnr = 0;
-    
-    private SettingsModelIntegerBounded m_maxIterations
-            = DelegatingLoopEndNodeDialog.createIterationsModel();
-    private SettingsModelIntegerBounded m_minNumberOfRows
-            = DelegatingLoopEndNodeDialog.createNumOfRowsModel();
-    private SettingsModelBoolean m_onlyLastResult 
-            = DelegatingLoopEndNodeDialog.createOnlyLastModel();
+
+    private SettingsModelIntegerBounded m_maxIterations = DelegatingLoopEndNodeDialog.createIterationsModel();
+    private SettingsModelIntegerBounded m_minNumberOfRows = DelegatingLoopEndNodeDialog.createNumOfRowsModel();
+    private SettingsModelBoolean m_onlyLastResult = DelegatingLoopEndNodeDialog.createOnlyLastModel();
 
     /**
      * Constructor for the node model.
@@ -68,8 +65,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
             final ExecutionContext exec) throws Exception {
         // in port 0: collects the data provided at the output port
         // in port 1: is fed back to loop start node
-        BufferedDataContainer loopData = exec.createDataContainer(
-                inData[resultingIn].getDataTableSpec());
+        BufferedDataContainer loopData = exec.createDataContainer(inData[resultingIn].getDataTableSpec());
 
 
         for (DataRow row : inData[resultingIn]) {
@@ -81,21 +77,19 @@ public class DelegatingLoopEndNodeModel extends NodeModel
 
         if (m_onlyLastResult.getBooleanValue()) {
             if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
-                       || m_iterationnr >= m_maxIterations.getIntValue()) {
+                    || m_iterationnr >= m_maxIterations.getIntValue()) {
                 return new BufferedDataTable[]{inData[collectingIn]};
             }
         } else {
             if (m_outcontainer == null) {
-                m_outcontainer = exec.createDataContainer(
-                        inData[collectingIn].getDataTableSpec());
+                m_outcontainer = exec.createDataContainer(inData[collectingIn].getDataTableSpec());
             }
-    
-    
+
             for (DataRow row : inData[collectingIn]) {
                 RowKey newKey = new RowKey(row.getKey() + "#" + m_iterationnr);
                 m_outcontainer.addRowToTable(createNewRow(row, newKey));
             }
-    
+
             // stop loop if there are less rows than needed.
             // or the max number of iterations is reached
             if (m_inData.getRowCount() < m_minNumberOfRows.getIntValue()
@@ -132,7 +126,11 @@ public class DelegatingLoopEndNodeModel extends NodeModel
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new DataTableSpec[]{inSpecs[0]};
+        if (m_onlyLastResult.getBooleanValue()) {
+            // the output may change over the loops
+            return new DataTableSpec[]{null};
+        }
+        return new DataTableSpec[]{inSpecs[collectingIn]};
     }
 
 
@@ -157,7 +155,7 @@ public class DelegatingLoopEndNodeModel extends NodeModel
         try {
             m_onlyLastResult.loadSettingsFrom(settings);
         } catch (InvalidSettingsException ise) {
-            // introduced in KNIME 2.6.1            
+            // introduced in KNIME 2.6.1
         }
     }
 
