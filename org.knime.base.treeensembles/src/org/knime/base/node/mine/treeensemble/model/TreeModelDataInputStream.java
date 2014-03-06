@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,50 +40,48 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   Jan 10, 2012 (wiswedel): created
+ * Created on Feb 2, 2014 by wiswedel
  */
-package org.knime.base.node.mine.treeensemble.node.predictor.classification;
+package org.knime.base.node.mine.treeensemble.model;
 
-import org.knime.base.node.mine.treeensemble.node.predictor.TreeEnsemblePredictorPanel;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.port.PortObjectSpec;
+import java.io.DataInputStream;
+import java.io.InputStream;
 
 /**
+ * An input stream that carries additional information used during loading.
  * 
  * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
  */
-public final class TreeEnsembleClassificationPredictorNodeDialogPane extends NodeDialogPane {
+final class TreeModelDataInputStream extends DataInputStream {
 
-    private final TreeEnsemblePredictorPanel m_predictorPanel;
+    private boolean m_containsClassDistribution;
 
     /**
-     *  */
-    public TreeEnsembleClassificationPredictorNodeDialogPane() {
-        m_predictorPanel = new TreeEnsemblePredictorPanel(false);
-        addTab(TreeEnsemblePredictorPanel.PANEL_NAME, m_predictorPanel);
+     * ...
+     * 
+     * @param in passed on to super.
+     */
+    TreeModelDataInputStream(final InputStream in) {
+        super(in);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-        throws NotConfigurableException {
-        m_predictorPanel.loadSettingsFrom(settings, specs);
+    /**
+     * @return the containsClassDistribution
+     */
+    boolean isContainsClassDistribution() {
+        return m_containsClassDistribution;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        m_predictorPanel.saveSettingsTo(settings);
+    /**
+     * @param value the containsClassDistribution to set
+     */
+    void setContainsClassDistribution(final boolean value) {
+        m_containsClassDistribution = value;
     }
 
 }
