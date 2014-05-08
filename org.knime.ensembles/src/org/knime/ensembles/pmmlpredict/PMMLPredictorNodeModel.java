@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -54,11 +54,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
-import org.knime.base.node.mine.decisiontree2.predictor.DecTreePredictorNodeModel;
-import org.knime.base.node.mine.neural.mlp.MLPPredictorNodeModel;
-import org.knime.base.node.mine.regression.logistic.predict.GeneralRegressionPredictorNodeModel;
-import org.knime.base.node.mine.regression.predict.RegressionPredictorNodeModel;
-import org.knime.base.node.mine.svm.predictor.SVMPredictorNodeModel;
+import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
+import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
+import org.knime.base.node.mine.regression.predict2.RegressionPredictorNodeModel;
+import org.knime.base.node.mine.svm.predictor2.SVMPredictorNodeModel;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -124,14 +123,10 @@ public class PMMLPredictorNodeModel extends NodeModel {
             ClusterAssignerNodeModel model = new ClusterAssignerNodeModel();
             return model.execute(inObjects, exec);
         }
-        case GeneralRegressionModel: {
-            GeneralRegressionPredictorNodeModel model
-                        = new GeneralRegressionPredictorNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case RegressionModel: {
+        case GeneralRegressionModel:
+        case RegressionModel:{
             RegressionPredictorNodeModel model
-                        = new RegressionPredictorNodeModel();
+            = new RegressionPredictorNodeModel();
             return model.execute(inObjects, exec);
         }
         case TreeModel: {
