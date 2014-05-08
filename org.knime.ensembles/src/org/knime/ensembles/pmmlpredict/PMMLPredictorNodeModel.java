@@ -124,7 +124,7 @@ public class PMMLPredictorNodeModel extends NodeModel {
             return model.execute(inObjects, exec);
         }
         case GeneralRegressionModel:
-        case RegressionModel:{
+        case RegressionModel: {
             RegressionPredictorNodeModel model = new RegressionPredictorNodeModel();
             return model.execute(inObjects, exec);
         }
