@@ -16,16 +16,24 @@
             path="/mining/ensembles">
       </category>
       
-      <category 
-            icon="icons/missing.gif" 
-            level-id="ensembles-combine" 
-            name="PMML Ensembles" 
+      <category
+            icon="icons/missing.gif"
+            level-id="ensembles-combine"
+            name="PMML"
             path="/mining/ensembles"/>
+      <category
+            after="ensembles-combine"
+            icon="icons/missing.gif"
+            level-id="meta-ensembles"
+            name="Meta"
+            path="/mining/ensembles">
+      </category>
    </extension>
    <extension
          point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/mining/ensembles/ensembles-util"
+            after="org.knime.base.node.preproc.pmml.xml2pmml.XML2PMMLNodeFactory"
+            category-path="/manipulation/pmml"
             factory-class="org.knime.ensembles.pmmlporttocell.PMMLPortToCellNodeFactory"
             id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
       </node>
@@ -80,7 +88,8 @@
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/ensembles-util"
+            after="org.knime.base.node.preproc.pmml.xml2pmml.XML2PMMLNodeFactory"
+            category-path="/manipulation/pmml"
             factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
@@ -90,7 +99,7 @@
             id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles/ensembles-util"
+            category-path="/mining/mining-pmml"
             factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
             id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
       </node>
@@ -103,7 +112,7 @@
    <extension
          point="org.knime.workbench.repository.metanode">
       <PersistedMetaNode
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/meta-ensembles"
             description="Boosting Learner"
             icon="icons/boosting.png"
             id="org.knime.ensembles.boosting_learner"
@@ -111,7 +120,7 @@
             workflowDir="metanode_templates/Boosting Learner/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/meta-ensembles"
             description="Boosting Predictor"
             icon="icons/boostingpredictor.png"
             id="org.knime.ensembles.boosting_predictor"
@@ -119,7 +128,7 @@
             workflowDir="metanode_templates/Boosting Predictor/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/meta-ensembles"
             description="Delegating"
             icon="icons/delegating.png"
             id="org.knime.ensembles.delegated_learning"
@@ -127,7 +136,7 @@
             workflowDir="metanode_templates/Delegating/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles"
+            category-path="/mining/ensembles/meta-ensembles"
             description="Bagging"
             icon="icons/bagging.png"
             id="org.knime.ensembles.bagging"
