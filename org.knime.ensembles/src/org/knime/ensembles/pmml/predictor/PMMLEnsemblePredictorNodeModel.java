@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -63,11 +63,10 @@ import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
-import org.knime.base.node.mine.decisiontree2.predictor.DecTreePredictorNodeModel;
-import org.knime.base.node.mine.neural.mlp.MLPPredictorNodeModel;
-import org.knime.base.node.mine.regression.logistic.predict.GeneralRegressionPredictorNodeModel;
-import org.knime.base.node.mine.regression.predict.RegressionPredictorNodeModel;
-import org.knime.base.node.mine.svm.predictor.SVMPredictorNodeModel;
+import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
+import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
+import org.knime.base.node.mine.regression.predict2.RegressionPredictorNodeModel;
+import org.knime.base.node.mine.svm.predictor2.SVMPredictorNodeModel;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
@@ -94,8 +93,8 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObject;
+import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
-import org.knime.core.pmml.PMMLModelType;
 import org.knime.ensembles.pmml.ModelNotSupportedException;
 
 
@@ -234,7 +233,6 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         return new DataTableSpec[]{null};
     }
 
-
     private Map<RowKey, ArrayList<DataCell>> calculateAllPredictions(final List<PMMLModelWrapper> wrappers,
                                                   final PortObject[] inData, final PMMLDocument pmmldoc,
                                                   final MININGFUNCTION.Enum funcName, final ExecutionContext exec)
@@ -242,6 +240,8 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
         BufferedDataTable inTable = (BufferedDataTable)inData[1];
         Map<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
         double count = 0;
+        PMMLPortObjectSpec inPMMLSpec = ((PMMLPortObject)inData[0]).getSpec();
+
         for (PMMLModelWrapper modelwrapper : wrappers) {
             exec.checkCanceled();
             exec.setProgress(count++ / wrappers.size());
@@ -249,8 +249,8 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
             // Create a fake pmml port for using the predictors
             PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(inTable.getDataTableSpec());
-            creator.setTargetCols(((PMMLPortObject)inData[0]).getSpec().getTargetCols());
-            creator.setLearningCols(((PMMLPortObject)inData[0]).getSpec().getLearningCols());
+            creator.setTargetCols(inPMMLSpec.getTargetCols());
+            creator.setLearningCols(inPMMLSpec.getLearningCols());
             PMMLPortObject fakePMMLPort = new PMMLPortObject(creator.createSpec(), modelDoc);
             DataTable result = null;
             final ExecutionContext subexec = exec.createSubExecutionContext(1.0 / wrappers.size());
@@ -265,14 +265,9 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                     result = (DataTable)mlpModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case RegressionModel:
+                case GeneralRegressionModel:
                     RegressionPredictorNodeModel regrModel = new RegressionPredictorNodeModel();
                     result = (DataTable)regrModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
-                    break;
-                case GeneralRegressionModel:
-                    GeneralRegressionPredictorNodeModel genregrModel =
-                        new GeneralRegressionPredictorNodeModel();
-                    result = (DataTable)genregrModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case ClusteringModel:
                     ClusterAssignerNodeModel clusterModel = new ClusterAssignerNodeModel();
@@ -297,16 +292,8 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
                 }
                 /*
                  * We have to assume that the last column contains the prediction.
-                 * One exception is classification with a neural network where the predicted class is
-                 * in a column named "PredClass" which is followed by columns with probabilities for each class.
                  */
-                if (modelwrapper.getModelType() == PMMLModelType.NeuralNetwork
-                        && funcName == org.dmg.pmml.MININGFUNCTION.CLASSIFICATION) {
-                    int col = result.getDataTableSpec().findColumnIndex("PredClass");
-                    list.add(row.getCell(col));
-                } else {
-                    list.add(row.getCell(row.getNumCells() - 1));
-                }
+                list.add(row.getCell(row.getNumCells() - 1));
             }
         }
         return results;

@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -199,7 +199,8 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                     exec.checkCanceled();
                     if (model.getMiningSchema() != null) {
                         for (MiningField field : model.getMiningSchema().getMiningFieldList()) {
-                            if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED) {
+                            if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED
+                                    || field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.TARGET) {
                                 targetCols.add(field.getName());
                             } else if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.ACTIVE) {
                                 learningCols.add(field.getName());
