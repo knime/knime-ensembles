@@ -25,7 +25,7 @@
             after="ensembles-combine"
             icon="icons/missing.gif"
             level-id="meta-ensembles"
-            name="Meta"
+            name="Meta Learning"
             path="/mining/ensembles">
       </category>
    </extension>
