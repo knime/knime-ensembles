@@ -17,7 +17,7 @@
             path="/mining/ensembles"/>
       <category
             after="ensembles-combine"
-            icon="icons/missing.gif"
+            icon="icons/metanode.png"
             level-id="meta"
             name="Meta Nodes"
             path="/mining/ensembles">
