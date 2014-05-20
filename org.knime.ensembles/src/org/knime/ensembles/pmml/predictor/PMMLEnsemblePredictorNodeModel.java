@@ -354,19 +354,22 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             if (funcName == org.dmg.pmml.MININGFUNCTION.CLASSIFICATION) {
                 if (!methodValidFor(method, CLASSIFICATIONMETHODS)) {
                     throw new ModelNotSupportedException(
-                            "The multiple model method is not suitable for classification");
+                            "The multiple model method '" + method.toString()
+                            + "' is not suitable for classification");
                 }
                 types[counter] = StringCell.TYPE;
             } else if (funcName == org.dmg.pmml.MININGFUNCTION.REGRESSION) {
                 if (!methodValidFor(method, REGRESSIONMETHODS)) {
                     throw new ModelNotSupportedException(
-                            "The multiple model method is not suitable for regression");
+                        "The multiple model method '" + method.toString()
+                        + "' is not suitable for regression");
                 }
                 types[counter] = DoubleCell.TYPE;
             } else if (funcName == org.dmg.pmml.MININGFUNCTION.CLUSTERING) {
                 if (!methodValidFor(method, CLUSTERINGMETHODS)) {
                     throw new ModelNotSupportedException(
-                            "The multiple model method is not suitable for clustering");
+                        "The multiple model method '" + method.toString()
+                        + "' is not suitable for clustering");
                 }
                 types[counter] = StringCell.TYPE;
             }
