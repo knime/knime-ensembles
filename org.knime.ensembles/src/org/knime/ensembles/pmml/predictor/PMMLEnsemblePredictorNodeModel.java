@@ -247,8 +247,10 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             exec.setProgress(count++ / wrappers.size());
             // Create a new document with only one model
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
+            DataTableSpec datadictSpec = new DataTableSpec(inTable.getDataTableSpec(),
+                                                            new DataTableSpec(inPMMLSpec.getTargetCols().get(0)));
             // Create a fake pmml port for using the predictors
-            PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(inTable.getDataTableSpec());
+            PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(datadictSpec);
             creator.setTargetCols(inPMMLSpec.getTargetCols());
             creator.setLearningCols(inPMMLSpec.getLearningCols());
             PMMLPortObject fakePMMLPort = new PMMLPortObject(creator.createSpec(), modelDoc);

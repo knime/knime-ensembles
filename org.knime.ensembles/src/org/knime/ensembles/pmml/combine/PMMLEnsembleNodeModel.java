@@ -283,7 +283,8 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             exec.checkCanceled();
             if (model.getMiningSchema() != null) {
                 for (MiningField field : model.getMiningSchema().getMiningFieldList()) {
-                    if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED || field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.TARGET) {
+                    if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED
+                            || field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.TARGET) {
                         targetCols.add(field.getName());
                     } else if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.ACTIVE) {
                         learningCols.add(field.getName());
