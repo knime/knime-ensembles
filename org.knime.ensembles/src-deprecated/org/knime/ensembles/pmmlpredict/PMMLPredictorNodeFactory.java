@@ -54,11 +54,13 @@ import org.knime.core.node.NodeView;
 
 /**
  * The node factory for the pmml predictor.
- * 
+ *
  *
  * @author Iris Adae, University of Konstanz, Germany
+ * @deprecated
  */
-public class PMMLPredictorNodeFactory 
+@Deprecated
+public class PMMLPredictorNodeFactory
                     extends NodeFactory<PMMLPredictorNodeModel> {
 
     /** {@inheritDoc} */

@@ -56,8 +56,10 @@ import org.knime.core.node.NodeView;
  *
  * @author Alexander Fillbrunn, Universitaet Konstanz
  * @since 2.8
+ * @deprecated
  */
-public class PMMLEnsemblePredictorNodeFactory 
+@Deprecated
+public class PMMLEnsemblePredictorNodeFactory
         extends NodeFactory<PMMLEnsemblePredictorNodeModel> {
 
     /**

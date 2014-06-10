@@ -56,9 +56,11 @@ import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
  *
  * @author Alexander Fillbrunn, Universitaet Konstanz
  * @since 2.8
+ * @deprecated
  */
+@Deprecated
 public class PMMLEnsemblePredictorNodeDialog extends DefaultNodeSettingsPane {
-    
+
     /**
      * New pane for configuring PMMLEnsemblePredictor node dialog.
      * This is just a suggestion to demonstrate possible default dialog
@@ -66,7 +68,7 @@ public class PMMLEnsemblePredictorNodeDialog extends DefaultNodeSettingsPane {
      */
     protected PMMLEnsemblePredictorNodeDialog() {
         super();
-        
+
         addDialogComponent(new DialogComponentBoolean(
                 PMMLEnsemblePredictorNodeModel.createReturnIndividualPredictionsSettingsModel(),
                 "Return individual predictions"));
@@ -77,6 +79,6 @@ public class PMMLEnsemblePredictorNodeDialog extends DefaultNodeSettingsPane {
                 PMMLEnsemblePredictorNodeModel.createTieBreakSettingsModel(),
                 "Tie break", new String[]{"missing", "any"}));
     }
-    
+
 }
 

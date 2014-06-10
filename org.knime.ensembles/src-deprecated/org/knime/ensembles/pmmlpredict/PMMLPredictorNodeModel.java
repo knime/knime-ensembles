@@ -79,7 +79,9 @@ import org.w3c.dom.Node;
 * The node model for the general pmml predictor.
 *
 * @author Iris Adae, University of Konstanz, Germany
+* @deprecated
 */
+@Deprecated
 public class PMMLPredictorNodeModel extends NodeModel {
 
     private static final int PMML_PORT = 0;

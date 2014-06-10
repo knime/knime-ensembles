@@ -108,7 +108,9 @@ import org.knime.ensembles.pmml.ModelNotSupportedException;
  *
  * @author Alexander Fillbrunn, Universitaet Konstanz
  * @since 2.8
+ * @deprecated
  */
+@Deprecated
 public class PMMLEnsemblePredictorNodeModel extends NodeModel {
 
     private final SettingsModelString m_tieBreak = createTieBreakSettingsModel();
