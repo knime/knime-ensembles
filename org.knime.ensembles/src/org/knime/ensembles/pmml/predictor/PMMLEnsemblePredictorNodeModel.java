@@ -65,6 +65,7 @@ import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
 import org.knime.base.node.mine.regression.predict2.RegressionPredictorNodeModel;
 import org.knime.base.node.mine.svm.predictor2.SVMPredictorNodeModel;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -244,8 +245,14 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
             exec.setProgress(count++ / wrappers.size());
             // Create a new document with only one model
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
-            DataTableSpec datadictSpec = new DataTableSpec(inTable.getDataTableSpec(),
-                                                            new DataTableSpec(inPMMLSpec.getTargetCols().get(0)));
+            DataTableSpec datadictSpec = inTable.getDataTableSpec();
+            DataColumnSpec targetCol = null;
+            if (inPMMLSpec.getTargetCols().size() > 0) {
+                targetCol = inPMMLSpec.getTargetCols().get(0);
+            }
+            if (targetCol != null && !datadictSpec.containsName(targetCol.getName())) {
+                datadictSpec = new DataTableSpec(inTable.getDataTableSpec(), new DataTableSpec(targetCol));
+            }
             // Create a fake pmml port for using the predictors
             PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(datadictSpec);
             creator.setTargetCols(inPMMLSpec.getTargetCols());
