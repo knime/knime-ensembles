@@ -94,13 +94,13 @@
       </node>
       <node
             category-path="/mining/mining-pmml"
-            factory-class="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory"
-            id="org.knime.ensembles.pmmlpredict.PMMLPredictorNodeFactory">
+            factory-class="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory"
+            id="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory">
       </node>
       
         <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" id="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory"/>
         <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
-        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor.PMMLEnsemblePredictorNodeFactory" id="org.knime.ensembles.pmml.predictor.PMMLEnsemblePredictorNodeFactory"/>
+        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" id="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
         <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
    </extension>
    <extension

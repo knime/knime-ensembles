@@ -40,40 +40,53 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * -------------------------------------------------------------------
+ *
  */
-package org.knime.ensembles.pmml.predictor;
+package org.knime.ensembles.pmmlpredict2;
 
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * <code>NodeDialog</code> for the "PMMLEnsemblePredictor" Node.
+ * The node factory for the pmml predictor.
  *
- * @author Alexander Fillbrunn, Universitaet Konstanz
- * @since 2.8
+ *
+ * @author Iris Adae, University of Konstanz, Germany
  */
-public class PMMLEnsemblePredictorNodeDialog extends DefaultNodeSettingsPane {
-    
-    /**
-     * New pane for configuring PMMLEnsemblePredictor node dialog.
-     * This is just a suggestion to demonstrate possible default dialog
-     * components.
-     */
-    protected PMMLEnsemblePredictorNodeDialog() {
-        super();
-        
-        addDialogComponent(new DialogComponentBoolean(
-                PMMLEnsemblePredictorNodeModel.createReturnIndividualPredictionsSettingsModel(),
-                "Return individual predictions"));
-        addDialogComponent(new DialogComponentBoolean(
-                PMMLEnsemblePredictorNodeModel.createUseMethodSettingsModel(),
-                "Use Multiple Model Method as result column name"));
-        addDialogComponent(new DialogComponentStringSelection(
-                PMMLEnsemblePredictorNodeModel.createTieBreakSettingsModel(),
-                "Tie break", new String[]{"missing", "any"}));
-    }
-    
-}
+public class PMMLPredictor2NodeFactory
+                    extends NodeFactory<PMML2PredictorNodeModel> {
 
+    /** {@inheritDoc} */
+    @Override
+    public PMML2PredictorNodeModel createNodeModel() {
+        return new PMML2PredictorNodeModel();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public NodeView<PMML2PredictorNodeModel> createNodeView(final int viewIndex,
+            final PMML2PredictorNodeModel nodeModel) {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected boolean hasDialog() {
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return null;
+    }
+
+}

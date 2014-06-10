@@ -9,7 +9,7 @@ Export-Package: org.knime.ensembles.bagging,
  org.knime.ensembles.delegating,
  org.knime.ensembles.modeltotable,
  org.knime.ensembles.pmmlporttocell,
- org.knime.ensembles.pmmlpredict,
+ org.knime.ensembles.pmmlpredict2,
  org.knime.ensembles.tabletomodel,
  org.knime.ensembles.tabletopmmlport,
  org.knime.ensembles.voting

@@ -1,6 +1,12 @@
-/*
- * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+========================================================================
+ *
+ *  Copyright (C) 2003 - 2013
+ *  University of Konstanz, Germany and
+ *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,63 +46,10 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- */
-package org.knime.ensembles.pmml.predictor;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
-/**
- * <code>NodeFactory</code> for the "PMMLEnsemblePredictor" Node.
- *
- * @author Alexander Fillbrunn, Universitaet Konstanz
- * @since 2.8
- */
-public class PMMLEnsemblePredictorNodeFactory 
-        extends NodeFactory<PMMLEnsemblePredictorNodeModel> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PMMLEnsemblePredictorNodeModel createNodeModel() {
-        return new PMMLEnsemblePredictorNodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<PMMLEnsemblePredictorNodeModel> createNodeView(final int viewIndex,
-            final PMMLEnsemblePredictorNodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeDialogPane createNodeDialogPane() {
-        return new PMMLEnsemblePredictorNodeDialog();
-    }
-
-}
-
+====================================================================
+-->
+</head>
+<body>
+	Contains classes for the general pmml prediction node.
+</body>
+</html>

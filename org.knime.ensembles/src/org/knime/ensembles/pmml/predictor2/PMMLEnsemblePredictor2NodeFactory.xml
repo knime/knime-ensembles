@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="pmmlensemblepredictor.png" type="Predictor">
+    <name>PMML Ensemble Predictor</name>
+    
+    <shortDescription>
+        Predicts data using a ensemble model
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+            The PMML Ensemble Predictor node takes a pmml document containing an ensemble of other models and executes all
+            of them on the given data. The results from all models is then aggregated using a method specified in the ensemble
+            model. The output contains a column for each prediction of the single models (if set in the settings)
+            and one column with the combined result.
+        </intro>
+        <option name="Return individual predictions">Determines whether the output contains
+        one column for each model's prediction</option>
+        <option name="Multiple model method as column name">Determines whether the column with the combined
+        predictions should be named after the combination method</option>
+        <option name="Tie break">Determines what is output when there is a tie between two classes in the combination
+        methods majority vote and weighted majority vote</option>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="PMML Ensemble">A PMML Model containing an ensemble mining model</inPort>
+        <inPort index="1" name="Input data">Data to be predicted</inPort>
+        <outPort index="0" name="Prediction">Prediction of every single model and the aggregated ensemble prediction</outPort>
+    </ports>    
+</knimeNode>

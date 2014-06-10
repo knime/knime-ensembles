@@ -1,6 +1,9 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *
+ *  Copyright (C) 2003 - 2013
+ *  University of Konstanz, Germany and
+ *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -40,53 +43,40 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * -------------------------------------------------------------------
- *
+ * ------------------------------------------------------------------------
  */
-package org.knime.ensembles.pmmlpredict;
+package org.knime.ensembles.pmml.predictor;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 
 /**
- * The node factory for the pmml predictor.
- * 
+ * <code>NodeDialog</code> for the "PMMLEnsemblePredictor" Node.
  *
- * @author Iris Adae, University of Konstanz, Germany
+ * @author Alexander Fillbrunn, Universitaet Konstanz
+ * @since 2.8
  */
-public class PMMLPredictorNodeFactory 
-                    extends NodeFactory<PMMLPredictorNodeModel> {
-
-    /** {@inheritDoc} */
-    @Override
-    public PMMLPredictorNodeModel createNodeModel() {
-        return new PMMLPredictorNodeModel();
+public class PMMLEnsemblePredictorNodeDialog extends DefaultNodeSettingsPane {
+    
+    /**
+     * New pane for configuring PMMLEnsemblePredictor node dialog.
+     * This is just a suggestion to demonstrate possible default dialog
+     * components.
+     */
+    protected PMMLEnsemblePredictorNodeDialog() {
+        super();
+        
+        addDialogComponent(new DialogComponentBoolean(
+                PMMLEnsemblePredictorNodeModel.createReturnIndividualPredictionsSettingsModel(),
+                "Return individual predictions"));
+        addDialogComponent(new DialogComponentBoolean(
+                PMMLEnsemblePredictorNodeModel.createUseMethodSettingsModel(),
+                "Use Multiple Model Method as result column name"));
+        addDialogComponent(new DialogComponentStringSelection(
+                PMMLEnsemblePredictorNodeModel.createTieBreakSettingsModel(),
+                "Tie break", new String[]{"missing", "any"}));
     }
-
-    /** {@inheritDoc} */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public NodeView<PMMLPredictorNodeModel> createNodeView(final int viewIndex,
-            final PMMLPredictorNodeModel nodeModel) {
-        return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected boolean hasDialog() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return null;
-    }
-
+    
 }
+
