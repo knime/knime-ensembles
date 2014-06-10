@@ -127,7 +127,6 @@ public class PMMLPredictorNodeModel extends NodeModel {
         }
         case TreeModel: {
             DecTreePredictorNodeModel model = new DecTreePredictorNodeModel();
-            model.setPredictionColumnName("Prediction (DecTree)");
             return model.execute(inObjects, exec);
         }
         case SupportVectorMachineModel: {
