@@ -41,63 +41,72 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
+ *
  */
 package org.knime.ensembles.delegating;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 
 /**
- * <code>NodeFactory</code> for the "DelegatingLoopStart" Node.
- * 
+ * Dialog for the delegating loop end.
  *
- * @author Iris Adae, University of Konstanz, Germany
+ * @author Iris Adae
+ * @deprecated use the recursive loops instead.
  */
-public class DelegatingLoopStartNodeFactory 
-        extends NodeFactory<DelegatingLoopStartNodeModel> {
+@Deprecated
+public class DelegatingLoopEndNodeDialog extends DefaultNodeSettingsPane {
+
+
 
     /**
-     * {@inheritDoc}
+     * Create new dialog.
      */
-    @Override
-    public DelegatingLoopStartNodeModel createNodeModel() {
-        return new DelegatingLoopStartNodeModel();
+    public DelegatingLoopEndNodeDialog() {
+        SettingsModelIntegerBounded numberofRows = createNumOfRowsModel();
+        SettingsModelIntegerBounded iterations = createIterationsModel();
+
+        createNewGroup("End conditions");
+
+        super.addDialogComponent(new DialogComponentNumber(numberofRows,
+                "Minimal number of rows :", 1));
+
+        super.addDialogComponent(new DialogComponentNumber(iterations,
+                "Maximal number of iterations :", 1));
+        closeCurrentGroup();
+
+        addDialogComponent(new DialogComponentBoolean(createOnlyLastModel(),
+                "Output only last result"));
+    }
+
+
+    /**
+     *
+     * @return the settings model for the maximal number of iterations.
+     */
+    static  SettingsModelIntegerBounded createIterationsModel() {
+        return new SettingsModelIntegerBounded("CFG_ITERATIONS", 100,
+                1, Integer.MAX_VALUE);
     }
 
     /**
-     * {@inheritDoc}
+     *
+     * @return the settings model for the minimal number of rows.
      */
-    @Override
-    public int getNrNodeViews() {
-        return 0;
+    static  SettingsModelIntegerBounded createNumOfRowsModel() {
+        return new SettingsModelIntegerBounded("CFG_MINROWS", 1, 1,
+                Integer.MAX_VALUE);
     }
 
     /**
-     * {@inheritDoc}
+     * @return the settings model that contains the only last result flag
      */
-    @Override
-    public NodeView<DelegatingLoopStartNodeModel> createNodeView(
-            final int viewIndex,
-            final DelegatingLoopStartNodeModel nodeModel) {
-        return null;
+    static SettingsModelBoolean createOnlyLastModel() {
+        return new SettingsModelBoolean("CFG_onlyLastResult", false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasDialog() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeDialogPane createNodeDialogPane() {
-        return null;
-    }
 
 }
-

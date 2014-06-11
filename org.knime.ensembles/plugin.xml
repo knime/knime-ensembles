@@ -43,16 +43,6 @@
       </node>
       <node
             category-path="/mining/ensembles"
-            factory-class="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory"
-            id="org.knime.ensembles.delegating.DelegatingLoopEndNodeFactory">
-      </node>
-      <node
-            category-path="/mining/ensembles"
-            factory-class="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory"
-            id="org.knime.ensembles.delegating.DelegatingLoopStartNodeFactory">
-      </node>
-      <node
-            category-path="/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
       </node>

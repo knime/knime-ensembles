@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./delegateloopend.png" type="LoopEnd">
-    <name>Delegating Loop End</name>
+    <name>Delegating Loop End (deprecated)</name>
     
     <shortDescription>
     The loop end node for performing delegating, a version of meta learning.
@@ -9,6 +9,8 @@
     
     <fullDescription>
         <intro>
+        The delegating nodes are deprecated since 2.10. Please use the Recursive Loop Nodes instead.
+        
         The data passed to port 0 is collected and passed to the output. 
         The data in port 1 is returned to the delegating loop start.
         

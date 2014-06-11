@@ -50,11 +50,13 @@ import org.knime.core.node.NodeView;
 
 /**
  * <code>NodeFactory</code> for the "TimeDelayLoopEnd" Node.
- * 
+ *
  *
  * @author Iris Adae, University of Konstanz, Germany
+ * @deprecated use the recursive loops instead.
  */
-public class DelegatingLoopEndNodeFactory 
+@Deprecated
+public class DelegatingLoopEndNodeFactory
         extends NodeFactory<DelegatingLoopEndNodeModel> {
 
     /**
@@ -80,7 +82,7 @@ public class DelegatingLoopEndNodeFactory
     public NodeView<DelegatingLoopEndNodeModel> createNodeView(
             final int viewIndex,
             final DelegatingLoopEndNodeModel nodeModel) {
-        return null; 
+        return null;
     }
 
     /**
