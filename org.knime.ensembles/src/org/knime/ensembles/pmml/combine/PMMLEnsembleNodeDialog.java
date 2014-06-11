@@ -57,7 +57,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.util.DataValueColumnFilter;
 
 /**
- * <code>NodeDialog</code> for the "PMMLEnsemble" Node. 
+ * <code>NodeDialog</code> for the "PMMLEnsemble" Node.
  *
  * @author Alexander Fillbrunn, Universitaet Konstanz
  * @since 2.8
@@ -72,22 +72,22 @@ public class PMMLEnsembleNodeDialog extends DefaultNodeSettingsPane {
     @SuppressWarnings("unchecked")
     protected PMMLEnsembleNodeDialog() {
         super();
-        
+
         final DialogComponentColumnNameSelection weightColumn = new DialogComponentColumnNameSelection(
                 PMMLEnsembleNodeModel.createWeightColumnSettingsModel(),
-                "Weight Column", 0, new DataValueColumnFilter(DoubleValue.class));
+                "Weight Column", 0, false, new DataValueColumnFilter(DoubleValue.class));
 
         DialogComponentBoolean weightColumnAvailable = new DialogComponentBoolean(
                 PMMLEnsembleNodeModel.createWeightAvailableSettingsModel(),
                 "Weight available");
-        
+
         weightColumnAvailable.getModel().addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent arg0) {
                 weightColumn.getModel().setEnabled(((SettingsModelBoolean)arg0.getSource()).getBooleanValue());
             }
         });
-        
+
         addDialogComponent(new DialogComponentColumnNameSelection(
                 PMMLEnsembleNodeModel.createPMMLColumnSettingsModel(),
                 "PMML Column", 0, new DataValueColumnFilter(PMMLValue.class)));
