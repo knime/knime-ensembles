@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
 import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
@@ -139,6 +140,10 @@ public class PMML2PredictorNodeModel extends NodeModel {
         }
         case MiningModel: {
             PMMLEnsemblePredictor2NodeModel model = new PMMLEnsemblePredictor2NodeModel();
+            return model.execute(inObjects, exec);
+        }
+        case NaiveBayesModel: {
+            NaiveBayesPredictorNodeModel2 model = new NaiveBayesPredictorNodeModel2();
             return model.execute(inObjects, exec);
         }
         default:

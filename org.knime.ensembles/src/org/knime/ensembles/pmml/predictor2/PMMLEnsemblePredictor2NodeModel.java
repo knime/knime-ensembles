@@ -59,6 +59,7 @@ import org.dmg.pmml.MULTIPLEMODELMETHOD;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
+import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
 import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
@@ -284,6 +285,10 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
                     SVMPredictorNodeModel svmModel = new SVMPredictorNodeModel();
                     result = (DataTable)svmModel.execute(
                             new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                    break;
+                case NaiveBayesModel:
+                    NaiveBayesPredictorNodeModel2 nbModel = new NaiveBayesPredictorNodeModel2();
+                    result = (DataTable)nbModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 default:
                     throw new ModelNotSupportedException("Model of type "
