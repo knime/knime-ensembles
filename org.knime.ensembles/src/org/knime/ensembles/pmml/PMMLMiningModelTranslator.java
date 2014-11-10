@@ -131,14 +131,14 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         m_weights = new ArrayList<Double>();
 
         if (miningModels.size() > 0) {
-            for (MiningModel mmodel : miningModels) {
-                for (Segment s : mmodel.getSegmentation().getSegmentList()) {
-                    PMMLModelWrapper model = PMMLModelWrapper.getSegmentContent(s);
-                    PMMLDocument doc = model.createPMMLDocument(dataDict);
-                    m_docs.add(doc);
-                    double w = s.getWeight();
-                    m_weights.add(w);
-                }
+            MiningModel mmodel = miningModels.get(0);
+            m_multModelMethod = mmodel.getSegmentation().getMultipleModelMethod();
+            for (Segment s : mmodel.getSegmentation().getSegmentList()) {
+                PMMLModelWrapper model = PMMLModelWrapper.getSegmentContent(s);
+                PMMLDocument doc = model.createPMMLDocument(dataDict);
+                m_docs.add(doc);
+                double w = s.getWeight();
+                m_weights.add(w);
             }
         }
     }
