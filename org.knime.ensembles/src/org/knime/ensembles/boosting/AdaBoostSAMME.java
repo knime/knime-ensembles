@@ -1,4 +1,4 @@
-/* 
+/*
  * ------------------------------------------------------------------------
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -63,9 +63,9 @@ import org.knime.core.node.ExecutionMonitor;
  * @author Thorsten Meinl, University of Konstanz
  */
 public class AdaBoostSAMME implements BoostingStrategy {
-    private final double[] m_weights;
+    private final double[] m_sampleWeights;
 
-    private final double[] m_samples;
+    private final double[] m_sampleDistribution;
 
     private final Random m_rand = new Random();
 
@@ -78,12 +78,12 @@ public class AdaBoostSAMME implements BoostingStrategy {
      * @param classCount the number of possible classes for all patterns
      */
     public AdaBoostSAMME(final int numberOfRows, final int classCount) {
-        m_weights = new double[numberOfRows];
-        m_samples = new double[numberOfRows];
+        m_sampleWeights = new double[numberOfRows];
+        m_sampleDistribution = new double[numberOfRows];
 
         for (int i = 0; i < numberOfRows; i++) {
-            m_weights[i] = 1.0 / numberOfRows;
-            m_samples[i] = i / (double)numberOfRows;
+            m_sampleWeights[i] = 1.0 / numberOfRows;
+            m_sampleDistribution[i] = i / (double)numberOfRows;
         }
 
         m_classCorrection = Math.log(classCount - 1);
@@ -94,7 +94,7 @@ public class AdaBoostSAMME implements BoostingStrategy {
      */
     @Override
     public double sampleWeight(final int rowIndex) {
-        return m_weights[rowIndex];
+        return m_sampleWeights[rowIndex];
     }
 
     /**
@@ -102,11 +102,11 @@ public class AdaBoostSAMME implements BoostingStrategy {
      */
     @Override
     public int nextSample() {
-        int index = Arrays.binarySearch(m_samples, m_rand.nextDouble());
+        int index = Arrays.binarySearch(m_sampleDistribution, m_rand.nextDouble());
         if (index < 0) {
             index = -(index + 1) - 1;
         }
-        assert (index >= 0) && (index < m_samples.length);
+        assert (index >= 0) && (index < m_sampleDistribution.length);
         return index;
     }
 
@@ -117,9 +117,9 @@ public class AdaBoostSAMME implements BoostingStrategy {
     public double[] score(final BufferedDataTable table,
             final int predictionColIndex, final int classColIndex,
             final ExecutionMonitor exec) throws CanceledExecutionException {
-        if (table.getRowCount() != m_weights.length) {
+        if (table.getRowCount() != m_sampleWeights.length) {
             throw new IllegalStateException(
-                    "Current table does not have the same number " 
+                    "Current table does not have the same number "
                    + "of rows as the previous table");
         }
 
@@ -137,7 +137,7 @@ public class AdaBoostSAMME implements BoostingStrategy {
             DataCell predictedValue = row.getCell(predictionColIndex);
             if (realValue.equals(predictedValue)) {
                 correct[count] = true;
-                correctSum += m_weights[count];
+                correctSum += m_sampleWeights[count];
             }
             count++;
         }
@@ -147,26 +147,27 @@ public class AdaBoostSAMME implements BoostingStrategy {
         double modelWeight = Math.log((1 - error) / error) + m_classCorrection;
 
         subexec = exec.createSubProgress(0.1);
-        double sum = 0;
+        double sampleWeightSum = 0;
         for (int i = 0; i < correct.length; i++) {
             if (i % 1000 == 0) {
                 subexec.checkCanceled();
                 subexec.setProgress(i / max);
             }
             if (correct[i]) {
-                m_weights[i] *= Math.exp(-modelWeight);
+                m_sampleWeights[i] *= Math.exp(-modelWeight);
             }
-            sum += m_weights[i];
+            sampleWeightSum += m_sampleWeights[i];
         }
 
         subexec = exec.createSubProgress(0.1);
-        m_weights[0] /= sum;
-        for (int i = 1; i < m_weights.length; i++) {
+        m_sampleWeights[0] /= sampleWeightSum;
+        for (int i = 1; i < m_sampleWeights.length; i++) {
             if (i % 1000 == 0) {
                 subexec.checkCanceled();
                 subexec.setProgress(i / max);
             }
-            m_samples[i] = m_samples[i - 1] + m_weights[i - 1];
+            m_sampleWeights[i] /= sampleWeightSum;
+            m_sampleDistribution[i] = m_sampleDistribution[i - 1] + m_sampleWeights[i - 1];
         }
 
         exec.setProgress(1);
