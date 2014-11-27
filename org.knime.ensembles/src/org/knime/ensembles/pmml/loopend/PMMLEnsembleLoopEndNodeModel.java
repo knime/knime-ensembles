@@ -251,7 +251,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        return new PortObjectSpec[]{inSpecs[0]};
+        return new PortObjectSpec[]{inSpecs[1]};
     }
 
     /**
