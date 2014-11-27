@@ -141,6 +141,13 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
                 m_weights.add(w);
             }
         }
+        m_weightAvailable = false;
+        for (double d : m_weights) {
+            if (d != 1.0) {
+                m_weightAvailable = true;
+                break;
+            }
+        }
     }
 
     /**
