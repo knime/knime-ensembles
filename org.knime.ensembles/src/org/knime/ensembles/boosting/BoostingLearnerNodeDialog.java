@@ -50,10 +50,14 @@ package org.knime.ensembles.boosting;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 
@@ -84,8 +88,14 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
     private final JSpinner m_iterations = new JSpinner(new SpinnerNumberModel(
             1000, 1, Integer.MAX_VALUE, 1));
 
+    private final JCheckBox m_useSeed = new JCheckBox();
+
+    private final JTextField m_randomSeed = new JTextField();
+
     private final BoostingLearnerSettings m_settings =
             new BoostingLearnerSettings();
+
+    private final JLabel m_seedLabel = new JLabel("Seed");
 
     /**
      * Creates a new dialog.
@@ -95,7 +105,7 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(2, 0, 2, 0);
+        c.insets = new Insets(2, 2, 2, 2);
 
         c.gridx = 0;
         c.gridy = 0;
@@ -115,6 +125,31 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
         c.gridx = 1;
         p.add(m_iterations, c);
 
+        c.gridx = 0;
+        c.gridy++;
+        p.add(new JLabel("Use seed for random numbers   "), c);
+        c.gridx = 1;
+        c.insets = new Insets(2, 0, 2, 2);
+        p.add(m_useSeed, c);
+
+        c.gridx = 0;
+        c.gridy++;
+        c.insets = new Insets(2, 2, 2, 2);
+        p.add(m_seedLabel, c);
+        c.gridx = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        p.add(m_randomSeed, c);
+
+
+        m_useSeed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                m_seedLabel.setEnabled(m_useSeed.isSelected());
+                m_randomSeed.setEnabled(m_useSeed.isSelected());
+            }
+        });
+
         addTab("Standard settings", p);
     }
 
@@ -130,6 +165,11 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
         m_predictionColumn.update((DataTableSpec)specs[1],
                 m_settings.predictionColumn());
         m_iterations.setValue(m_settings.maxIterations());
+        m_useSeed.setSelected(m_settings.useSeed());
+        m_randomSeed.setText(Long.toString(m_settings.randomSeed()));
+
+        m_seedLabel.setEnabled(m_useSeed.isSelected());
+        m_randomSeed.setEnabled(m_useSeed.isSelected());
     }
 
     /**
@@ -141,6 +181,8 @@ public class BoostingLearnerNodeDialog extends NodeDialogPane {
         m_settings.maxIterations((Integer)m_iterations.getValue());
         m_settings.classColumn(m_classColumn.getSelectedColumn());
         m_settings.predictionColumn(m_predictionColumn.getSelectedColumn());
+        m_settings.useSeed(m_useSeed.isSelected());
+        m_settings.randomSeed(Long.parseLong(m_randomSeed.getText()));
         m_settings.saveSettings(settings);
     }
 }

@@ -50,6 +50,7 @@ package org.knime.ensembles.boosting;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.knime.core.data.DataCell;
@@ -186,7 +187,7 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
             }
             if (m_settings.predictionColumn() == null) {
                 throw new InvalidSettingsException(
-                        "No suitable prediction column with nominal values " 
+                        "No suitable prediction column with nominal values "
                               + "in input table");
             }
         }
@@ -233,8 +234,8 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
                 }
                 exec.setMessage("");
             }
-            m_weightModel =
-                    new AdaBoostSAMME(data.getRowCount(), domain.size());
+            long seed = m_settings.useSeed() ? m_settings.randomSeed() : System.currentTimeMillis();
+            m_weightModel = new AdaBoostSAMME(data.getRowCount(), domain.size(), new Random(seed));
             m_container = exec.createDataContainer(OUT_SPEC);
         }
 

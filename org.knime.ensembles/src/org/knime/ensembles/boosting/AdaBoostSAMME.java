@@ -67,7 +67,7 @@ public class AdaBoostSAMME implements BoostingStrategy {
 
     private final double[] m_sampleDistribution;
 
-    private final Random m_rand = new Random();
+    private final Random m_rand;
 
     private final double m_classCorrection;
 
@@ -76,8 +76,9 @@ public class AdaBoostSAMME implements BoostingStrategy {
      *
      * @param numberOfRows the total number or rows or patterns
      * @param classCount the number of possible classes for all patterns
+     * @param random a random number generator
      */
-    public AdaBoostSAMME(final int numberOfRows, final int classCount) {
+    public AdaBoostSAMME(final int numberOfRows, final int classCount, final Random random) {
         m_sampleWeights = new double[numberOfRows];
         m_sampleDistribution = new double[numberOfRows];
 
@@ -87,6 +88,7 @@ public class AdaBoostSAMME implements BoostingStrategy {
         }
 
         m_classCorrection = Math.log(classCount - 1);
+        m_rand = random;
     }
 
     /**

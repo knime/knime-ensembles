@@ -23,6 +23,9 @@
         </option>
         <option name="Number of iterations">The number of iterations the loop should be run i.e. the number of models to be learned
         </option>
+        <option name="Use seed for random numbers">Check this option if you want to use a fixed see for generating random numbers. This ensures that
+        for the same input data always the same sets in each iteration are created.</option>
+        <option name="Seed">Enter the seed for the random number generator here.</option>
     </fullDescription>
 
     <ports>

@@ -57,11 +57,15 @@ import org.knime.core.node.NodeSettingsWO;
  * @author Thorsten Meinl, University of Konstanz
  */
 public class BoostingLearnerSettings {
-    private int m_maxIterations = 100; 
+    private int m_maxIterations = 100;
 
     private String m_classColumn;
 
     private String m_predictionColumn;
+
+    private boolean m_useSeed;
+
+    private long m_randomSeed;
 
     /**
      * Returns the name of the column containing the predicted classes.
@@ -118,6 +122,42 @@ public class BoostingLearnerSettings {
     }
 
     /**
+     * Returns whether a fixed seed for the random number generator should be used.
+     *
+     * @return <code>true</code> if a fixed seed should be used, <code>false</code> otherwise
+     */
+    public boolean useSeed() {
+        return m_useSeed;
+    }
+
+    /**
+     * Sets whether a fixed seed for the random number generator should be used.
+     *
+     * @param b <code>true</code> if a fixed seed should be used, <code>false</code> otherwise
+     */
+    public void useSeed(final boolean b) {
+        m_useSeed = b;
+    }
+
+    /**
+     * Returns the seed for the random number generator.
+     *
+     * @return the seed
+     */
+    public long randomSeed() {
+        return m_randomSeed;
+    }
+
+    /**
+     * Sets the seed for the random number generator.
+     *
+     * @param seed the seed
+     */
+    public void randomSeed(final long seed) {
+        m_randomSeed = seed;
+    }
+
+    /**
      * Loads the settings from the given settings object.
      *
      * @param settings a settings object
@@ -128,6 +168,9 @@ public class BoostingLearnerSettings {
         m_maxIterations = settings.getInt("maxIterations");
         m_classColumn = settings.getString("classColumn");
         m_predictionColumn = settings.getString("predictionColumn");
+        // since 2.11
+        m_useSeed = settings.getBoolean("useSeed", false);
+        m_randomSeed = settings.getLong("randomSeed", System.currentTimeMillis());
     }
 
     /**
@@ -140,6 +183,8 @@ public class BoostingLearnerSettings {
         m_maxIterations = settings.getInt("maxIterations", 100);
         m_classColumn = settings.getString("classColumn", null);
         m_predictionColumn = settings.getString("predictionColumn", null);
+        m_useSeed = settings.getBoolean("useSeed", false);
+        m_randomSeed = settings.getLong("randomSeed", System.currentTimeMillis());
     }
 
     /**
@@ -151,5 +196,7 @@ public class BoostingLearnerSettings {
         settings.addInt("maxIterations", m_maxIterations);
         settings.addString("classColumn", m_classColumn);
         settings.addString("predictionColumn", m_predictionColumn);
+        settings.addBoolean("useSeed", m_useSeed);
+        settings.addLong("randomSeed", m_randomSeed);
     }
 }
