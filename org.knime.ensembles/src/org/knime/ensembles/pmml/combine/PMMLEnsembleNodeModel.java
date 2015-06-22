@@ -47,11 +47,7 @@ package org.knime.ensembles.pmml.combine;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
-import org.dmg.pmml.MiningFieldDocument.MiningField;
 import org.dmg.pmml.PMMLDocument;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
@@ -75,11 +71,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObject;
-import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
-import org.knime.ensembles.pmml.PMMLEnsembleHelpers;
-import org.knime.ensembles.pmml.PMMLMiningModelTranslator;
 
 
 /**
@@ -265,41 +257,6 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             }
         }
 
-        ExecutionContext getModelsCtx = exec.createSubExecutionContext(0.4);
-        List<PMMLModelWrapper> wrappers =
-            PMMLEnsembleHelpers.getModelListFromDocuments(documents, getModelsCtx);
-        PMMLEnsembleHelpers.checkInputTablePMML(wrappers);
-
-        /*
-         * Learning and target columns are lost when PMML is written in a table.
-         * Here we retrieve it from the mining schema and put it in our output pmml port.
-         */
-        Set<String> targetCols = new LinkedHashSet<String>();
-        Set<String> learningCols = new LinkedHashSet<String>();
-        for (PMMLModelWrapper model : wrappers) {
-            exec.checkCanceled();
-            if (model.getMiningSchema() != null) {
-                for (MiningField field : model.getMiningSchema().getMiningFieldList()) {
-                    if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.PREDICTED
-                            || field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.TARGET) {
-                        targetCols.add(field.getName());
-                    } else if (field.getUsageType() == org.dmg.pmml.FIELDUSAGETYPE.ACTIVE) {
-                        learningCols.add(field.getName());
-                    }
-                }
-            }
-        }
-
-        ExecutionContext createTableSpecCtx = exec.createSubExecutionContext(0.8);
-        // A fake spec created from the data dictionary
-        DataTableSpec fakeSpec = PMMLEnsembleHelpers.createTableSpec(documents, createTableSpecCtx);
-
-        PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(fakeSpec);
-        creator.setTargetColsNames(new ArrayList<String>(targetCols));
-        creator.setLearningColsNames(new ArrayList<String>(learningCols));
-        PMMLPortObject outPMMLPort = new PMMLPortObject(creator.createSpec());
-        PMMLMiningModelTranslator trans;
-
         //Find the corresponding MultiModelMethod value for the selected string
         int multimodelchoice = -1;
         for (int i = 0; i < MULTIMODELMETHOD_CHOICES.length; i++) {
@@ -309,11 +266,12 @@ public class PMMLEnsembleNodeModel extends NodeModel {
             }
         }
 
-        trans = new PMMLMiningModelTranslator(documents, weights,
-                    MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
+        //trans = new PMMLMiningModelTranslator(documents, weights,
+         //           MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice]);
 
-        outPMMLPort.addModelTranslater(trans);
-
+        //outPMMLPort.addModelTranslater(trans);
+        PMMLPortObject outPMMLPort = PMMLEnsembleUtilities.convertToPmmlEnsemble(documents,
+            weights, MULTIMODELMETHOD_CHOICES_ENUM[multimodelchoice], exec);
         return new PortObject[]{outPMMLPort};
     }
 
