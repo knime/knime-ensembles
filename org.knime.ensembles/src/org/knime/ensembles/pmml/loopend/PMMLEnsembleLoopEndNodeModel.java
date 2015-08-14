@@ -48,7 +48,7 @@ package org.knime.ensembles.pmml.loopend;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -190,8 +190,8 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
                  * Learning and target columns are lost when PMML is written in a table.
                  * Here we retrieve it from the mining schema and put it in our output pmml port.
                  */
-                Set<String> targetCols = new HashSet<String>();
-                Set<String> learningCols = new HashSet<String>();
+                Set<String> targetCols = new LinkedHashSet<>();
+                Set<String> learningCols = new LinkedHashSet<>();
                 for (PMMLModelWrapper model : wrappers) {
                     exec.checkCanceled();
                     if (model.getMiningSchema() != null) {
