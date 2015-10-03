@@ -7,20 +7,20 @@
             icon="icons/missing.gif"
             level-id="ensembles"
             name="Ensemble Learning"
-            path="/mining">
+            path="/analytics/mining">
       </category>
       
       <category
             icon="icons/missing.gif"
             level-id="ensembles-combine"
             name="PMML"
-            path="/mining/ensembles"/>
+            path="/analytics/mining/ensembles"/>
       <category
             after="ensembles-combine"
             icon="icons/metanode.png"
             level-id="meta"
             name="Meta Nodes"
-            path="/mining/ensembles">
+            path="/analytics/mining/ensembles">
       </category>
    </extension>
    <extension
@@ -32,42 +32,42 @@
             id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.modeltotable.ModelToTableNodeFactory"
             id="org.knime.ensembles.modeltotable.ModelToTableNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.tabletomodel.TableToModelNodeFactory"
             id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
             id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.bagging.ModelLoopStartNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopStartNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.bagging.ModelLoopEndNodeFactory"
             id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
       </node>
@@ -78,25 +78,25 @@
             id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
       </node>
       <node
-            category-path="/mining/ensembles"
+            category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.voting.VotingLoopEndNodeFactory"
             id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
       </node>
       <node
-            category-path="/mining/mining-pmml"
+            category-path="/analytics/mining/mining-pmml"
             factory-class="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory"
             id="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory">
       </node>
       
-        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" id="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory"/>
-        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
-        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" id="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
-        <node category-path="/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" id="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory"/>
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" id="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">
       <PersistedMetaNode
-            category-path="/mining/ensembles/meta"
+            category-path="/analytics/mining/ensembles/meta"
             description="Boosting Learner"
             icon="icons/boosting.png"
             id="org.knime.ensembles.boosting_learner"
@@ -104,7 +104,7 @@
             workflowDir="metanode_templates/Boosting Learner/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles/meta"
+            category-path="/analytics/mining/ensembles/meta"
             description="Boosting Predictor"
             icon="icons/boostingpredictor.png"
             id="org.knime.ensembles.boosting_predictor"
@@ -112,7 +112,7 @@
             workflowDir="metanode_templates/Boosting Predictor/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles/meta"
+            category-path="/analytics/mining/ensembles/meta"
             description="Delegating"
             icon="icons/delegating.png"
             id="org.knime.ensembles.delegated_learning"
@@ -120,7 +120,7 @@
             workflowDir="metanode_templates/Delegating/">
       </PersistedMetaNode>
       <PersistedMetaNode
-            category-path="/mining/ensembles/meta"
+            category-path="/analytics/mining/ensembles/meta"
             description="Bagging"
             icon="icons/bagging.png"
             id="org.knime.ensembles.bagging"
