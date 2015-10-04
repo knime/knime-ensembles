@@ -47,8 +47,9 @@ package org.knime.ensembles.pmml;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.xmlbeans.SchemaType;
 import org.dmg.pmml.DataDictionaryDocument.DataDictionary;
@@ -235,7 +236,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         }
 
         DataDictionary output = DataDictionary.Factory.newInstance();
-        HashMap<String, DataField> fields = new HashMap<String, DataFieldDocument.DataField>();
+        Map<String, DataField> fields = new LinkedHashMap<String, DataFieldDocument.DataField>();
 
         for (DataField df : dict1.getDataFieldList()) {
             fields.put(df.getName(), df);
@@ -247,7 +248,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
             }
         }
 
-        HashMap<String, Taxonomy> taxons = new HashMap<String, Taxonomy>();
+        Map<String, Taxonomy> taxons = new LinkedHashMap<String, Taxonomy>();
         for (Taxonomy tax : dict1.getTaxonomyList()) {
             taxons.put(tax.getName(), tax);
         }
@@ -277,7 +278,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
     // This method is used to merge two mining schemes from two different models
     private MiningSchema mergeSchemes(final MiningSchema original, final MiningSchema s) {
         ArrayList<MiningField> fields = new ArrayList<MiningField>();
-        HashMap<String, MiningField> orgFields = new HashMap<String, MiningField>();
+        Map<String, MiningField> orgFields = new LinkedHashMap<String, MiningField>();
         for (MiningField mf2 : original.getMiningFieldList()) {
             orgFields.put(mf2.getName(), mf2);
         }
