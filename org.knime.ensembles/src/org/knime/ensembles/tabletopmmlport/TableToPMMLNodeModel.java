@@ -68,7 +68,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 /**
  * The node model for the table to pmml node.
- * 
+ *
  * @author Iris Adae, University of Konstanz, Germany
  *
  */
@@ -81,15 +81,15 @@ public class TableToPMMLNodeModel extends NodeModel {
      *  The default constructor, for the node factory.
      */
     protected TableToPMMLNodeModel() {
-        super(new PortType[] {new PortType(BufferedDataTable.class)},
-                new PortType[] {new PortType(PMMLPortObject.class)});
+        super(new PortType[] {BufferedDataTable.TYPE},
+                new PortType[] {PMMLPortObject.TYPE});
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, 
+    protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
         BufferedDataTable table = (BufferedDataTable) inObjects[0];
         if (table.getRowCount() == 0) {
@@ -113,7 +113,7 @@ public class TableToPMMLNodeModel extends NodeModel {
                 }
                 PMMLValue model = (PMMLValue) dc;
                 PMMLImport pmmlImport = new PMMLImport(model.getDocument());
-                return new PortObject[] {pmmlImport.getPortObject()}; 
+                return new PortObject[] {pmmlImport.getPortObject()};
             }
             rowCount++;
         }
@@ -132,7 +132,7 @@ public class TableToPMMLNodeModel extends NodeModel {
          DataTableSpec spec = (DataTableSpec) inSpecs[0];
             if (!spec.containsName(m_column.getStringValue())) {
                 throw new InvalidSettingsException("Selected column '"
-                        + m_column.getStringValue() 
+                        + m_column.getStringValue()
                         + "' not in input spec.");
             }
             return new PortObjectSpec[]{null};
@@ -142,7 +142,7 @@ public class TableToPMMLNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, 
+    protected void loadInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // nothing to load
@@ -153,7 +153,7 @@ public class TableToPMMLNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, 
+    protected void saveInternals(final File nodeInternDir,
             final ExecutionMonitor exec)
             throws IOException, CanceledExecutionException {
         // TODO Auto-generated method stub

@@ -91,8 +91,7 @@ public class BoostingPredictorLoopStartNodeModel extends NodeModel implements
      * Creates a new node model.
      */
     public BoostingPredictorLoopStartNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{new PortType(PortObject.class)});
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{PortObject.TYPE});
     }
 
     /**

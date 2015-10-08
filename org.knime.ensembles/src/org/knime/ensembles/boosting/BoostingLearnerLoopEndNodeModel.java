@@ -117,8 +117,7 @@ public class BoostingLearnerLoopEndNodeModel extends NodeModel implements
      * Creates a new node model.
      */
     public BoostingLearnerLoopEndNodeModel() {
-        super(new PortType[]{new PortType(PortObject.class),
-           BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
+        super(new PortType[]{PortObject.TYPE, BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**

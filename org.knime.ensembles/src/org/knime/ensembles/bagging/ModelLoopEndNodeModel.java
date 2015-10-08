@@ -87,8 +87,7 @@ public class ModelLoopEndNodeModel extends NodeModel
      * Creates a new model with one input and one output port.
      */
     public ModelLoopEndNodeModel() {
-        super(new PortType[] {new PortType(PortObject.class)},
-                new PortType[] {BufferedDataTable.TYPE});
+        super(new PortType[] {PortObject.TYPE}, new PortType[] {BufferedDataTable.TYPE});
     }
 
     /**

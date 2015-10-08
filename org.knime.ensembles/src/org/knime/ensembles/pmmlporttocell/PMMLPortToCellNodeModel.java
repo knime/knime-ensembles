@@ -82,8 +82,8 @@ public class PMMLPortToCellNodeModel extends NodeModel {
      * Creates a new model with a PMML input and a data output.
      */
     protected PMMLPortToCellNodeModel() {
-        super(new PortType[] {new PortType(PMMLPortObject.class)},
-              new PortType[] {new PortType(BufferedDataTable.class)});
+        super(new PortType[] {PMMLPortObject.TYPE},
+              new PortType[] {BufferedDataTable.TYPE});
     }
 
     /** {@inheritDoc} */

@@ -85,8 +85,8 @@ public class PMMLEnsemble2TableNodeModel extends NodeModel {
      * Constructor for the node model.
      */
     protected PMMLEnsemble2TableNodeModel() {
-        super(new PortType[]{new PortType(PMMLPortObject.class)},
-                new PortType[]{new PortType(BufferedDataTable.class)});
+        super(new PortType[]{PMMLPortObject.TYPE},
+                new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**

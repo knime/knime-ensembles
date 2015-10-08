@@ -83,8 +83,7 @@ public class ModelToTableNodeModel extends NodeModel {
 
     /** Constructor for the node model. */
     protected ModelToTableNodeModel() {
-        super(new PortType[]{new PortType(PortObject.class)},
-                new PortType[]{BufferedDataTable.TYPE});
+        super(new PortType[]{PortObject.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**

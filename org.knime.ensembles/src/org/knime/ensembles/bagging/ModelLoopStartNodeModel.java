@@ -84,8 +84,7 @@ public class ModelLoopStartNodeModel extends NodeModel
      * Creates a new model with one input and one output port.
      */
     public ModelLoopStartNodeModel() {
-        super(new PortType[] {BufferedDataTable.TYPE},
-                new PortType[] {new PortType(PortObject.class)});
+        super(new PortType[] {BufferedDataTable.TYPE}, new PortType[] {PortObject.TYPE});
     }
 
     /** {@inheritDoc} */

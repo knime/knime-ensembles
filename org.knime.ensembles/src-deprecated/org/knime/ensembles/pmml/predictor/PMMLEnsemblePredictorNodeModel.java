@@ -156,8 +156,8 @@ public class PMMLEnsemblePredictorNodeModel extends NodeModel {
      * Constructor for the node model.
      */
     public PMMLEnsemblePredictorNodeModel() {
-        super(new PortType[]{new PortType(PMMLPortObject.class), new PortType(BufferedDataTable.class)},
-                new PortType[]{new PortType(BufferedDataTable.class)});
+        super(new PortType[]{PMMLPortObject.TYPE, BufferedDataTable.TYPE},
+                new PortType[]{BufferedDataTable.TYPE});
     }
 
     // See http://www.dmg.org/v4-0-1/MultipleModels.html

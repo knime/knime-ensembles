@@ -95,8 +95,8 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
      * Constructor for the node model.
      */
     protected PMMLEnsembleLoopEndNodeModel() {
-        super(new PortType[]{new PortType(FlowVariablePortObject.class, true) , new PortType(PMMLPortObject.class)},
-                new PortType[]{new PortType(PMMLPortObject.class)});
+        super(new PortType[]{FlowVariablePortObject.TYPE_OPTIONAL , PMMLPortObject.TYPE},
+                new PortType[]{PMMLPortObject.TYPE});
         m_documents = null;
         m_weights = null;
     }
