@@ -92,6 +92,11 @@
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" id="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
+      <node
+            category-path="/analytics/mining/ensembles"
+            factory-class="org.knime.ensembles.predictionfusion.PredictionFusionNodeFactory"
+            id="org.knime.ensembles.predictionfusion.PredictionFusionNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.metanode">

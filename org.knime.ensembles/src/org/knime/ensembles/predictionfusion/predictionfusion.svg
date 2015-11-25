@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Ebene_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 16 16"
+   style="enable-background:new 0 0 16 16;"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="naiveBayesPredictor.svg"
+   inkscape:export-filename="/home/winter/predictionfusion.png"
+   inkscape:export-xdpi="111.10252"
+   inkscape:export-ydpi="111.10252"><metadata
+     id="metadata24"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+     id="defs22" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="984"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="0.91525424"
+     inkscape:cy="8"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Ebene_1" /><style
+     type="text/css"
+     id="style3">
+	.st0{fill:#CBCBCB;}
+	.st1{fill:#1A171B;}
+</style><g
+     id="XMLID_18_"
+     transform="matrix(0.66484616,0,0,0.66484616,5.2431326,2.5815755)"><polygon
+       id="XMLID_51_"
+       class="st0"
+       points="3.9,1.9 3.9,14.1 13.8,8 "
+       style="fill:#cbcbcb" /><path
+       id="XMLID_20_"
+       class="st1"
+       d="M 15,7.6 3.6,0.6 C 3.3,0.4 2.9,0.6 2.9,1 l 0,14 c 0,0.4 0.4,0.6 0.8,0.4 l 11.4,-7 C 15.3,8.2 15.3,7.8 15,7.6 Z M 3.9,14.1 3.9,1.9 13.8,8 3.9,14.1 Z"
+       inkscape:connector-curvature="0"
+       style="fill:#1a171b" /></g><g
+     id="XMLID_18_-9"
+     transform="matrix(0.37021471,0,0,0.37021471,0.49395013,1.343367)"><polygon
+       id="XMLID_51_-5"
+       class="st0"
+       points="3.9,1.9 3.9,14.1 13.8,8 "
+       style="fill:#cbcbcb" /><path
+       id="XMLID_20_-6"
+       class="st1"
+       d="M 15,7.6 3.6,0.6 C 3.3,0.4 2.9,0.6 2.9,1 l 0,14 c 0,0.4 0.4,0.6 0.8,0.4 l 11.4,-7 C 15.3,8.2 15.3,7.8 15,7.6 Z M 3.9,14.1 3.9,1.9 13.8,8 3.9,14.1 Z"
+       inkscape:connector-curvature="0"
+       style="fill:#1a171b" /></g><g
+     id="XMLID_18_-9-3"
+     transform="matrix(0.37021471,0,0,0.37021471,0.5066727,8.7670958)"><polygon
+       id="XMLID_51_-5-3"
+       class="st0"
+       points="13.8,8 3.9,1.9 3.9,14.1 "
+       style="fill:#cbcbcb" /><path
+       id="XMLID_20_-6-5"
+       class="st1"
+       d="M 15,7.6 3.6,0.6 C 3.3,0.4 2.9,0.6 2.9,1 l 0,14 c 0,0.4 0.4,0.6 0.8,0.4 l 11.4,-7 C 15.3,8.2 15.3,7.8 15,7.6 Z M 3.9,14.1 3.9,1.9 13.8,8 3.9,14.1 Z"
+       inkscape:connector-curvature="0"
+       style="fill:#1a171b" /></g></svg>
