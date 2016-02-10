@@ -246,6 +246,8 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             exec.setProgress(count++ / wrappers.size());
             // Create a new document with only one model
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
+            // Fix for AP-5661
+            modelDoc.getPMML().setTransformationDictionary(pmmldoc.getPMML().getTransformationDictionary());
             DataTableSpec datadictSpec = inTable.getDataTableSpec();
             DataColumnSpec targetCol = null;
             if (inPMMLSpec.getTargetCols().size() > 0) {
