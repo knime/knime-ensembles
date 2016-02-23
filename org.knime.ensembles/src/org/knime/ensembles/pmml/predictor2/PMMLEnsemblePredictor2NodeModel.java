@@ -59,6 +59,7 @@ import org.dmg.pmml.MULTIPLEMODELMETHOD;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
+import org.dmg.pmml.TransformationDictionaryDocument.TransformationDictionary;
 import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
@@ -246,8 +247,12 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             exec.setProgress(count++ / wrappers.size());
             // Create a new document with only one model
             PMMLDocument modelDoc = modelwrapper.createPMMLDocument(pmmldoc.getPMML().getDataDictionary());
+
             // Fix for AP-5661
-            modelDoc.getPMML().setTransformationDictionary(pmmldoc.getPMML().getTransformationDictionary());
+            TransformationDictionary transDict = pmmldoc.getPMML().getTransformationDictionary();
+            if (transDict != null) {
+                modelDoc.getPMML().setTransformationDictionary(transDict);
+            }
             DataTableSpec datadictSpec = inTable.getDataTableSpec();
             DataColumnSpec targetCol = null;
             if (inPMMLSpec.getTargetCols().size() > 0) {
@@ -256,6 +261,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             if (targetCol != null && !datadictSpec.containsName(targetCol.getName())) {
                 datadictSpec = new DataTableSpec(inTable.getDataTableSpec(), new DataTableSpec(targetCol));
             }
+
             // Create a fake pmml port for using the predictors
             PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(datadictSpec);
             creator.setTargetCols(inPMMLSpec.getTargetCols());
