@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ensembles"
       label="KNIME Ensemble Learning Wrappers"
-      version="3.1.0.qualifier"
+      version="3.1.2.qualifier"
       provider-name="KNIME GmbH, Konstanz, Germany">
 
    <description>
