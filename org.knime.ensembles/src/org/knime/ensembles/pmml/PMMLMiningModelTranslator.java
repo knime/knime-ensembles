@@ -45,8 +45,10 @@
 
 package org.knime.ensembles.pmml;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,6 +279,42 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
 
     // This method is used to merge two mining schemes from two different models
     private MiningSchema mergeSchemes(final MiningSchema original, final MiningSchema s) {
+        Map<String, MiningField> fields = new HashMap<String, MiningField>();
+
+        for (MiningField mf2 : original.getMiningFieldList()) {
+            fields.put(mf2.getName(), mf2);
+        }
+
+        for (MiningField mf1 : s.getMiningFieldList()) {
+            boolean match = false;
+            MiningField mf2 = fields.get(mf1.getName());
+            if (mf2 != null) {
+                match = true;
+                if (miningFieldsAreEqual(mf1, mf2)) {
+                    MiningField merged = (MiningField) mf1.copy();
+                    merged.setHighValue(Math.max(mf1.getHighValue(), mf2.getHighValue()));
+                    merged.setLowValue(Math.min(mf1.getLowValue(), mf2.getLowValue()));
+
+                    BigDecimal imp1 = mf1.getImportance();
+                    BigDecimal imp2 = mf1.getImportance();
+                    if (imp1 == null && imp2 != null) {
+                        merged.setImportance(imp2);
+                    } else if (imp1 != null && imp2 == null) {
+                        merged.setImportance(imp1);
+                    } else if (imp1 != null && imp2 != null) {
+                        merged.setImportance((imp1.compareTo(imp2) == -1) ? imp1 : imp2);
+                    }
+
+                    fields.put(merged.getName(), merged);
+                }
+            }
+            if (!match) {
+                fields.put(mf1.getName(), mf1);
+            }
+        }
+        original.setMiningFieldArray(fields.values().toArray(new MiningField[0]));
+        return original;
+        /*
         ArrayList<MiningField> fields = new ArrayList<MiningField>();
         Map<String, MiningField> orgFields = new LinkedHashMap<String, MiningField>();
         for (MiningField mf2 : original.getMiningFieldList()) {
@@ -304,6 +342,7 @@ public class PMMLMiningModelTranslator implements PMMLTranslator {
         }
         original.setMiningFieldArray(fields.toArray(new MiningField[0]));
         return original;
+        */
     }
 
     // Since MiningField does not provide a suitable equals method, this method is used to compare two mining fields
