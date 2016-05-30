@@ -29,73 +29,73 @@
             after="org.knime.base.node.preproc.pmml.xml2pmml.XML2PMMLNodeFactory"
             category-path="/manipulation/pmml"
             factory-class="org.knime.ensembles.pmmlporttocell.PMMLPortToCellNodeFactory"
-            id="org.knime.metalearning.pmmlporttocell.PMMLPortToCellNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.modeltotable.ModelToTableNodeFactory"
-            id="org.knime.ensembles.modeltotable.ModelToTableNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.tabletomodel.TableToModelNodeFactory"
-            id="org.knime.ensembles.tabletomodel.TableToModelNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory"
-            id="org.knime.ensembles.boosting.BoostingLearnerLoopStartNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory"
-            id="org.knime.ensembles.boosting.BoostingLearnerLoopEndNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory"
-            id="org.knime.ensembles.boosting.BoostingPredictorLoopStartNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory"
-            id="org.knime.ensembles.boosting.BoostingPredictorLoopEndNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.bagging.ModelLoopStartNodeFactory"
-            id="org.knime.ensembles.bagging.ModelLoopStartNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.bagging.ModelLoopEndNodeFactory"
-            id="org.knime.ensembles.bagging.ModelLoopEndNodeFactory">
+            >
       </node>
       <node
             after="org.knime.base.node.preproc.pmml.xml2pmml.XML2PMMLNodeFactory"
             category-path="/manipulation/pmml"
             factory-class="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory"
-            id="org.knime.ensembles.tabletopmmlport.TableToPMMLNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.voting.VotingLoopEndNodeFactory"
-            id="org.knime.ensembles.voting.VotingLoopEndNodeFactory">
+            >
       </node>
       <node
             category-path="/analytics/mining/mining-pmml"
             factory-class="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory"
-            id="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory">
+            >
       </node>
       
-        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" id="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory"/>
-        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" id="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory"/>
-        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" id="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
-        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" id="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory"/>
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" />
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" />
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" />
+        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" />
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.predictionfusion.PredictionFusionNodeFactory"
-            id="org.knime.ensembles.predictionfusion.PredictionFusionNodeFactory">
+            >
       </node>
    </extension>
    <extension
