@@ -90,10 +90,11 @@ public class ModelToTableNodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects,
-            final ExecutionContext exec) throws Exception {
-        BufferedDataContainer buf = exec.createDataContainer(
-                new DataTableSpec(SPEC));
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        // force the table to disc to address AP-6262: file store cells are currently not properly handled in
+        // PortObjectCell ... would need to invent FileStorePortObjectCell for that; currently it would copy the file
+        // store into a "NotInWorkflowFileStoreHandler" and make it part of the model.
+        BufferedDataContainer buf = exec.createDataContainer(new DataTableSpec(SPEC), true, 0);
         RowKey rowKey = new RowKey(m_rowKeyModel.getStringValue());
         buf.addRowToTable(new DefaultRow(rowKey,
                 new PortObjectCell(inObjects[0])));
