@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -41,101 +40,50 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
+ * -------------------------------------------------------------------
  *
  * History
- *   Aug 30, 2016 (wiswedel): created
+ *   20.09.2007 (Fabian Dill): created
  */
 package org.knime.core.api.node.workflow;
 
-import org.knime.core.node.workflow.NodeID;
+import java.util.EventObject;
 
 /**
+ * Event that's fired by a {@link ConnectionContainer} when its UI information
+ * changes.
  *
- * @author wiswedel
+ * @see ConnectionContainer#setUIInfo(ConnectionUIInformation)
+ *
+ * @author Bernd Wiswedel, University of Konstanz
  */
-public interface IConnectionContainer {
+public class ConnectionUIInformationEvent extends EventObject {
 
-    /** Typ of the connection: metanode input, output, through or "standard" connection.
-     * @noreference */
-    public enum ConnectionType { STD, WFMIN, WFMOUT, WFMTHROUGH;
-        /**
-         * @return Whether this type is leaving a workflow (through or out)
-         */
-        public boolean isLeavingWorkflow() {
-            switch (this) {
-                case WFMOUT:
-                case WFMTHROUGH: return true;
-                default: return false;
-            }
-        }
+    private final ConnectionUIInformation m_uiInformation;
+
+    /**
+     * @param src the node id of the source node
+     * @param uiInformation the new UI information
+     */
+    public ConnectionUIInformationEvent(
+            final IConnectionContainer src,
+            final ConnectionUIInformation uiInformation) {
+        super(src);
+        m_uiInformation = uiInformation;
     }
 
     /**
-     * @return the uiInfo
+     *
+     * @return the new UI information
      */
-    ConnectionUIInformation getUIInfo();
+    public ConnectionUIInformation getUIInformation() {
+        return m_uiInformation;
+    }
 
-    /**
-     * @return the dest
-     */
-    NodeID getDest();
-
-    /**
-     * @return the destPort
-     */
-    int getDestPort();
-
-    /**
-     * @return the source
-     */
-    NodeID getSource();
-
-    /**
-     * @return the sourcePort
-     */
-    int getSourcePort();
-
-    /**
-     * @return the isDeletable
-     */
-    boolean isDeletable();
-
-    /**
-     * @return type of the connection
-     */
-    ConnectionType getType();
-
-    /**
-     * @return the ID for this connection.
-     */
-    ConnectionID getID();
-
-    /**
-     * @param uiInfo the uiInfo to set
-     */
-    void setUIInfo(ConnectionUIInformation uiInfo);
-
-    /** Add a listener to the list of registered listeners.
-     * @param l The listener to add, must not be null.
-     */
-    void addUIInformationListener(ConnectionUIInformationListener l);
-
-    /** Remove a registered listener from the listener list.
-     * @param l The listener to remove.
-     */
-    void removeUIInformationListener(ConnectionUIInformationListener l);
-
-    /**
-     * Adds a listener to the list of registered progress listeners.
-     * @param listener The listener to add, must not be null.
-     */
-    void addProgressListener(ConnectionProgressListener listener);
-
-    /**
-     * Removes a listener from the list of registered progress listeners.
-     * @param listener The listener to remove
-     */
-    void removeProgressListener(ConnectionProgressListener listener);
+    /** {@inheritDoc} */
+    @Override
+    public IConnectionContainer getSource() {
+        return (IConnectionContainer)super.getSource();
+    }
 
 }

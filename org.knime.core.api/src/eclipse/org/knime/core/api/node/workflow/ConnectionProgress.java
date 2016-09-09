@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,99 +42,72 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   Aug 30, 2016 (wiswedel): created
  */
 package org.knime.core.api.node.workflow;
 
-import org.knime.core.node.workflow.NodeID;
+import java.util.function.Supplier;
+
 
 /**
- *
- * @author wiswedel
+ * Contained in a {@link ConnectionProgressEvent} which is fired when the
+ * progress information has changed.
  */
-public interface IConnectionContainer {
+public final class ConnectionProgress {
 
-    /** Typ of the connection: metanode input, output, through or "standard" connection.
-     * @noreference */
-    public enum ConnectionType { STD, WFMIN, WFMOUT, WFMTHROUGH;
-        /**
-         * @return Whether this type is leaving a workflow (through or out)
-         */
-        public boolean isLeavingWorkflow() {
-            switch (this) {
-                case WFMOUT:
-                case WFMTHROUGH: return true;
-                default: return false;
-            }
-        }
+    private final boolean m_inProgress;
+
+    private final Supplier<String> m_messageSupplier;
+
+    /**
+     * Create a progress event based on progress value and message.
+     *
+     * @param inProgress true if currently in-progress.
+     * @param message the message to display (or <code>null</code> to display
+     *            nothing)
+     */
+    public ConnectionProgress(final boolean inProgress, final String message) {
+        this(inProgress, () -> message);
     }
 
     /**
-     * @return the uiInfo
+     * Create a progress event based on progress value and message supplier. The supplier is only evaluated if
+     * the event is processed by the UI (avoids storm of string creation, possibly synced on number formats).
+     *
+     * @param inProgress true if currently in-progress.
+     * @param messageSupplier the message supplier to display (or <code>null</code> to display nothing)
+     * @since 3.0
      */
-    ConnectionUIInformation getUIInfo();
+    public ConnectionProgress(final boolean inProgress, final Supplier<String> messageSupplier) {
+        m_inProgress = inProgress;
+        m_messageSupplier = messageSupplier;
+    }
 
     /**
-     * @return the dest
+     * @return whether we are currently in-progress. Within the UI, this
+     * determines whether we show the lines as dashed or solid. (If dashed, the
+     * lines are also animated, stepping with each event).
      */
-    NodeID getDest();
+    public boolean inProgress() {
+        return m_inProgress;
+    }
 
     /**
-     * @return the destPort
+     * Returns the current progress message or <code>null</code> to display
+     * nothing.
+     *
+     * @return current progress message or <code>null</code> to display nothing.
      */
-    int getDestPort();
+    public String getMessage() {
+        return m_messageSupplier.get();
+    }
 
     /**
-     * @return the source
+     * Returns whether there is currently a message to display.
+     *
+     * @return whether there is currently a message to display.
      */
-    NodeID getSource();
-
-    /**
-     * @return the sourcePort
-     */
-    int getSourcePort();
-
-    /**
-     * @return the isDeletable
-     */
-    boolean isDeletable();
-
-    /**
-     * @return type of the connection
-     */
-    ConnectionType getType();
-
-    /**
-     * @return the ID for this connection.
-     */
-    ConnectionID getID();
-
-    /**
-     * @param uiInfo the uiInfo to set
-     */
-    void setUIInfo(ConnectionUIInformation uiInfo);
-
-    /** Add a listener to the list of registered listeners.
-     * @param l The listener to add, must not be null.
-     */
-    void addUIInformationListener(ConnectionUIInformationListener l);
-
-    /** Remove a registered listener from the listener list.
-     * @param l The listener to remove.
-     */
-    void removeUIInformationListener(ConnectionUIInformationListener l);
-
-    /**
-     * Adds a listener to the list of registered progress listeners.
-     * @param listener The listener to add, must not be null.
-     */
-    void addProgressListener(ConnectionProgressListener listener);
-
-    /**
-     * Removes a listener from the list of registered progress listeners.
-     * @param listener The listener to remove
-     */
-    void removeProgressListener(ConnectionProgressListener listener);
+    public boolean hasMessage() {
+        return m_messageSupplier != null && m_messageSupplier.get() != null;
+    }
 
 }
