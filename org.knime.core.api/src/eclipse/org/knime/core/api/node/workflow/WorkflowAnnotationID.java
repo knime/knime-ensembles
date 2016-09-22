@@ -42,37 +42,69 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  *
- * History
- *   Oct 21, 2011 (wiswedel): created
  */
 package org.knime.core.api.node.workflow;
 
-import java.util.Optional;
-
 /**
- * Workflow annotation (not associated with a node).
+ * An identifier for a {@link IWorkflowAnnotation} object. It is only unique within one workflow (i.e. a workflow
+ * manager) but not among sub workflows and will not be persisted.
  *
- * Optionally a workfow annotation is associated with a {@link WorkflowAnnotationID}. It is required to identify a
- * specific {@link IWorkflowAnnotation}-object within the workflow manager.
+ * There is also an order defined on {@link WorkflowAnnotationID}s (cp. {@link #compareTo(WorkflowAnnotationID)}) - e.g.
+ * in which order they are drawn.
  *
- * Bernd Wiswedel, KNIME.com, Zurich, Switzerland
+ * @author Martin Horn, KNIME.com
  */
-public interface IWorkflowAnnotation extends IAnnotation<AnnotationData> {
+public final class WorkflowAnnotationID implements Comparable<WorkflowAnnotationID> {
+
+    private final int m_index;
 
     /**
-     * @return the associated workflow annotation ID if set, otherwise an empty {@link Optional}
+     * Creates a new {@link WorkflowAnnotationID} object with a given index.
+     * Within the same workflow manager there must not be equal {@link WorkflowAnnotationID}'s.
+     *
+     * The index also determines the order of workflow annotations (e.g. the order they are drawn).
+     *
+     * @param index an index
      */
-    Optional<WorkflowAnnotationID> getID();
+    public WorkflowAnnotationID(final int index) {
+        m_index = index;
+    }
 
     /**
-     * @param wfaID the id to be set
+     * @return an index
      */
-    void setID(WorkflowAnnotationID wfaID);
+    public int getIndex() {
+        return m_index;
+    }
 
     /**
-     * @return
+     * {@inheritDoc}
      */
     @Override
-    IWorkflowAnnotation clone();
+    public boolean equals(final Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if(!(obj instanceof WorkflowAnnotationID)) {
+            return false;
+        }
+        int index  = ((WorkflowAnnotationID) obj).getIndex();
+        return index == m_index;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return m_index;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(final WorkflowAnnotationID o) {
+        return Integer.compare(m_index, o.m_index);
+    }
 }
