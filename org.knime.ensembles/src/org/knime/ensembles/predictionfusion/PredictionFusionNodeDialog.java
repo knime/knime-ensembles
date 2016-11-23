@@ -14,10 +14,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -36,6 +38,7 @@ import javax.swing.border.LineBorder;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
@@ -117,36 +120,11 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
+		final JButton addFromColumn = new JButton("+");
+        addFromColumn
+            .addActionListener(e -> openClassesFromDomainDialog(addFromColumn).stream().forEach(c -> addClass(c)));
 		final JButton add = new JButton("+");
-		add.addActionListener(new ActionListener() {
-			@Override
-            public void actionPerformed(final ActionEvent e) {
-				String newClass = openInputDialog("Add class", "", add);
-				// ignore if input is empty
-				if (!newClass.isEmpty()) {
-					// check if class already exists
-					boolean found = false;
-					for (int i = 0; i < m_classesModel.getSize(); i++) {
-						if (m_classesModel.get(i).equals(newClass)) {
-							found = true;
-							break;
-						}
-					}
-					// only add if it doesn't already exist
-					if (!found) {
-						m_classesModel.addElement(newClass);
-					}
-				}
-				m_classes.revalidate();
-				m_classes.setSelectedIndex(m_classesModel.size() - 1);
-				// add column selectors for this class to predictions
-				m_classConfidences.put(newClass, new ArrayList<ColumnSelectionComboxBox>());
-				for (int i = 0; i < m_nrPredictions; i++) {
-					m_classConfidences.get(newClass).add(createColumnSelection());
-				}
-				updateConfidencePanel();
-			}
-		});
+		add.addActionListener(e -> addClass(openInputDialog("Add class", "", add)));
 		final JButton edit = new JButton("✎");
 		edit.addActionListener(new ActionListener() {
 			@Override
@@ -237,20 +215,24 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
 		});
 		// buttons should be small
 		Insets buttonMargin = new Insets(0, 3, 0, 3);
+		addFromColumn.setMargin(buttonMargin);
 		up.setMargin(buttonMargin);
 		down.setMargin(buttonMargin);
 		add.setMargin(buttonMargin);
 		edit.setMargin(buttonMargin);
 		remove.setMargin(buttonMargin);
 		// descriptive tooltips
+		addFromColumn.setToolTipText("Add classes from column domain");
 		up.setToolTipText("Move class up");
 		down.setToolTipText("Move class down");
 		add.setToolTipText("Add new class");
 		edit.setToolTipText("Edit selected class");
 		remove.setToolTipText("Remove selected class");
-		buttonPanel.add(up, gbc);
+		buttonPanel.add(addFromColumn, gbc);
 		gbc.gridy++;
 		gbc.insets = new Insets(5, 5, 5, 5);
+        buttonPanel.add(up, gbc);
+        gbc.gridy++;
 		buttonPanel.add(down, gbc);
 		gbc.gridy++;
 		buttonPanel.add(add, gbc);
@@ -267,6 +249,32 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
 		panel.add(new JScrollPane(m_classes), BorderLayout.CENTER);
 		panel.add(buttonPanel, BorderLayout.EAST);
 		return panel;
+	}
+
+	private void addClass(final String newClass) {
+        // ignore if input is empty
+        if (!newClass.isEmpty()) {
+            // check if class already exists
+            boolean found = false;
+            for (int i = 0; i < m_classesModel.getSize(); i++) {
+                if (m_classesModel.get(i).equals(newClass)) {
+                    found = true;
+                    break;
+                }
+            }
+            // only add if it doesn't already exist
+            if (!found) {
+                m_classesModel.addElement(newClass);
+                m_classes.revalidate();
+                m_classes.setSelectedIndex(m_classesModel.size() - 1);
+                // add column selectors for this class to predictions
+                m_classConfidences.put(newClass, new ArrayList<ColumnSelectionComboxBox>());
+                for (int i = 0; i < m_nrPredictions; i++) {
+                    m_classConfidences.get(newClass).add(createColumnSelection());
+                }
+                updateConfidencePanel();
+            }
+        }
 	}
 
 	/**
@@ -558,5 +566,90 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
 		dialog.dispose();
 		return input;
 	}
+
+	/**
+	 * Opens a dialog with a column selection panel.
+	 *
+	 * @param relativeTo Anchor for the dialogs placement
+	 * @return List of possible values contained in the selected column's domain. If the dialog is canceled an empty list will be returned.
+	 */
+    private List<String> openClassesFromDomainDialog(final Component relativeTo) {
+        Frame f = null;
+        Container c = getPanel().getParent();
+        while (c != null) {
+            if (c instanceof Frame) {
+                f = (Frame) c;
+                break;
+            }
+            c = c.getParent();
+        }
+        final JDialog dialog = new JDialog(f);
+        final AtomicBoolean apply = new AtomicBoolean(false);
+        @SuppressWarnings("unchecked")
+        ColumnSelectionComboxBox column = new ColumnSelectionComboxBox((Border)null, StringValue.class);
+        try {
+            column.update(m_spec, null);
+        } catch (NotConfigurableException e1) {
+        }
+        JButton ok = new JButton("OK");
+        JButton cancel = new JButton("Cancel");
+        Insets buttonMargin = new Insets(0, 0, 0, 0);
+        ok.setMargin(buttonMargin);
+        cancel.setMargin(buttonMargin);
+        // cancel and close dialog on escape
+        dialog.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(final KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
+                    dialog.setVisible(false);
+                }
+            }
+        });
+        ok.addActionListener(e -> {
+            apply.set(true);
+            dialog.setVisible(false);
+        });
+        cancel.addActionListener(e -> dialog.setVisible(false));
+        ok.setPreferredSize(cancel.getPreferredSize());
+        dialog.setLayout(new GridBagLayout());
+        dialog.setTitle("Add classes from class column domain");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        dialog.add(column, gbc);
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+        dialog.add(new JLabel(), gbc);
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx++;
+        dialog.add(ok, gbc);
+        gbc.gridx++;
+        dialog.add(cancel, gbc);
+        dialog.pack();
+        dialog.setLocationRelativeTo(relativeTo);
+        dialog.setModal(true);
+        dialog.setVisible(true);
+
+        List<String> values;
+        if (apply.get()) {
+            values = m_spec.getColumnSpec(column.getSelectedColumn()).getDomain().getValues().stream()
+                .filter(cell -> !cell.isMissing())
+                .map(cell -> ((StringValue)cell).getStringValue())
+                .collect(Collectors.toList());
+        } else {
+            values = Collections.emptyList();
+        }
+        dialog.dispose();
+        return values;
+    }
 
 }
