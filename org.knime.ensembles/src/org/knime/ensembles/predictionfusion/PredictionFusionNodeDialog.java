@@ -640,7 +640,7 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
         dialog.setVisible(true);
 
         List<String> values;
-        if (apply.get()) {
+        if (apply.get() && (column.getSelectedColumn() != null)) {
             values = m_spec.getColumnSpec(column.getSelectedColumn()).getDomain().getValues().stream()
                 .filter(cell -> !cell.isMissing())
                 .map(cell -> ((StringValue)cell).getStringValue())
