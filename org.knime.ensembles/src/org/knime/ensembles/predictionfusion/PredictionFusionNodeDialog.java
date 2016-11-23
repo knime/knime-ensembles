@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+import org.knime.core.data.DataCell;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
@@ -641,10 +643,15 @@ public class PredictionFusionNodeDialog extends NodeDialogPane {
 
         List<String> values;
         if (apply.get() && (column.getSelectedColumn() != null)) {
-            values = m_spec.getColumnSpec(column.getSelectedColumn()).getDomain().getValues().stream()
-                .filter(cell -> !cell.isMissing())
-                .map(cell -> ((StringValue)cell).getStringValue())
-                .collect(Collectors.toList());
+            Set<DataCell> possibleValues = m_spec.getColumnSpec(column.getSelectedColumn()).getDomain().getValues();
+            if (possibleValues != null) {
+                values = possibleValues.stream()
+                    .filter(cell -> !cell.isMissing())
+                    .map(cell -> ((StringValue)cell).getStringValue())
+                    .collect(Collectors.toList());
+            } else {
+                values = Collections.emptyList();
+            }
         } else {
             values = Collections.emptyList();
         }
