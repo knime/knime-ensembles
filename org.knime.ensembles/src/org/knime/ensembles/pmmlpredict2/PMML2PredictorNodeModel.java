@@ -94,61 +94,61 @@ public class PMML2PredictorNodeModel extends NodeModel {
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
-            final ExecutionContext exec)
-            throws Exception {
-            PMMLPortObject port = (PMMLPortObject) inObjects[PMML_PORT];
+        final ExecutionContext exec)
+                throws Exception {
+        PMMLPortObject port = (PMMLPortObject) inObjects[PMML_PORT];
 
-           Set<PMMLModelType> types =  port.getPMMLValue().getModelTypes();
-           if (types.size() < 1) {
-                throw new InvalidSettingsException("No PMML Model found.");
-           }
+        Set<PMMLModelType> types =  port.getPMMLValue().getModelTypes();
+        if (types.size() < 1) {
+            throw new InvalidSettingsException("No PMML Model found.");
+        }
 
-           PMMLModelType type = types.iterator().next();
+        PMMLModelType type = types.iterator().next();
 
-           if (types.size() > 1) {
-               setWarningMessage(
-                    "More models are found, the first one is used "
-                       + " : " + type.toString());
-           }
+        if (types.size() > 1) {
+            setWarningMessage(
+                "More models are found, the first one is used "
+                        + " : " + type.toString());
+        }
 
-            List<Node> models = port.getPMMLValue().getModels(type);
-            if (models.isEmpty()) {
-                throw new InvalidSettingsException("No PMML Model found.");
-            }
+        List<Node> models = port.getPMMLValue().getModels(type);
+        if (models.isEmpty()) {
+            throw new InvalidSettingsException("No PMML Model found.");
+        }
 
         switch (type) {
-        case ClusteringModel: {
-            ClusterAssignerNodeModel model = new ClusterAssignerNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case GeneralRegressionModel:
-        case RegressionModel: {
-            RegressionPredictorNodeModel model = new RegressionPredictorNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case TreeModel: {
-            DecTreePredictorNodeModel model = new DecTreePredictorNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case SupportVectorMachineModel: {
-            SVMPredictorNodeModel model = new SVMPredictorNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case NeuralNetwork: {
-            MLPPredictorNodeModel model = new MLPPredictorNodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case MiningModel: {
-            PMMLEnsemblePredictor2NodeModel model = new PMMLEnsemblePredictor2NodeModel();
-            return model.execute(inObjects, exec);
-        }
-        case NaiveBayesModel: {
-            NaiveBayesPredictorNodeModel2 model = new NaiveBayesPredictorNodeModel2();
-            return model.execute(inObjects, exec);
-        }
-        default:
-            // this should never happen.
-            throw new InvalidSettingsException("No suitable predictor found for these model types.");
+            case ClusteringModel: {
+                ClusterAssignerNodeModel model = new ClusterAssignerNodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case GeneralRegressionModel:
+            case RegressionModel: {
+                RegressionPredictorNodeModel model = new RegressionPredictorNodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case TreeModel: {
+                DecTreePredictorNodeModel model = new DecTreePredictorNodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case SupportVectorMachineModel: {
+                SVMPredictorNodeModel model = new SVMPredictorNodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case NeuralNetwork: {
+                MLPPredictorNodeModel model = new MLPPredictorNodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case MiningModel: {
+                PMMLEnsemblePredictor2NodeModel model = new PMMLEnsemblePredictor2NodeModel();
+                return model.execute(inObjects, exec);
+            }
+            case NaiveBayesModel: {
+                NaiveBayesPredictorNodeModel2 model = new NaiveBayesPredictorNodeModel2();
+                return model.execute(inObjects, exec);
+            }
+            default:
+                // this should never happen.
+                throw new InvalidSettingsException("No suitable predictor found for these model types.");
         }
     }
 
