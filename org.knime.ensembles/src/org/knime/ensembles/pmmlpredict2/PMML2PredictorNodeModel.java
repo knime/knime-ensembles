@@ -48,6 +48,7 @@ package org.knime.ensembles.pmmlpredict2;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
@@ -56,6 +57,8 @@ import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeMod
 import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
 import org.knime.base.node.mine.regression.predict2.RegressionPredictorNodeModel;
 import org.knime.base.node.mine.svm.predictor2.SVMPredictorNodeModel;
+import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml.GradientBoostingPMMLPredictorNodeModel;
+import org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor.RegressionTreePMMLPredictorNodeModel;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -71,6 +74,7 @@ import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.pmml.PMMLModelType;
 import org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeModel;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
 * The node model for the general pmml predictor.
@@ -127,6 +131,10 @@ public class PMML2PredictorNodeModel extends NodeModel {
                 return model.execute(inObjects, exec);
             }
             case TreeModel: {
+                if (isSimpleRegressionTree(models.get(0))) {
+                    RegressionTreePMMLPredictorNodeModel model = new RegressionTreePMMLPredictorNodeModel();
+                    return model.execute(inObjects, exec);
+                }
                 DecTreePredictorNodeModel model = new DecTreePredictorNodeModel();
                 return model.execute(inObjects, exec);
             }
@@ -139,6 +147,11 @@ public class PMML2PredictorNodeModel extends NodeModel {
                 return model.execute(inObjects, exec);
             }
             case MiningModel: {
+                if (isGradientBoostedTreesModel(models.get(0))) {
+                    GradientBoostingPMMLPredictorNodeModel<?> model =
+                            getGradientBoostedTreesPredictorNodeModel(models.get(0));
+                    return model.execute(inObjects, exec);
+                }
                 PMMLEnsemblePredictor2NodeModel model = new PMMLEnsemblePredictor2NodeModel();
                 return model.execute(inObjects, exec);
             }
@@ -152,7 +165,56 @@ public class PMML2PredictorNodeModel extends NodeModel {
         }
     }
 
+    private GradientBoostingPMMLPredictorNodeModel<?> getGradientBoostedTreesPredictorNodeModel(final Node miningModel) {
+        String functionName = miningModel.getAttributes().getNamedItem("functionName").getNodeValue();
+        return new GradientBoostingPMMLPredictorNodeModel(functionName.equals("regression"));
+    }
 
+    private boolean isSimpleRegressionTree(final Node treeModel) {
+        if (treeModel.getNodeName() != "TreeModel") {
+            return false;
+        }
+        return treeModel.getAttributes().getNamedItem("functionName").getNodeValue().equals("regression");
+    }
+
+    private boolean isGradientBoostedTreesModel(final Node miningModel) {
+        NodeList children = miningModel.getChildNodes();
+        Optional<Node> segmentation = findNode(children, "Segmentation");
+        if (!segmentation.isPresent()) {
+            return false;
+        }
+        String multipleMethodName = segmentation.get().getAttributes()
+                .getNamedItem("multipleModelMethod").getNodeValue();
+        if (multipleMethodName.equals("modelChain")) {
+            // only GBTs currently support model chains
+            return true;
+        } else if (multipleMethodName.equals("sum")) {
+            return allSegmentsAreRegressionTrees(segmentation.get());
+        }
+
+        return false;
+    }
+
+    private boolean allSegmentsAreRegressionTrees(final Node segmentation) {
+        NodeList segments = segmentation.getChildNodes();
+        for (int i = 0; i < segments.getLength(); i++) {
+            Node segment = segments.item(i);
+            if (!isSimpleRegressionTree(segment.getChildNodes().item(1))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Optional<Node> findNode(final NodeList nodeList, final String name) {
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeName().equals(name)) {
+                return Optional.of(node);
+            }
+        }
+        return Optional.empty();
+    }
 
     /** {@inheritDoc} */
     @Override
