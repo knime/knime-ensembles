@@ -9,6 +9,8 @@
 			GeneralRegressionModel,
 			RegressionModel,
 			TreeModel ,
+			RegressionTreeModel (Simple Regression Tree),
+			GradientBoostingModel (Gradient Boosted Trees),
 			SupportVectorMachineModel and 
 			NeuralNetwork </intro>
        
