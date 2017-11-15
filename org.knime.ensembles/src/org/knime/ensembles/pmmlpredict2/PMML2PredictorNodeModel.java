@@ -178,42 +178,8 @@ public class PMML2PredictorNodeModel extends NodeModel {
     }
 
     private boolean isGradientBoostedTreesModel(final Node miningModel) {
-        NodeList children = miningModel.getChildNodes();
-        Optional<Node> segmentation = findNode(children, "Segmentation");
-        if (!segmentation.isPresent()) {
-            return false;
-        }
-        String multipleMethodName = segmentation.get().getAttributes()
-                .getNamedItem("multipleModelMethod").getNodeValue();
-        if (multipleMethodName.equals("modelChain")) {
-            // only GBTs currently support model chains
-            return true;
-        } else if (multipleMethodName.equals("sum")) {
-            return allSegmentsAreRegressionTrees(segmentation.get());
-        }
-
-        return false;
-    }
-
-    private boolean allSegmentsAreRegressionTrees(final Node segmentation) {
-        NodeList segments = segmentation.getChildNodes();
-        for (int i = 0; i < segments.getLength(); i++) {
-            Node segment = segments.item(i);
-            if (!isSimpleRegressionTree(segment.getChildNodes().item(1))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private Optional<Node> findNode(final NodeList nodeList, final String name) {
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node.getNodeName().equals(name)) {
-                return Optional.of(node);
-            }
-        }
-        return Optional.empty();
+        Node modelName = miningModel.getAttributes().getNamedItem("modelName");
+        return modelName == null ? false : modelName.getNodeValue().equals("GradientBoostedTrees");
     }
 
     /** {@inheritDoc} */
