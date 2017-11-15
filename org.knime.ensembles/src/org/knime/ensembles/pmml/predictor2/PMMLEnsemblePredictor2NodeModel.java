@@ -59,13 +59,17 @@ import org.dmg.pmml.MULTIPLEMODELMETHOD;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
+import org.dmg.pmml.SegmentationDocument.Segmentation;
 import org.dmg.pmml.TransformationDictionaryDocument.TransformationDictionary;
+import org.dmg.pmml.TreeModelDocument.TreeModel;
 import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
 import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
 import org.knime.base.node.mine.regression.predict2.RegressionPredictorNodeModel;
 import org.knime.base.node.mine.svm.predictor2.SVMPredictorNodeModel;
+import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml.GradientBoostingPMMLPredictorNodeModel;
+import org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor.RegressionTreePMMLPredictorNodeModel;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
@@ -74,6 +78,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
@@ -91,6 +96,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.pmml.PMMLMiningModelWrapper;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
@@ -211,6 +217,13 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         }
         MiningModel usedModel = models.get(0);
 
+        // Check if the mining model is a GBT for regression which should not be predicted with this node
+        if (usedModel.getModelName() != null && usedModel.getModelName().equals("GradientBoostedTrees")) {
+            throw new ModelNotSupportedException("Gradient Boosted Trees model as top level model detected. "
+                + "Please use the Gradient "
+                + "Boosted Trees Predictor (PMML) or the PMML Predictor to predict this type of model.");
+        }
+
         // Retrieve a list of all models in the mining model
         List<PMMLModelWrapper> wrappers = PMMLModelWrapper.getModelListFromMiningModel(usedModel);
         // Predict with each model in the mining model
@@ -271,9 +284,15 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             final ExecutionContext subexec = exec.createSubExecutionContext(1.0 / wrappers.size());
             switch (modelwrapper.getModelType()) {
                 case TreeModel:
-                    DecTreePredictorNodeModel dectreeModel = new DecTreePredictorNodeModel();
-                    result = (DataTable)dectreeModel.execute(
+                    if (modelwrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
+                        RegressionTreePMMLPredictorNodeModel decTreeModel = new RegressionTreePMMLPredictorNodeModel();
+                        result = (DataTable)decTreeModel.execute(
                             new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                    } else {
+                        DecTreePredictorNodeModel dectreeModel = new DecTreePredictorNodeModel();
+                        result = (DataTable)dectreeModel.execute(
+                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                    }
                     break;
                 case NeuralNetwork:
                     MLPPredictorNodeModel mlpModel = new MLPPredictorNodeModel();
@@ -298,6 +317,9 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
                     NaiveBayesPredictorNodeModel2 nbModel = new NaiveBayesPredictorNodeModel2();
                     result = (DataTable)nbModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
+                case MiningModel:
+                    result = processGBTModel((PMMLMiningModelWrapper)modelwrapper, fakePMMLPort, inTable, subexec);
+                    break;
                 default:
                     throw new ModelNotSupportedException("Model of type "
                             + modelwrapper.getModelType().toString() + " is not supported");
@@ -316,6 +338,58 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             }
         }
         return results;
+    }
+
+    private DataTable processGBTModel(final PMMLMiningModelWrapper modelWrapper, final PMMLPortObject pmmlPO,
+        final BufferedDataTable inTable, final ExecutionContext exec) throws Exception {
+        GradientBoostingPMMLPredictorNodeModel<?> predictor = null;
+        // check for classification gbt
+        if (modelWrapper.getFunctionName() == MININGFUNCTION.CLASSIFICATION) {
+            // must contain a model chain
+            if (modelWrapper.getModel().getSegmentation().getMultipleModelMethod() == MULTIPLEMODELMETHOD.MODEL_CHAIN) {
+                predictor = new GradientBoostingPMMLPredictorNodeModel<>(false);
+            }
+            // check for regression gbt
+        } else if (modelWrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
+            // multiple model method must be 'sum'
+            MiningModel gbt = modelWrapper.getModel();
+            if (gbt.getTargets() != null && !gbt.getTargets().getTargetList().isEmpty() // contains target rescale
+                    && gbt.getSegmentation().getMultipleModelMethod() == MULTIPLEMODELMETHOD.SUM // is a sum
+                    && allBaseModelsAreRegressionTrees(gbt.getSegmentation())) { // all base models are regression trees
+                    predictor = new GradientBoostingPMMLPredictorNodeModel<>(true);
+            }
+        }
+        if (predictor == null) {
+            throw new ModelNotSupportedException(
+                "Currently a PMML ensemble may not contain other PMML"
+                + " ensembles except for Gradient Boosted Trees models.");
+        }
+        BufferedDataTable result = (BufferedDataTable)predictor.execute(new PortObject[] {pmmlPO,  inTable}, exec)[0];
+        DataTableSpec resultSpec = result.getDataTableSpec();
+        if (resultSpec.containsName("Confidence")) {
+            ColumnRearranger cr = new ColumnRearranger(result.getDataTableSpec());
+            cr.remove("Confidence");
+            return exec.createColumnRearrangeTable(result, cr, exec);
+        } else {
+            return result;
+        }
+    }
+
+    private boolean allBaseModelsAreRegressionTrees(final Segmentation segmentation) {
+        List<Segment> segments = segmentation.getSegmentList();
+        for (Segment segment : segments) {
+            TreeModel tree = segment.getTreeModel();
+            if (tree != null) {
+                if (tree.getFunctionName() != MININGFUNCTION.REGRESSION) {
+                    // tree model is not a regression tree
+                    return false;
+                }
+            } else {
+                // segment contains no tree model
+                return false;
+            }
+        }
+        return true;
     }
 
     private BufferedDataTable combine(final BufferedDataTable inTable,
