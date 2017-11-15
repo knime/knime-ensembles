@@ -59,9 +59,7 @@ import org.dmg.pmml.MULTIPLEMODELMETHOD;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
-import org.dmg.pmml.SegmentationDocument.Segmentation;
 import org.dmg.pmml.TransformationDictionaryDocument.TransformationDictionary;
-import org.dmg.pmml.TreeModelDocument.TreeModel;
 import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
@@ -343,20 +341,17 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
     private DataTable processGBTModel(final PMMLMiningModelWrapper modelWrapper, final PMMLPortObject pmmlPO,
         final BufferedDataTable inTable, final ExecutionContext exec) throws Exception {
         GradientBoostingPMMLPredictorNodeModel<?> predictor = null;
-        // check for classification gbt
-        if (modelWrapper.getFunctionName() == MININGFUNCTION.CLASSIFICATION) {
-            // must contain a model chain
-            if (modelWrapper.getModel().getSegmentation().getMultipleModelMethod() == MULTIPLEMODELMETHOD.MODEL_CHAIN) {
+        // check for gbt
+        if (modelWrapper.getModel().getModelName().equals("GradientBoostedTrees")) {
+            if (modelWrapper.getFunctionName() == MININGFUNCTION.CLASSIFICATION) {
                 predictor = new GradientBoostingPMMLPredictorNodeModel<>(false);
-            }
-            // check for regression gbt
-        } else if (modelWrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
+            } else if (modelWrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
             // multiple model method must be 'sum'
-            MiningModel gbt = modelWrapper.getModel();
-            if (gbt.getTargets() != null && !gbt.getTargets().getTargetList().isEmpty() // contains target rescale
-                    && gbt.getSegmentation().getMultipleModelMethod() == MULTIPLEMODELMETHOD.SUM // is a sum
-                    && allBaseModelsAreRegressionTrees(gbt.getSegmentation())) { // all base models are regression trees
-                    predictor = new GradientBoostingPMMLPredictorNodeModel<>(true);
+                predictor = new GradientBoostingPMMLPredictorNodeModel<>(true);
+            } else {
+                throw new ModelNotSupportedException(
+                    "Gradient Boosted Tree model with invalid function name detected."
+                    + " Must be classification or regression but was '" + modelWrapper.getFunctionName() + "'.");
             }
         }
         if (predictor == null) {
@@ -373,23 +368,6 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         } else {
             return result;
         }
-    }
-
-    private boolean allBaseModelsAreRegressionTrees(final Segmentation segmentation) {
-        List<Segment> segments = segmentation.getSegmentList();
-        for (Segment segment : segments) {
-            TreeModel tree = segment.getTreeModel();
-            if (tree != null) {
-                if (tree.getFunctionName() != MININGFUNCTION.REGRESSION) {
-                    // tree model is not a regression tree
-                    return false;
-                }
-            } else {
-                // segment contains no tree model
-                return false;
-            }
-        }
-        return true;
     }
 
     private BufferedDataTable combine(final BufferedDataTable inTable,
