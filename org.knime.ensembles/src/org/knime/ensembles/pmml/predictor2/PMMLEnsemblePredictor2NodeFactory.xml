@@ -10,9 +10,12 @@
     <fullDescription>
         <intro>
             The PMML Ensemble Predictor node takes a pmml document containing an ensemble of other models and executes all
-            of them on the given data. The results from all models is then aggregated using a method specified in the ensemble
+            of them on the given data. The results from all models are then aggregated using a method specified in the ensemble
             model. The output contains a column for each prediction of the single models (if set in the settings)
             and one column with the combined result.
+            Note that ensembles of ensembles are not supported with the exception of Gradient Boosted Trees which are treated base model.
+            It's on the other hand not possible to predict Gradient Boosted Trees models with this predictor, please use the PMML Predictor node
+            or the Gradient Boosted Trees Predictor (PMML) nodes for this task.
         </intro>
         <option name="Return individual predictions">Determines whether the output contains
         one column for each model's prediction</option>
