@@ -53,6 +53,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.data.xml.PMMLCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -68,6 +69,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.ensembles.pmml.PMMLMiningModelTranslator;
+import org.w3c.dom.Document;
 
 
 
@@ -95,7 +97,12 @@ public class PMMLEnsemble2TableNodeModel extends NodeModel {
     @Override
     protected PortObject[] execute(final PortObject[] inData,
             final ExecutionContext exec) throws Exception {
-        PMMLDocument pmmldoc = PMMLDocument.Factory.parse(((PMMLPortObject)inData[0]).getPMMLValue().getDocument());
+        PMMLDocument pmmldoc;
+
+        try (AutocloseableSupplier<Document> supplier =
+            ((PMMLPortObject)inData[0]).getPMMLValue().getDocumentSupplier()) {
+            pmmldoc = PMMLDocument.Factory.parse(supplier.get());
+        }
 
         PMMLMiningModelTranslator trans = new PMMLMiningModelTranslator();
         trans.initializeFrom(pmmldoc);

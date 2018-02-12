@@ -81,6 +81,7 @@ import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -100,6 +101,7 @@ import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
 import org.knime.ensembles.pmml.ModelNotSupportedException;
+import org.w3c.dom.Document;
 
 
 
@@ -208,7 +210,12 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         exec.setMessage("PMML Ensemble Prediction");
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
-        PMMLDocument pmmldoc = PMMLDocument.Factory.parse(pmmlIn.getPMMLValue().getDocument());
+        PMMLDocument pmmldoc;
+
+        try (AutocloseableSupplier<Document> supplier = pmmlIn.getPMMLValue().getDocumentSupplier()) {
+            pmmldoc = PMMLDocument.Factory.parse(supplier.get());
+        }
+
         List<MiningModel> models = pmmldoc.getPMML().getMiningModelList();
         if (models.size() == 0) {
             throw new ModelNotSupportedException("No mining models found");

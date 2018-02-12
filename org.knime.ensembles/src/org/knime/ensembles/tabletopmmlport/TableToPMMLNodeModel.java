@@ -52,6 +52,7 @@ import org.knime.base.node.io.pmml.read.PMMLImport;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -66,6 +67,7 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
+import org.w3c.dom.Document;
 /**
  * The node model for the table to pmml node.
  *
@@ -112,8 +114,11 @@ public class TableToPMMLNodeModel extends NodeModel {
                     }
                 }
                 PMMLValue model = (PMMLValue) dc;
-                PMMLImport pmmlImport = new PMMLImport(model.getDocument());
-                return new PortObject[] {pmmlImport.getPortObject()};
+
+                try (AutocloseableSupplier<Document> supplier = model.getDocumentSupplier()) {
+                    PMMLImport pmmlImport = new PMMLImport(supplier.get());
+                    return new PortObject[]{pmmlImport.getPortObject()};
+                }
             }
             rowCount++;
         }

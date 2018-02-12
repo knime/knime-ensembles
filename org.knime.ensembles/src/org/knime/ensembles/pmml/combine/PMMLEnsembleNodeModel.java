@@ -55,6 +55,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -72,6 +73,7 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
+import org.w3c.dom.Document;
 
 
 /**
@@ -248,8 +250,10 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         for (DataRow r : inTable) {
             exec.checkCanceled();
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
-            documents.add(pmmldoc);
+            try (AutocloseableSupplier<Document> supplier = val.getDocumentSupplier()) {
+                PMMLDocument pmmldoc = PMMLDocument.Factory.parse(supplier.get());
+                documents.add(pmmldoc);
+            }
 
             if (weights != null) {
                 Double w = ((DoubleCell)r.getCell(weightColIndex)).getDoubleValue();

@@ -51,6 +51,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.data.xml.PMMLCell;
 import org.knime.core.data.xml.PMMLCellFactory;
 import org.knime.core.data.xml.PMMLValue;
@@ -68,6 +69,7 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
+import org.w3c.dom.Document;
 
 /**
 *
@@ -94,7 +96,11 @@ public class PMMLPortToCellNodeModel extends NodeModel {
         PMMLPortObject in = (PMMLPortObject) inObjects[0];
         PMMLValue value = in.getPMMLValue();
 
-        DataCell cell = PMMLCellFactory.create(value.getDocument());
+        DataCell cell;
+
+        try (AutocloseableSupplier<Document> supplier = value.getDocumentSupplier()) {
+            cell = PMMLCellFactory.create(supplier.get());
+        }
 
         BufferedDataContainer out
                         = exec.createDataContainer(createSpec());

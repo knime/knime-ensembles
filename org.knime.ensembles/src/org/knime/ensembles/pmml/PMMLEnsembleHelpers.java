@@ -62,10 +62,12 @@ import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.util.AutocloseableSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.port.pmml.PMMLModelWrapper;
+import org.w3c.dom.Document;
 
 /**
  * Contains helper functions for PMML ensemble processing.
@@ -99,8 +101,11 @@ public final class PMMLEnsembleHelpers {
                 exec.checkCanceled();
             }
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            PMMLDocument pmmldoc = PMMLDocument.Factory.parse(val.getDocument());
-            docs.add(pmmldoc);
+
+            try (AutocloseableSupplier<Document> supplier = val.getDocumentSupplier()) {
+                PMMLDocument pmmldoc = PMMLDocument.Factory.parse(supplier.get());
+                docs.add(pmmldoc);
+            }
         }
         return docs;
     }
