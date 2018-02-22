@@ -53,7 +53,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.data.xml.PMMLCell;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
@@ -99,7 +99,7 @@ public class PMMLEnsemble2TableNodeModel extends NodeModel {
             final ExecutionContext exec) throws Exception {
         PMMLDocument pmmldoc;
 
-        try (AutocloseableSupplier<Document> supplier =
+        try (LockedSupplier<Document> supplier =
             ((PMMLPortObject)inData[0]).getPMMLValue().getDocumentSupplier()) {
             pmmldoc = PMMLDocument.Factory.parse(supplier.get());
         }

@@ -81,7 +81,7 @@ import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -212,7 +212,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
         PMMLDocument pmmldoc;
 
-        try (AutocloseableSupplier<Document> supplier = pmmlIn.getPMMLValue().getDocumentSupplier()) {
+        try (LockedSupplier<Document> supplier = pmmlIn.getPMMLValue().getDocumentSupplier()) {
             pmmldoc = PMMLDocument.Factory.parse(supplier.get());
         }
 

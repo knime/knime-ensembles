@@ -62,7 +62,7 @@ import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -102,7 +102,7 @@ public final class PMMLEnsembleHelpers {
             }
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
 
-            try (AutocloseableSupplier<Document> supplier = val.getDocumentSupplier()) {
+            try (LockedSupplier<Document> supplier = val.getDocumentSupplier()) {
                 PMMLDocument pmmldoc = PMMLDocument.Factory.parse(supplier.get());
                 docs.add(pmmldoc);
             }

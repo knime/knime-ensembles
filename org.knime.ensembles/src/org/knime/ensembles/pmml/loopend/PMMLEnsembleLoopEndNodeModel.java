@@ -55,7 +55,7 @@ import java.util.Set;
 import org.dmg.pmml.MiningFieldDocument.MiningField;
 import org.dmg.pmml.PMMLDocument;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
@@ -173,7 +173,7 @@ public class PMMLEnsembleLoopEndNodeModel extends NodeModel implements LoopEndNo
             }
         }
 
-        try (AutocloseableSupplier<Document> supplier =
+        try (LockedSupplier<Document> supplier =
             ((PMMLPortObject)inData[1]).getPMMLValue().getDocumentSupplier()) {
             PMMLDocument pmmldoc = PMMLDocument.Factory.parse(supplier.get());
 

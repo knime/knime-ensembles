@@ -55,7 +55,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -250,7 +250,7 @@ public class PMMLEnsembleNodeModel extends NodeModel {
         for (DataRow r : inTable) {
             exec.checkCanceled();
             PMMLValue val = (PMMLValue) r.getCell(pmmlColIndex);
-            try (AutocloseableSupplier<Document> supplier = val.getDocumentSupplier()) {
+            try (LockedSupplier<Document> supplier = val.getDocumentSupplier()) {
                 PMMLDocument pmmldoc = PMMLDocument.Factory.parse(supplier.get());
                 documents.add(pmmldoc);
             }

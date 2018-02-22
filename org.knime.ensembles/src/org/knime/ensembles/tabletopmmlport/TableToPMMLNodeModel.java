@@ -52,7 +52,7 @@ import org.knime.base.node.io.pmml.read.PMMLImport;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.util.AutocloseableSupplier;
+import org.knime.core.data.util.LockedSupplier;
 import org.knime.core.data.xml.PMMLValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -115,7 +115,7 @@ public class TableToPMMLNodeModel extends NodeModel {
                 }
                 PMMLValue model = (PMMLValue) dc;
 
-                try (AutocloseableSupplier<Document> supplier = model.getDocumentSupplier()) {
+                try (LockedSupplier<Document> supplier = model.getDocumentSupplier()) {
                     PMMLImport pmmlImport = new PMMLImport(supplier.get());
                     return new PortObject[]{pmmlImport.getPortObject()};
                 }
