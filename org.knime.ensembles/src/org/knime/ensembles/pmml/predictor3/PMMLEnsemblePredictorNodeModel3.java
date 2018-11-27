@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,9 +41,12 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
+ *
+ * History
+ *   Nov 27, 2018 (Mark Ortmann, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.ensembles.pmml.predictor2;
+package org.knime.ensembles.pmml.predictor3;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +64,7 @@ import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.PMMLDocument;
 import org.dmg.pmml.SegmentDocument.Segment;
 import org.dmg.pmml.TransformationDictionaryDocument.TransformationDictionary;
-import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
+import org.knime.base.node.mine.bayes.naivebayes.predictor4.NaiveBayesPredictorNodeModel3;
 import org.knime.base.node.mine.cluster.assign.ClusterAssignerNodeModel;
 import org.knime.base.node.mine.decisiontree2.predictor2.DecTreePredictorNodeModel;
 import org.knime.base.node.mine.neural.mlp2.MLPPredictorNodeModel;
@@ -103,31 +107,21 @@ import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
 import org.knime.ensembles.pmml.ModelNotSupportedException;
 import org.w3c.dom.Document;
 
-
-
 /**
- * This is the model implementation of PMMLEnsemblePredictor.
- * This node takes a PMML ensemble document and an input table and uses each model in the ensemble on the given data.
- * The individual results from applying the models are then combined using the multiple model method specified in the
- * PMML document.
  *
- * @author Alexander Fillbrunn, Universitaet Konstanz
- * @since 2.8
+ * @author Mark Ortmann, KNIME GmbH, Berlin, Germany
  */
-public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
+final class PMMLEnsemblePredictorNodeModel3 extends NodeModel {
 
     private final SettingsModelString m_tieBreak = createTieBreakSettingsModel();
 
     /**
-     * Flag that indicates whether predictions from individual models should be included
-     * in the result table.
+     * Flag that indicates whether predictions from individual models should be included in the result table.
      */
     private final SettingsModelBoolean m_returnIndividualPredictions = createReturnIndividualPredictionsSettingsModel();
 
-
     /**
-     * Flag that indicates whether the used multiple model method should be used as the name
-     * of the result column.
+     * Flag that indicates whether the used multiple model method should be used as the name of the result column.
      */
     private final SettingsModelBoolean m_useMethodAsColumnName = createUseMethodSettingsModel();
 
@@ -141,6 +135,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
 
     /**
      * Creates a SettingsModelBoolean for determining how ties in majority vote or weighted majority vote are treated.
+     *
      * @return The SettingsModel
      */
     public static SettingsModelString createTieBreakSettingsModel() {
@@ -149,6 +144,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
 
     /**
      * Creates a SettingsModelBoolean for determining whether individual predictions from models are included in output.
+     *
      * @return The SettingsModel
      */
     public static SettingsModelBoolean createReturnIndividualPredictionsSettingsModel() {
@@ -158,42 +154,30 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
     /**
      * Constructor for the node model.
      */
-    public PMMLEnsemblePredictor2NodeModel() {
-        super(new PortType[]{PMMLPortObject.TYPE, BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE});
+    public PMMLEnsemblePredictorNodeModel3() {
+        super(new PortType[]{PMMLPortObject.TYPE, BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     // See http://www.dmg.org/v4-0-1/MultipleModels.html
-    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] CLUSTERINGMETHODS
-    = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL
-    };
+    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] CLUSTERINGMETHODS =
+        new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE, org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL};
 
-    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] CLASSIFICATIONMETHODS
-    = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL,
-    };
+    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] CLASSIFICATIONMETHODS =
+        new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{org.dmg.pmml.MULTIPLEMODELMETHOD.MAJORITY_VOTE,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_MAJORITY_VOTE, org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL,};
 
-    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] REGRESSIONMETHODS
-    = new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{
-        org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MAX,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SUM,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST,
-        org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL
-    };
+    private static final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] REGRESSIONMETHODS =
+        new org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[]{org.dmg.pmml.MULTIPLEMODELMETHOD.AVERAGE,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.MAX, org.dmg.pmml.MULTIPLEMODELMETHOD.WEIGHTED_AVERAGE,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.MEDIAN, org.dmg.pmml.MULTIPLEMODELMETHOD.SUM,
+            org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST, org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL};
 
     //Check if the multiplemodelmethod is in the array for a mining function
-    private boolean methodValidFor(final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum method,
-            final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] allowed) {
+    private static boolean methodValidFor(final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum method,
+        final org.dmg.pmml.MULTIPLEMODELMETHOD.Enum[] allowed) {
         for (org.dmg.pmml.MULTIPLEMODELMETHOD.Enum m : allowed) {
             if (m == method) {
                 return true;
@@ -206,8 +190,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    public PortObject[] execute(final PortObject[] inData,
-            final ExecutionContext exec) throws Exception {
+    public PortObject[] execute(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         exec.setMessage("PMML Ensemble Prediction");
         PMMLPortObject pmmlIn = ((PMMLPortObject)inData[0]);
         PMMLDocument pmmldoc;
@@ -224,16 +207,16 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
 
         // Check if the mining model is a GBT for regression which should not be predicted with this node
         if (usedModel.getModelName() != null && usedModel.getModelName().equals("GradientBoostedTrees")) {
-            throw new ModelNotSupportedException("Gradient Boosted Trees model as top level model detected. "
-                + "Please use the Gradient "
-                + "Boosted Trees Predictor (PMML) or the PMML Predictor to predict this type of model.");
+            throw new ModelNotSupportedException(
+                "Gradient Boosted Trees model as top level model detected. " + "Please use the Gradient "
+                    + "Boosted Trees Predictor (PMML) or the PMML Predictor to predict this type of model.");
         }
 
         // Retrieve a list of all models in the mining model
         List<PMMLModelWrapper> wrappers = PMMLModelWrapper.getModelListFromMiningModel(usedModel);
         // Predict with each model in the mining model
-        Map<RowKey, ArrayList<DataCell>> results = calculateAllPredictions(wrappers, inData, pmmldoc,
-                usedModel.getFunctionName(), exec);
+        Map<RowKey, ArrayList<DataCell>> results =
+            calculateAllPredictions(wrappers, inData, pmmldoc, usedModel.getFunctionName(), exec);
         // Calculate the aggregated result depending on the MultipleModelsMethod
         BufferedDataTable output = combine((BufferedDataTable)inData[1], results, usedModel, wrappers.size(), exec);
 
@@ -244,17 +227,15 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
-            throws InvalidSettingsException {
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         // We cannot know from the specs how many columns will be added because we don't know the number of models
         // in the ensemble
         return new DataTableSpec[]{null};
     }
 
     private Map<RowKey, ArrayList<DataCell>> calculateAllPredictions(final List<PMMLModelWrapper> wrappers,
-                                                  final PortObject[] inData, final PMMLDocument pmmldoc,
-                                                  final MININGFUNCTION.Enum funcName, final ExecutionContext exec)
-                                                  throws Exception {
+        final PortObject[] inData, final PMMLDocument pmmldoc, final MININGFUNCTION.Enum funcName,
+        final ExecutionContext exec) throws Exception {
         BufferedDataTable inTable = (BufferedDataTable)inData[1];
         Map<RowKey, ArrayList<DataCell>> results = new HashMap<RowKey, ArrayList<DataCell>>();
         double count = 0;
@@ -291,12 +272,10 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
                 case TreeModel:
                     if (modelwrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
                         RegressionTreePMMLPredictorNodeModel decTreeModel = new RegressionTreePMMLPredictorNodeModel();
-                        result = (DataTable)decTreeModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                        result = (DataTable)decTreeModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     } else {
                         DecTreePredictorNodeModel dectreeModel = new DecTreePredictorNodeModel();
-                        result = (DataTable)dectreeModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                        result = (DataTable)dectreeModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     }
                     break;
                 case NeuralNetwork:
@@ -310,24 +289,22 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
                     break;
                 case ClusteringModel:
                     ClusterAssignerNodeModel clusterModel = new ClusterAssignerNodeModel();
-                    result = (DataTable)clusterModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                    result = (DataTable)clusterModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case SupportVectorMachineModel:
                     SVMPredictorNodeModel svmModel = new SVMPredictorNodeModel();
-                    result = (DataTable)svmModel.execute(
-                            new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
+                    result = (DataTable)svmModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case NaiveBayesModel:
-                    NaiveBayesPredictorNodeModel2 nbModel = new NaiveBayesPredictorNodeModel2();
+                    NaiveBayesPredictorNodeModel3 nbModel = new NaiveBayesPredictorNodeModel3();
                     result = (DataTable)nbModel.execute(new PortObject[]{fakePMMLPort, inTable}, subexec)[0];
                     break;
                 case MiningModel:
                     result = processGBTModel((PMMLMiningModelWrapper)modelwrapper, fakePMMLPort, inTable, subexec);
                     break;
                 default:
-                    throw new ModelNotSupportedException("Model of type "
-                            + modelwrapper.getModelType().toString() + " is not supported");
+                    throw new ModelNotSupportedException(
+                        "Model of type " + modelwrapper.getModelType().toString() + " is not supported");
             }
             // Retrieve the value in the result column
             for (DataRow row : result) {
@@ -345,7 +322,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         return results;
     }
 
-    private DataTable processGBTModel(final PMMLMiningModelWrapper modelWrapper, final PMMLPortObject pmmlPO,
+    private static DataTable processGBTModel(final PMMLMiningModelWrapper modelWrapper, final PMMLPortObject pmmlPO,
         final BufferedDataTable inTable, final ExecutionContext exec) throws Exception {
         GradientBoostingPMMLPredictorNodeModel<?> predictor = null;
         // check for gbt
@@ -353,20 +330,18 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             if (modelWrapper.getFunctionName() == MININGFUNCTION.CLASSIFICATION) {
                 predictor = new GradientBoostingPMMLPredictorNodeModel<>(false);
             } else if (modelWrapper.getFunctionName() == MININGFUNCTION.REGRESSION) {
-            // multiple model method must be 'sum'
+                // multiple model method must be 'sum'
                 predictor = new GradientBoostingPMMLPredictorNodeModel<>(true);
             } else {
-                throw new ModelNotSupportedException(
-                    "Gradient Boosted Tree model with invalid function name detected."
+                throw new ModelNotSupportedException("Gradient Boosted Tree model with invalid function name detected."
                     + " Must be classification or regression but was '" + modelWrapper.getFunctionName() + "'.");
             }
         }
         if (predictor == null) {
-            throw new ModelNotSupportedException(
-                "Currently a PMML ensemble may not contain other PMML"
+            throw new ModelNotSupportedException("Currently a PMML ensemble may not contain other PMML"
                 + " ensembles except for Gradient Boosted Trees models.");
         }
-        BufferedDataTable result = (BufferedDataTable)predictor.execute(new PortObject[] {pmmlPO,  inTable}, exec)[0];
+        BufferedDataTable result = (BufferedDataTable)predictor.execute(new PortObject[]{pmmlPO, inTable}, exec)[0];
         DataTableSpec resultSpec = result.getDataTableSpec();
         if (resultSpec.containsName("Confidence")) {
             ColumnRearranger cr = new ColumnRearranger(result.getDataTableSpec());
@@ -377,12 +352,9 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         }
     }
 
-    private BufferedDataTable combine(final BufferedDataTable inTable,
-                                    final Map<RowKey, ArrayList<DataCell>> results,
-                                    final MiningModel usedModel,
-                                    final int numModels,
-                                    final ExecutionContext exec)
-                  throws ModelNotSupportedException, CanceledExecutionException {
+    private BufferedDataTable combine(final BufferedDataTable inTable, final Map<RowKey, ArrayList<DataCell>> results,
+        final MiningModel usedModel, final int numModels, final ExecutionContext exec)
+        throws ModelNotSupportedException, CanceledExecutionException {
 
         MULTIPLEMODELMETHOD.Enum method = usedModel.getSegmentation().getMultipleModelMethod();
         MININGFUNCTION.Enum funcName = usedModel.getFunctionName();
@@ -427,27 +399,24 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.MODEL_CHAIN) {
             throw new ModelNotSupportedException("Model chains are currently not supported");
         } else if (method != org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL
-                && method != org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST) {
+            && method != org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_FIRST) {
 
             if (funcName == org.dmg.pmml.MININGFUNCTION.CLASSIFICATION) {
                 if (!methodValidFor(method, CLASSIFICATIONMETHODS)) {
                     throw new ModelNotSupportedException(
-                            "The multiple model method '" + method.toString()
-                            + "' is not suitable for classification");
+                        "The multiple model method '" + method.toString() + "' is not suitable for classification");
                 }
                 types[counter] = StringCell.TYPE;
             } else if (funcName == org.dmg.pmml.MININGFUNCTION.REGRESSION) {
                 if (!methodValidFor(method, REGRESSIONMETHODS)) {
                     throw new ModelNotSupportedException(
-                        "The multiple model method '" + method.toString()
-                        + "' is not suitable for regression");
+                        "The multiple model method '" + method.toString() + "' is not suitable for regression");
                 }
                 types[counter] = DoubleCell.TYPE;
             } else if (funcName == org.dmg.pmml.MININGFUNCTION.CLUSTERING) {
                 if (!methodValidFor(method, CLUSTERINGMETHODS)) {
                     throw new ModelNotSupportedException(
-                        "The multiple model method '" + method.toString()
-                        + "' is not suitable for clustering");
+                        "The multiple model method '" + method.toString() + "' is not suitable for clustering");
                 }
                 types[counter] = StringCell.TYPE;
             }
@@ -456,8 +425,8 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         }
 
         // Combine the cells in the results to one final result according to the multiple model method
-        final DataContainer cont = exec.createDataContainer(
-                new DataTableSpec(inTable.getDataTableSpec(), new DataTableSpec(names, types)));
+        final DataContainer cont =
+            exec.createDataContainer(new DataTableSpec(inTable.getDataTableSpec(), new DataTableSpec(names, types)));
         for (DataRow row : inTable) {
             exec.checkCanceled();
             final RowKey key = row.getKey();
@@ -481,12 +450,12 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
             } else if (method == org.dmg.pmml.MULTIPLEMODELMETHOD.SELECT_ALL) {
                 list.add(selectAll(list));
             } else {
-                throw new ModelNotSupportedException("Multiple model method "
-                        + method.toString() +  " is not supported");
+                throw new ModelNotSupportedException(
+                    "Multiple model method " + method.toString() + " is not supported");
             }
             int numCols = inTable.getDataTableSpec().getNumColumns();
-            DataCell[] cells = new DataCell[
-                         (m_returnIndividualPredictions.getBooleanValue()) ? numCols + numModels + 1 : numCols + 1];
+            DataCell[] cells =
+                new DataCell[(m_returnIndividualPredictions.getBooleanValue()) ? numCols + numModels + 1 : numCols + 1];
 
             counter = 0;
             for (DataCell c : row) {
@@ -500,12 +469,12 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
                 cells[counter++] = list.get(list.size() - 1);
             }
             cont.addRowToTable(new DefaultRow(key, cells));
-         }
-         cont.close();
-         return (BufferedDataTable) cont.getTable();
+        }
+        cont.close();
+        return (BufferedDataTable)cont.getTable();
     }
 
-    private StringCell selectAll(final List<DataCell> cells) {
+    private static StringCell selectAll(final List<DataCell> cells) {
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < cells.size(); i++) {
             buffer.append('\"');
@@ -518,7 +487,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         return new StringCell(buffer.toString());
     }
 
-    private DataCell median(final List<DataCell> cells) {
+    private static DataCell median(final List<DataCell> cells) {
         if (cells.size() == 1) {
             return cells.get(0);
         }
@@ -552,7 +521,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         }
     }
 
-    private DoubleCell sum(final List<DataCell> cells) {
+    private static DoubleCell sum(final List<DataCell> cells) {
         double sum = 0.0;
         for (DataCell c : cells) {
             if (c instanceof DoubleCell) {
@@ -562,7 +531,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         return new DoubleCell(sum);
     }
 
-    private DoubleCell max(final List<DataCell> cells) {
+    private static DoubleCell max(final List<DataCell> cells) {
         Double max = Double.NaN;
         for (DataCell c : cells) {
             if (c instanceof DoubleCell) {
@@ -621,7 +590,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         return new StringCell(winner);
     }
 
-    private DoubleCell average(final List<DataCell> cells) {
+    private static DoubleCell average(final List<DataCell> cells) {
         double sum = 0;
         for (DataCell c : cells) {
             sum += ((DoubleCell)c).getDoubleValue();
@@ -629,7 +598,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
         return new DoubleCell(sum / cells.size());
     }
 
-    private DoubleCell weightedAverage(final List<DataCell> cells, final double[] weights) {
+    private static DoubleCell weightedAverage(final List<DataCell> cells, final double[] weights) {
         double sum = 0;
         int counter = 0;
         for (DataCell c : cells) {
@@ -659,8 +628,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_returnIndividualPredictions.loadSettingsFrom(settings);
         m_useMethodAsColumnName.loadSettingsFrom(settings);
         m_tieBreak.loadSettingsFrom(settings);
@@ -670,8 +638,7 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_returnIndividualPredictions.validateSettings(settings);
         m_useMethodAsColumnName.validateSettings(settings);
         m_tieBreak.validateSettings(settings);
@@ -681,20 +648,17 @@ public class PMMLEnsemblePredictor2NodeModel extends NodeModel {
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File internDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void loadInternals(final File internDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File internDir,
-            final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+    protected void saveInternals(final File internDir, final ExecutionMonitor exec)
+        throws IOException, CanceledExecutionException {
 
     }
 
 }
-

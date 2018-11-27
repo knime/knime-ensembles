@@ -48,7 +48,6 @@ package org.knime.ensembles.pmmlpredict2;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.knime.base.node.mine.bayes.naivebayes.predictor3.NaiveBayesPredictorNodeModel2;
@@ -74,13 +73,14 @@ import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.pmml.PMMLModelType;
 import org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeModel;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
-* The node model for the general pmml predictor.
-*
-* @author Iris Adae, University of Konstanz, Germany
-*/
+ * The node model for the general pmml predictor.
+ *
+ * @author Iris Adae, University of Konstanz, Germany
+ * @deprecated
+ */
+@Deprecated
 public class PMML2PredictorNodeModel extends NodeModel {
 
     private static final int PMML_PORT = 0;

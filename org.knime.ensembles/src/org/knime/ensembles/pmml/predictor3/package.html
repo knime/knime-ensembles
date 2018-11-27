@@ -1,5 +1,5 @@
-/*
- * ------------------------------------------------------------------------
+<!--
+====================================================================
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,63 +40,8 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- */
-package org.knime.ensembles.pmml.predictor2;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-
-/**
- * <code>NodeFactory</code> for the "PMMLEnsemblePredictor" Node.
- *
- * @author Alexander Fillbrunn, Universitaet Konstanz
- * @since 2.8
- */
-public class PMMLEnsemblePredictor2NodeFactory
-        extends NodeFactory<PMMLEnsemblePredictor2NodeModel> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PMMLEnsemblePredictor2NodeModel createNodeModel() {
-        return new PMMLEnsemblePredictor2NodeModel();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<PMMLEnsemblePredictor2NodeModel> createNodeView(final int viewIndex,
-            final PMMLEnsemblePredictor2NodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeDialogPane createNodeDialogPane() {
-        return new PMMLEnsemblePredictor2NodeDialog();
-    }
-
-}
-
+====================================================================
+-->
+<body>
+Contains classes for the pmml predictor node
+</body>

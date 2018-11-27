@@ -1,5 +1,8 @@
-/*
- * ------------------------------------------------------------------------
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+========================================================================
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,40 +43,10 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- */
-package org.knime.ensembles.pmml.predictor2;
-
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
-
-/**
- * <code>NodeDialog</code> for the "PMMLEnsemblePredictor" Node.
- *
- * @author Alexander Fillbrunn, Universitaet Konstanz
- * @since 2.8
- */
-public class PMMLEnsemblePredictor2NodeDialog extends DefaultNodeSettingsPane {
-    
-    /**
-     * New pane for configuring PMMLEnsemblePredictor node dialog.
-     * This is just a suggestion to demonstrate possible default dialog
-     * components.
-     */
-    protected PMMLEnsemblePredictor2NodeDialog() {
-        super();
-        
-        addDialogComponent(new DialogComponentBoolean(
-                PMMLEnsemblePredictor2NodeModel.createReturnIndividualPredictionsSettingsModel(),
-                "Return individual predictions"));
-        addDialogComponent(new DialogComponentBoolean(
-                PMMLEnsemblePredictor2NodeModel.createUseMethodSettingsModel(),
-                "Use Multiple Model Method as result column name"));
-        addDialogComponent(new DialogComponentStringSelection(
-                PMMLEnsemblePredictor2NodeModel.createTieBreakSettingsModel(),
-                "Tie break", new String[]{"missing", "any"}));
-    }
-    
-}
-
+====================================================================
+-->
+</head>
+<body>
+	Contains classes for the general pmml prediction node.
+</body>
+</html>

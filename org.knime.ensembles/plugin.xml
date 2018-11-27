@@ -84,18 +84,31 @@
       </node>
       <node
             category-path="/analytics/mining/mining-pmml"
-            factory-class="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.ensembles.pmmlpredict2.PMMLPredictor2NodeFactory">
       </node>
       
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.combine.PMMLEnsembleNodeFactory" />
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.totable.PMMLEnsemble2TableNodeFactory" />
-        <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory" />
+        <node
+              category-path="/analytics/mining/ensembles/ensembles-combine"
+              deprecated="true"
+              factory-class="org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeFactory"/>
         <node category-path="/analytics/mining/ensembles/ensembles-combine" factory-class="org.knime.ensembles.pmml.loopend.PMMLEnsembleLoopEndNodeFactory" />
       <node
             category-path="/analytics/mining/ensembles"
             factory-class="org.knime.ensembles.predictionfusion.PredictionFusionNodeFactory"
             >
+      </node>
+      <node
+            category-path="/analytics/mining/mining-pmml"
+            deprecated="false"
+            factory-class="org.knime.ensembles.pmmlpredict3.PMMLPredictorNodeFactory3">
+      </node>
+      <node
+            category-path="/analytics/mining/ensembles/ensembles-combine"
+            deprecated="false"
+            factory-class="org.knime.ensembles.pmml.predictor3.PMMLEnsemblePredictorNodeFactory3">
       </node>
    </extension>
    <extension

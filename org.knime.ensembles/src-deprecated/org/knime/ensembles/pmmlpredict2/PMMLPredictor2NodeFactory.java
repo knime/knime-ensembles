@@ -54,7 +54,9 @@ import org.knime.core.node.NodeView;
  *
  *
  * @author Iris Adae, University of Konstanz, Germany
+ * @deprecated
  */
+@Deprecated
 public class PMMLPredictor2NodeFactory
                     extends NodeFactory<PMML2PredictorNodeModel> {
 
