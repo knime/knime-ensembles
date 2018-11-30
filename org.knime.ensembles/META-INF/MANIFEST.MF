@@ -5,16 +5,15 @@ Bundle-SymbolicName: org.knime.ensembles;singleton:=true
 Bundle-Version: 3.7.0.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Export-Package: org.knime.ensembles.bagging,
-  org.knime.ensembles.boosting,
-  org.knime.ensembles.delegating,
-  org.knime.ensembles.modeltotable,
-  org.knime.ensembles.pmml,
-  org.knime.ensembles.pmml.combine,
-  org.knime.ensembles.pmmlporttocell,
-  org.knime.ensembles.pmmlpredict2,
-  org.knime.ensembles.tabletomodel,
-  org.knime.ensembles.tabletopmmlport,
-  org.knime.ensembles.voting
+ org.knime.ensembles.boosting,
+ org.knime.ensembles.delegating,
+ org.knime.ensembles.modeltotable,
+ org.knime.ensembles.pmml,
+ org.knime.ensembles.pmml.combine,
+ org.knime.ensembles.pmmlporttocell,
+ org.knime.ensembles.tabletomodel,
+ org.knime.ensembles.tabletopmmlport,
+ org.knime.ensembles.voting
 Require-Bundle: org.knime.base;bundle-version="[3.6.0,4.0.0)",
   org.knime.workbench.repository;bundle-version="[3.0.0,4.0.0)",
   org.knime.core.pmml;bundle-version="[3.2.0,4.0.0)",
