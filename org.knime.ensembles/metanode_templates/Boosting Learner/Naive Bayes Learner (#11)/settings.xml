@@ -10,7 +10,7 @@
 <entry key="SettingsModelID" type="xstring" value="SMID_string"/>
 <entry key="EnabledStatus" type="xboolean" value="true"/>
 </config>
-<entry key="classifyColumn" type="xstring" value="Cluster Membership"/>
+<entry key="classifyColumn" type="xstring" value="class"/>
 <config key="skipMissingVals_Internals">
 <entry key="SettingsModelID" type="xstring" value="SMID_boolean"/>
 <entry key="EnabledStatus" type="xboolean" value="true"/>
@@ -57,11 +57,7 @@
 <config key="styles"/>
 </config>
 <entry key="customDescription" type="xstring" isnull="true" value=""/>
-<entry key="state" type="xstring" value="CONFIGURED"/>
-<config key="nodecontainer_message">
-<entry key="type" type="xstring" value="WARNING"/>
-<entry key="message" type="xstring" value="Classification column preset to Cluster Membership"/>
-</config>
+<entry key="state" type="xstring" value="IDLE"/>
 <entry key="factory" type="xstring" value="org.knime.base.node.mine.bayes.naivebayes.learner3.NaiveBayesLearnerNodeFactory4"/>
 <entry key="node-name" type="xstring" value="Naive Bayes Learner"/>
 <entry key="node-bundle-name" type="xstring" value="KNIME Base Nodes"/>
