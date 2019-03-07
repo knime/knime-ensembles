@@ -51,10 +51,8 @@ package org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.pan
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Set;
 
 import javax.swing.ButtonGroup;
@@ -133,13 +131,10 @@ public class OptionsPanel extends JPanel {
         super(new GridBagLayout());
         Class<? extends DataValue> targetClass = isRegression ? DoubleValue.class : NominalValue.class;
         m_targetColumnBox = new ColumnSelectionComboxBox((Border)null, targetClass);
-        m_targetColumnBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
+        m_targetColumnBox.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    newTargetSelected((DataColumnSpec)e.getItem());
+                    newTargetSelected();
                 }
-            }
         });
         m_fingerprintColumnBox = new ColumnSelectionComboxBox((Border)null,
             new DataValueColumnFilter(BitVectorValue.class, ByteVectorValue.class, DoubleVectorValue.class));
@@ -150,13 +145,10 @@ public class OptionsPanel extends JPanel {
         final ButtonGroup bg = new ButtonGroup();
         bg.add(m_useFingerprintColumnRadio);
         bg.add(m_useOrdinaryColumnsRadio);
-        ActionListener actListener = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
+        ActionListener actListener = e -> {
                 boolean isFP = bg.getSelection() == m_useFingerprintColumnRadio.getModel();
                 m_fingerprintColumnBox.setEnabled(isFP);
                 m_includeColumnsFilterPanel2.setEnabled(!isFP);
-            }
         };
         m_useFingerprintColumnRadio.addActionListener(actListener);
         m_useOrdinaryColumnsRadio.addActionListener(actListener);
@@ -166,12 +158,7 @@ public class OptionsPanel extends JPanel {
 
         m_maxLevelSpinner = new JSpinner(new SpinnerNumberModel(3, 1, Integer.MAX_VALUE, 1));
         m_maxLevelChecker = new JCheckBox("Limit number of levels (tree depth)");
-        m_maxLevelChecker.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent e) {
-                m_maxLevelSpinner.setEnabled(m_maxLevelChecker.isSelected());
-            }
-        });
+        m_maxLevelChecker.addItemListener(e -> m_maxLevelSpinner.setEnabled(m_maxLevelChecker.isSelected()));
         m_maxLevelChecker.doClick();
 
         // Boosting Options
@@ -228,7 +215,6 @@ public class OptionsPanel extends JPanel {
         gbc.weighty = 1.0;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
-        //        add(m_includeColumnsFilterPanel, gbc);
         add(m_includeColumnsFilterPanel2, gbc);
 
         gbc.gridy += 1;
@@ -308,20 +294,20 @@ public class OptionsPanel extends JPanel {
      */
     public void loadSettingsFrom(final DataTableSpec inSpec, final GradientBoostingLearnerConfiguration cfg)
         throws NotConfigurableException {
-        int nrNominalCols = 0;
-        int nrNumericCols = 0;
-        for (DataColumnSpec col : inSpec) {
-            DataType type = col.getType();
-            if (type.isCompatible(NominalValue.class)) {
-                nrNominalCols += 1;
-            } else if (type.isCompatible(DoubleValue.class)) {
-                nrNumericCols += 1;
-            }
-        }
-        boolean hasOrdinaryColumnsInInput = nrNominalCols > 1 || nrNumericCols > 0;
-        boolean hasFPColumnInInput =
-            inSpec.containsCompatibleType(BitVectorValue.class) || inSpec.containsCompatibleType(ByteVectorValue.class)
-                || inSpec.containsCompatibleType(DoubleVectorValue.class);
+        loadColumnSettings(inSpec, cfg);
+        loadTreeSettings(cfg);
+        loadBoostingSettings(cfg);
+    }
+
+    /**
+     * @param inSpec
+     * @param cfg
+     * @throws NotConfigurableException
+     */
+    private void loadColumnSettings(final DataTableSpec inSpec, final GradientBoostingLearnerConfiguration cfg)
+        throws NotConfigurableException {
+        boolean hasOrdinaryColumnsInInput = hasOrdinaryColumns(inSpec);
+        boolean hasFPColumnInInput = hasVectorColumn(inSpec);
 
         String fpColumn = cfg.getFingerprintColumn();
         m_useOrdinaryColumnsRadio.setEnabled(true);
@@ -349,9 +335,39 @@ public class OptionsPanel extends JPanel {
         } else {
             m_useOrdinaryColumnsRadio.doClick();
         }
+    }
 
-        // Tree Options
+    private static boolean hasVectorColumn(final DataTableSpec inSpec) {
+        return inSpec.containsCompatibleType(BitVectorValue.class) || inSpec.containsCompatibleType(ByteVectorValue.class)
+            || inSpec.containsCompatibleType(DoubleVectorValue.class);
+    }
 
+    private static boolean hasOrdinaryColumns(final DataTableSpec inSpec) {
+        int nrNominalCols = 0;
+        int nrNumericCols = 0;
+        for (DataColumnSpec col : inSpec) {
+            DataType type = col.getType();
+            if (type.isCompatible(NominalValue.class)) {
+                nrNominalCols += 1;
+            } else if (type.isCompatible(DoubleValue.class)) {
+                nrNumericCols += 1;
+            }
+        }
+        return nrNominalCols > 1 || nrNumericCols > 0;
+    }
+
+    /**
+     * @param cfg
+     */
+    private void loadBoostingSettings(final GradientBoostingLearnerConfiguration cfg) {
+        m_nrModelsSpinner.setValue(cfg.getNrModels());
+        m_learningRateSpinner.setValue(cfg.getLearningRate());
+    }
+
+    /**
+     * @param cfg
+     */
+    private void loadTreeSettings(final GradientBoostingLearnerConfiguration cfg) {
         int maxLevel = cfg.getMaxLevels();
         if ((maxLevel != TreeEnsembleLearnerConfiguration.MAX_LEVEL_INFINITE) != m_maxLevelChecker.isSelected()) {
             m_maxLevelChecker.doClick();
@@ -361,13 +377,6 @@ public class OptionsPanel extends JPanel {
         } else {
             m_maxLevelSpinner.setValue(maxLevel);
         }
-
-        // Boosting Options
-
-        m_nrModelsSpinner.setValue(cfg.getNrModels());
-        m_learningRateSpinner.setValue(cfg.getLearningRate());
-
-        // Other
     }
 
     /**
@@ -410,10 +419,7 @@ public class OptionsPanel extends JPanel {
 
     }
 
-    /**
-     * @param item
-     */
-    private void newTargetSelected(final DataColumnSpec item) {
+    private void newTargetSelected() {
         DataColumnSpec col = (DataColumnSpec)m_targetColumnBox.getSelectedItem();
         if (col == null) {
             return;
