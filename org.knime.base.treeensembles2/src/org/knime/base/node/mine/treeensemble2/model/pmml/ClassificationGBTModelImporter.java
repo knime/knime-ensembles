@@ -56,6 +56,8 @@ import org.dmg.pmml.MININGFUNCTION;
 import org.dmg.pmml.MULTIPLEMODELMETHOD;
 import org.dmg.pmml.MiningModelDocument.MiningModel;
 import org.dmg.pmml.OutputFieldDocument.OutputField;
+import org.dmg.pmml.RegressionModelDocument.RegressionModel;
+import org.dmg.pmml.RegressionTableDocument.RegressionTable;
 import org.dmg.pmml.SegmentDocument.Segment;
 import org.dmg.pmml.SegmentationDocument.Segmentation;
 import org.dmg.pmml.TargetDocument.Target;
@@ -109,16 +111,37 @@ final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<Mult
             coefficientMaps.add(gbtPair.getSecond());
             classLabels.add(extractClassLabel(segments.get(i)));
         }
-        double initialValue = extractInitialValue(segments.get(0));
+        double initialValue = extractInitialValue(segments.get(0), segments.get(segments.size() - 1));
         return MultiClassGradientBoostedTreesModel.create(getMetaDataMapper().getTreeMetaData(), trees,
             coefficientMaps, initialValue, TreeType.Ordinary, classLabels);
     }
 
-    private double extractInitialValue(final Segment classSegment) {
+    private double extractInitialValue(final Segment classSegment, final Segment regressionSegment) {
+        if (classSegment.getMiningModel().getTargets() != null) {
+            return extractInitialValueFromClassSegment(classSegment);
+        } else {
+            return extractInitialValueFromRegressionSegment(regressionSegment);
+        }
+    }
+
+    private static double extractInitialValueFromClassSegment(final Segment classSegment) {
         List<Target> ts = classSegment.getMiningModel().getTargets().getTargetList();
         CheckUtils.checkArgument(ts.size() == 1,
                 "There must be exactly one target field in each class segment but there were %d", ts.size());
         return ts.get(0).getRescaleConstant();
+    }
+
+    private static double extractInitialValueFromRegressionSegment(final Segment regressionSegment) {
+        final RegressionModel regressionModel = regressionSegment.getRegressionModel();
+        final List<RegressionTable> regressionTables = regressionModel.getRegressionTableList();
+        double initialValue = regressionTables.get(0).getIntercept();
+        for (RegressionTable regressionTable : regressionTables) {
+            if (regressionTable.getIntercept() != initialValue) {
+                throw new IllegalArgumentException("Varying initial values for Gradient Boosted Trees detected. "
+                    + "This is currently not supported.");
+            }
+        }
+        return initialValue;
     }
 
     private String extractClassLabel(final Segment classSegment) {

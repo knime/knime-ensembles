@@ -49,6 +49,7 @@
 package org.knime.base.node.mine.treeensemble2.model.pmml;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -71,12 +72,12 @@ import org.dmg.pmml.RegressionModelDocument.RegressionModel;
 import org.dmg.pmml.RegressionTableDocument.RegressionTable;
 import org.dmg.pmml.SegmentDocument.Segment;
 import org.dmg.pmml.SegmentationDocument.Segmentation;
-import org.dmg.pmml.TargetDocument.Target;
-import org.dmg.pmml.TargetsDocument.Targets;
 import org.knime.base.node.mine.treeensemble2.model.MultiClassGradientBoostedTreesModel;
 import org.knime.base.node.mine.treeensemble2.model.TreeModelRegression;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 import org.knime.core.node.port.pmml.PMMLMiningSchemaTranslator;
+import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
+import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
 import org.knime.core.node.port.pmml.preproc.DerivedFieldMapper;
 
 /**
@@ -134,9 +135,10 @@ final class ClassificationGBTModelExporter extends AbstractGBTModelExporter<Mult
     }
 
     private void addRegressionTables(final RegressionModel regression) {
+        final double initialValue = getGBTModel().getInitialValue();
         for (int i = 0; i < getGBTModel().getNrClasses(); i++) {
             RegressionTable regTable = regression.addNewRegressionTable();
-            regTable.setIntercept(0);
+            regTable.setIntercept(initialValue);
             regTable.setTargetCategory(getClassLabel(i));
             NumericPredictor np = regTable.addNewNumericPredictor();
             np.setName(logitName(i));
@@ -189,10 +191,20 @@ final class ClassificationGBTModelExporter extends AbstractGBTModelExporter<Mult
         MiningModel cm = cs.addNewMiningModel();
         cm.setFunctionName(MININGFUNCTION.REGRESSION);
         // write mining schema
-        PMMLMiningSchemaTranslator.writeMiningSchema(getPMMLSpec(), cm);
+        PMMLMiningSchemaTranslator.writeMiningSchema(getPMMLSpecWithoutTarget(), cm);
         addOutput(cm, classIdx);
-        addTarget(cm);
         addSegmentation(cm, classIdx);
+    }
+
+    /**
+     * The class segments define a regression model but the target is actually of type string
+     * which results in invalid PMML (see AP-10888).
+     * @return The pmml spec without the target column
+     */
+    private PMMLPortObjectSpec getPMMLSpecWithoutTarget() {
+        final PMMLPortObjectSpecCreator specCreator = new PMMLPortObjectSpecCreator(getPMMLSpec());
+        specCreator.setTargetCols(Collections.emptyList());
+        return specCreator.createSpec();
     }
 
 
@@ -206,13 +218,6 @@ final class ClassificationGBTModelExporter extends AbstractGBTModelExporter<Mult
                 .mapToObj(i -> gbt.getCoefficientMap(i, c))
                 .collect(Collectors.toList());
         writeSumSegmentation(seg, trees, coefficientMaps);
-    }
-
-    private void addTarget(final MiningModel miningModel) {
-        Targets targets = miningModel.addNewTargets();
-        Target target = targets.addNewTarget();
-        target.setRescaleConstant(getGBTModel().getInitialValue());
-        target.setField(getGBTModel().getMetaData().getTargetMetaData().getAttributeName());
     }
 
     private void addOutput(final MiningModel miningModel, final int idx) {

@@ -48,6 +48,7 @@
  */
 package org.knime.base.node.mine.treeensemble2.model.pmml;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -148,7 +149,14 @@ abstract class AbstractTreeModelExporter<T extends AbstractTreeNode> extends Abs
         recursivelyCheckUsedFields(m_treeModel.getRootNode(), pmmlSpec.getLearningFields().size(), usedFields);
         creator.setLearningCols(pmmlSpec.getLearningCols().stream()
             .filter(s -> usedFields.contains(s.getName())).collect(Collectors.toList()));
+        if (removeTargetFromMiningSchema()) {
+            creator.setTargetCols(Collections.emptyList());
+        }
         return creator.createSpec();
+    }
+
+    protected boolean removeTargetFromMiningSchema() {
+        return false;
     }
 
     private void recursivelyCheckUsedFields(final AbstractTreeNode node, final int numLearnCols,
