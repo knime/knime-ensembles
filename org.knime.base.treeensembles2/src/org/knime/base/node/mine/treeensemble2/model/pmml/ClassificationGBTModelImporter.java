@@ -79,6 +79,11 @@ import org.knime.core.util.Pair;
 final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<MultiClassGradientBoostedTreesModel> {
 
     /**
+     *
+     */
+    private static final String NO_REGRESSION_SEGMENT_MESSAGE = "Invalid GBT PMML. The model must contain a final segment that performs the softmax transformation on the class logits";
+
+    /**
      * @param conditionParser
      * @param signatureFactory
      * @param treeFactory
@@ -96,27 +101,33 @@ final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<Mult
      */
     @Override
     protected MultiClassGradientBoostedTreesModel importFromPMMLInternal(final MiningModel miningModel) {
-        Segmentation modelChain = miningModel.getSegmentation();
+        final Segmentation modelChain = miningModel.getSegmentation();
         CheckUtils.checkArgument(modelChain.getMultipleModelMethod() == MULTIPLEMODELMETHOD.MODEL_CHAIN,
-                "The top level segmentation should have multiple model method '%s' but has '%s'",
-                MULTIPLEMODELMETHOD.MODEL_CHAIN, modelChain.getMultipleModelMethod());
-        List<List<TreeModelRegression>> trees = new ArrayList<>();
-        List<List<Map<TreeNodeSignature, Double>>> coefficientMaps = new ArrayList<>();
-        List<String> classLabels = new ArrayList<>();
-        List<Segment> segments = modelChain.getSegmentList();
+            "The top level segmentation should have multiple model method '%s' but has '%s'",
+            MULTIPLEMODELMETHOD.MODEL_CHAIN, modelChain.getMultipleModelMethod());
+        final List<List<TreeModelRegression>> trees = new ArrayList<>();
+        final List<List<Map<TreeNodeSignature, Double>>> coefficientMaps = new ArrayList<>();
+        final List<String> classLabels = new ArrayList<>();
+        final List<Segment> segments = modelChain.getSegmentList();
+        CheckUtils.checkArgument(segments.size() > 2, "Invalid GBT PMML. "
+            + "The model must contain at least two class segments and a final regression segment.");
         for (int i = 0; i < segments.size() - 1; i++) {
-            Pair<List<TreeModelRegression>, List<Map<TreeNodeSignature, Double>>> gbtPair =
-                    processClassSegment(segments.get(i));
+            final Pair<List<TreeModelRegression>, List<Map<TreeNodeSignature, Double>>> gbtPair =
+                processClassSegment(segments.get(i));
             trees.add(gbtPair.getFirst());
             coefficientMaps.add(gbtPair.getSecond());
             classLabels.add(extractClassLabel(segments.get(i)));
         }
-        double initialValue = extractInitialValue(segments.get(0), segments.get(segments.size() - 1));
-        return MultiClassGradientBoostedTreesModel.create(getMetaDataMapper().getTreeMetaData(), trees,
-            coefficientMaps, initialValue, TreeType.Ordinary, classLabels);
+        final double initialValue = extractInitialValue(segments.get(0), segments.get(segments.size() - 1));
+        return MultiClassGradientBoostedTreesModel.create(getMetaDataMapper().getTreeMetaData(), trees, coefficientMaps,
+            initialValue, TreeType.Ordinary, classLabels);
     }
 
-    private double extractInitialValue(final Segment classSegment, final Segment regressionSegment) {
+    private static double extractInitialValue(final Segment classSegment, final Segment regressionSegment) {
+        CheckUtils.checkArgumentNotNull(classSegment, "The class segment was null. This indicates a coding error.");
+        final MiningModel miningModel = classSegment.getMiningModel();
+        CheckUtils.checkArgumentNotNull(miningModel,
+            "The mining model of a class segment is null. This indicates a coding error.");
         if (classSegment.getMiningModel().getTargets() != null) {
             return extractInitialValueFromClassSegment(classSegment);
         } else {
@@ -125,16 +136,19 @@ final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<Mult
     }
 
     private static double extractInitialValueFromClassSegment(final Segment classSegment) {
-        List<Target> ts = classSegment.getMiningModel().getTargets().getTargetList();
+        final List<Target> ts = classSegment.getMiningModel().getTargets().getTargetList();
         CheckUtils.checkArgument(ts.size() == 1,
-                "There must be exactly one target field in each class segment but there were %d", ts.size());
+            "There must be exactly one target field in each class segment but there were %d", ts.size());
         return ts.get(0).getRescaleConstant();
     }
 
     private static double extractInitialValueFromRegressionSegment(final Segment regressionSegment) {
+        CheckUtils.checkArgumentNotNull(regressionSegment, NO_REGRESSION_SEGMENT_MESSAGE);
         final RegressionModel regressionModel = regressionSegment.getRegressionModel();
+        CheckUtils.checkArgumentNotNull(regressionModel, NO_REGRESSION_SEGMENT_MESSAGE);
         final List<RegressionTable> regressionTables = regressionModel.getRegressionTableList();
-        double initialValue = regressionTables.get(0).getIntercept();
+        CheckUtils.checkArgument(regressionTables.size() > 1, "There must be at least two classes present in the final regression table.");
+        final double initialValue = regressionTables.get(0).getIntercept();
         for (RegressionTable regressionTable : regressionTables) {
             if (regressionTable.getIntercept() != initialValue) {
                 throw new IllegalArgumentException("Varying initial values for Gradient Boosted Trees detected. "
@@ -147,19 +161,25 @@ final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<Mult
     private String extractClassLabel(final Segment classSegment) {
         List<OutputField> ofs = classSegment.getMiningModel().getOutput().getOutputFieldList();
         CheckUtils.checkArgument(ofs.size() == 1,
-                "There must be exactly one output field in each class segment but there were %d.", ofs.size());
+            "There must be exactly one output field in each class segment but there were %d.", ofs.size());
         String wrappedName = ofs.get(0).getName();
         String name = wrappedName.replaceFirst("gbtValue\\(", "");
         return name.substring(0, name.length() - 1);
     }
 
-    private Pair<List<TreeModelRegression>, List<Map<TreeNodeSignature, Double>>> processClassSegment(
-        final Segment segment) {
+    private Pair<List<TreeModelRegression>, List<Map<TreeNodeSignature, Double>>>
+        processClassSegment(final Segment segment) {
+        CheckUtils.checkArgumentNotNull(segment, "A class segment was null. This indicates a coding error.");
         MiningModel m = segment.getMiningModel();
+        CheckUtils.checkArgumentNotNull(m, "Invalid GBT PMML. The class segment %s does not contain a mining model.",
+            segment);
         CheckUtils.checkArgument(m.getFunctionName() == MININGFUNCTION.REGRESSION,
-                "The mining function of a class segment mining model must be '%s' but was '%s'.",
-                MININGFUNCTION.REGRESSION, m.getFunctionName());
-        return readSumSegmentation(m.getSegmentation());
+            "The mining function of a class segment mining model must be '%s' but was '%s'.", MININGFUNCTION.REGRESSION,
+            m.getFunctionName());
+        final Segmentation sumSegmentation = m.getSegmentation();
+        CheckUtils.checkArgumentNotNull(sumSegmentation,
+            "Invalid GBT PMML. The class segment mining model %s does not contain a segmentation.");
+        return readSumSegmentation(sumSegmentation);
     }
 
 }

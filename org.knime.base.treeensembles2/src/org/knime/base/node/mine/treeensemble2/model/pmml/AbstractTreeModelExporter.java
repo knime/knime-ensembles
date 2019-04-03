@@ -155,7 +155,7 @@ abstract class AbstractTreeModelExporter<T extends AbstractTreeNode> extends Abs
         return creator.createSpec();
     }
 
-    protected boolean removeTargetFromMiningSchema() {
+    boolean removeTargetFromMiningSchema() {
         return false;
     }
 
