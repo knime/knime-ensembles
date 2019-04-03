@@ -99,7 +99,7 @@ final class GBTRegressionTreeModelExporter extends RegressionTreeModelExporter {
      * {@inheritDoc}
      */
     @Override
-    protected boolean removeTargetFromMiningSchema() {
+    boolean removeTargetFromMiningSchema() {
         // gbt regression trees are used within a Segmentation and therefore do not need to specify the
         // target in the mining schema. For classification models this even leads to invalid PMML (see AP-10888).
         return true;

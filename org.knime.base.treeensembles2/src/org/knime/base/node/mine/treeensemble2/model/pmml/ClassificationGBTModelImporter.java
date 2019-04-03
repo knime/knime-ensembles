@@ -81,7 +81,8 @@ final class ClassificationGBTModelImporter extends AbstractGBTModelImporter<Mult
     /**
      *
      */
-    private static final String NO_REGRESSION_SEGMENT_MESSAGE = "Invalid GBT PMML. The model must contain a final segment that performs the softmax transformation on the class logits";
+    private static final String NO_REGRESSION_SEGMENT_MESSAGE = "Invalid GBT PMML. The model must contain a final "
+        + "segment that performs the softmax transformation on the class logits";
 
     /**
      * @param conditionParser
