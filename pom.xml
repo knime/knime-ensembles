@@ -26,6 +26,7 @@
 		-->
 		<knime.base.p2>${env.KNIME_BASE_P2}</knime.base.p2>
 		<knime.core.p2>${env.KNIME_CORE_P2}</knime.core.p2>
+		<knime.svg.p2>${env.KNIME_SVG_P2}</knime.svg.p2>
 		<knime.expressions.p2>${env.KNIME_EXPRESSIONS_P2}</knime.expressions.p2>
 		<knime.shared.p2>${env.KNIME_SHARED_P2}</knime.shared.p2>
 		<knime.tp.p2>${env.KNIME_TP_P2}</knime.tp.p2>
@@ -53,6 +54,11 @@
 			<url>${knime.core.p2}</url>
 		</repository>
 		<repository>
+			<id>knime.svg.p2</id>
+			<layout>p2</layout>
+			<url>${knime.svg.p2}</url>
+		</repository>
+		<repository>
 			<id>knime.shared.p2</id>
 			<layout>p2</layout>
 			<url>${knime.shared.p2}</url>
@@ -61,6 +67,11 @@
 			<id>knime.distmatrix.p2</id>
 			<layout>p2</layout>
 			<url>${knime.distmatrix.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.javasnippet.p2</id>
+			<layout>p2</layout>
+			<url>${knime.javasnippet.p2}</url>
 		</repository>
 		<repository>
 			<id>knime.tp.p2</id>
