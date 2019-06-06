@@ -4,11 +4,14 @@
 	<name>Prediction Fusion</name>
 
 	<shortDescription>
-		Fuses multiple predictions into one, combined prediction.
+		Fuses multiple prediction confidences into one, combined prediction.
 	</shortDescription>
 	<fullDescription>
 		<intro>
-		Fuses multiple predictions into one, combined prediction.
+		Fuses multiple prediction confidences into one, combined prediction, using the selected fusion method. 
+		The selected fusion method will be applied to all confidence values (resulting from multiple predictions) 
+		of the same class. After the fusion method was applied, the resulting combined prediction confidences
+		will be normalized to add up to one, such that they can be interpreted as probabilities.
 		<br /><br />
 		Note: Missing values will be skipped.
 		</intro>
@@ -21,7 +24,7 @@
 		</ul>
 		</option>
 		<option name="Classes">
-		The classes that were predicted and for which confidences are available. In case of a tie the higher class wins.
+		The classes that were predicted and for which confidences are available. In case of a tie the higher class (in the list) wins.
 		</option>
 		<option name="Class confidences">
 		Each row represents the predicted confidences from one classifier. The fusion method is applied to all confidence values of the same class.
