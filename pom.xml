@@ -13,7 +13,7 @@
 
 	<groupId>org.knime</groupId>
 	<artifactId>knime-ensembles</artifactId>
-	<version>3.8.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
