@@ -22,18 +22,37 @@ public class LKGradientBoostedTreesPredictor extends AbstractPredictor<Classific
 
     private final boolean m_calculateProbabilities;
 
+    private final boolean m_useSafeSoftmax;
+
     /**
      * Constructor for classification gbt predictors.
      *
      * @param model the gradient boosted trees model
      * @param calculateProbabilities indicates whether probabilities should be calculated
      * @param rowConverter converts input {@link DataRow rows} into {@link PredictorRecord records}
+     * @param useSafeSoftmax set to true if the softmax operation should be safeguarded against numerical overflow
      */
     public LKGradientBoostedTreesPredictor(final MultiClassGradientBoostedTreesModel model,
-        final boolean calculateProbabilities, final Function<DataRow, PredictorRecord> rowConverter) {
+        final boolean calculateProbabilities, final Function<DataRow, PredictorRecord> rowConverter,
+        final boolean useSafeSoftmax) {
         super(rowConverter);
         m_model = model;
         m_calculateProbabilities = calculateProbabilities;
+        m_useSafeSoftmax = useSafeSoftmax;
+    }
+
+    /**
+     * Legacy constructor for code that requires the functionality prior to 4.0.1
+     *
+     * @param model
+     * @param calculateProbabilities
+     * @param rowConverter
+     * @deprecated
+     */
+    @Deprecated
+    public LKGradientBoostedTreesPredictor(final MultiClassGradientBoostedTreesModel model,
+        final boolean calculateProbabilities, final Function<DataRow, PredictorRecord> rowConverter) {
+        this(model, calculateProbabilities, rowConverter, false);
     }
 
     /* (non-Javadoc)
@@ -67,16 +86,40 @@ public class LKGradientBoostedTreesPredictor extends AbstractPredictor<Classific
     private void transformToProbabilities(final double[] logits) {
         double[] probabilities = logits;
         double expSum = 0;
+        final double constant = getNormalizationConstant(logits);
         for (int i = 0; i < logits.length; i++) {
-            probabilities[i] = Math.exp(logits[i]);
-            expSum += probabilities[i];
+            final double exp = Math.exp(logits[i] - constant);
+            probabilities[i] = exp;
+            expSum += exp;
         }
+        assert expSum > 0 : "The exponential sum was zero.";
         for (int i = 0; i < probabilities.length; i++) {
             probabilities[i] /= expSum;
         }
     }
 
-    private int argmax(final double[] vector) {
+    private double getNormalizationConstant(final double[] logits) {
+        if (m_useSafeSoftmax) {
+            return max(logits);
+        } else {
+            return 0;
+        }
+    }
+
+    private static double max(final double[] logits) {
+        double max = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < logits.length; i++) {
+            final double logit = logits[i];
+            if (logit > max) {
+                max = logit;
+            }
+        }
+        return max;
+    }
+
+
+
+    private static int argmax(final double[] vector) {
         int argmax = -1;
         double max = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < vector.length; i++) {
@@ -88,7 +131,7 @@ public class LKGradientBoostedTreesPredictor extends AbstractPredictor<Classific
         return argmax;
     }
 
-    private class LKGBTPrediction implements ClassificationPrediction {
+    private final class LKGBTPrediction implements ClassificationPrediction {
 
         private final int m_winningClassIdx;
 

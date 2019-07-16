@@ -81,13 +81,27 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
 
     private GradientBoostingLearnerConfiguration m_configuration;
 
+    private final boolean m_fixAP7245;
+
+    private final boolean m_fixAP12360;
+
     /**
-     * @param inPortTypes
-     * @param outPortTypes
+     *
      */
     protected GradientBoostingClassificationLearnerNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{GradientBoostingModelPortObject.TYPE});
+        this(true);
     }
+
+    /**
+     * @param pre401 set to true for versions prior to 4.0.1
+     */
+    protected GradientBoostingClassificationLearnerNodeModel(final boolean pre401) {
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{GradientBoostingModelPortObject.TYPE});
+        m_fixAP7245 = !pre401;
+        m_fixAP12360 = !pre401;
+    }
+
+
 
     /**
      * {@inheritDoc}
@@ -147,7 +161,7 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
         }
         readInExec.setProgress(1.0);
         exec.setMessage("Learning trees");
-        AbstractGradientBoostingLearner learner = new LKGradientBoostedTreesLearner(m_configuration, data);
+        AbstractGradientBoostingLearner learner = new LKGradientBoostedTreesLearner(m_configuration, data, m_fixAP7245, m_fixAP12360);
         AbstractGradientBoostingModel model;
 //        m_configuration.setMissingValueHandling(MissingValueHandling.XGBoost);
 //        try {

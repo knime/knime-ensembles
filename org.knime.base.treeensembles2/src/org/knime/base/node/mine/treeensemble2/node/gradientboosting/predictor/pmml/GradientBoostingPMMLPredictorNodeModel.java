@@ -104,29 +104,62 @@ import org.knime.core.node.util.CheckUtils;
  */
 public class GradientBoostingPMMLPredictorNodeModel <M extends AbstractGradientBoostingModel> extends NodeModel {
 
+    /**
+     * Versions in which changes were made to this class.
+     *
+     * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+     */
+    public enum Version {
+        /**
+         * Nodes created with KNIME Analytics Platform prior to version 3.6.0
+         */
+        PRE360,
+        /**
+         * Nodes created with KNIME Analytics Platform of version 3.6.0 to 4.0.0
+         */
+        V360,
+        /**
+         * Nodes created with KNIME Analytics Platform of version 4.0.1 and later
+         */
+        V401;
+    }
+
     private TreeEnsemblePredictorConfiguration m_configuration;
     private final boolean m_isRegression;
-    private final boolean m_pre36;
+    private final Version m_version;
 
     /**
      * This constructor ensures backwards compatibility.
      * @param isRegression indicates whether the node expects a regression model
+     * @deprecated
      */
+    @Deprecated
     public GradientBoostingPMMLPredictorNodeModel(final boolean isRegression) {
         this(isRegression, true);
     }
 
     /**
-     * Default constructor
+     * Default constructor for nodes created between KNIME Analytics Platform 3.6.0 and 4.0.1
      * @param isRegression boolean indicating if the node model expects a regression model
      * @param pre36 whether the model was build prior to version 3.6.0
+     * @deprecated
      */
+    @Deprecated
     public GradientBoostingPMMLPredictorNodeModel(final boolean isRegression, final boolean pre36) {
+        this(isRegression, pre36 ? Version.PRE360 : Version.V360);
+    }
+
+    /**
+     * @param isRegression boolean indicating if the node model expects a regression model
+     * @param version the KNIME Analytics Platform version the node was created with
+     */
+    public GradientBoostingPMMLPredictorNodeModel(final boolean isRegression, final Version version) {
         super(new PortType[]{PMMLPortObject.TYPE, BufferedDataTable.TYPE},
             new PortType[]{BufferedDataTable.TYPE});
         m_isRegression = isRegression;
-        m_pre36 = pre36;
+        m_version = version;
     }
+
 
     /** {@inheritDoc} */
     @Override
@@ -171,8 +204,10 @@ public class GradientBoostingPMMLPredictorNodeModel <M extends AbstractGradientB
             prc = new PredictionRearrangerCreator(predictSpec,
                 new LKGradientBoostedTreesPredictor(gbt,
                     m_configuration.isAppendClassConfidences() || m_configuration.isAppendPredictionConfidence(),
-                TreeEnsemblePredictionUtil.createRowConverter(modelSpec, model, predictSpec)));
-            TreeEnsemblePredictionUtil.setupRearrangerCreatorGBT(m_pre36, prc, modelSpec, gbt, m_configuration);
+                TreeEnsemblePredictionUtil.createRowConverter(modelSpec, model, predictSpec),
+                m_version == Version.V401));
+            TreeEnsemblePredictionUtil.setupRearrangerCreatorGBT(
+                m_version == Version.PRE360, prc, modelSpec, gbt, m_configuration);
         }
         return prc;
     }

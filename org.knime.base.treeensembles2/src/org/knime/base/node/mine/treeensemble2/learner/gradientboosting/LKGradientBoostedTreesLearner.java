@@ -86,16 +86,39 @@ import com.google.common.math.IntMath;
 /**
  * This class learns a {@link MultiClassGradientBoostedTreesModel}.
  *
- * @author Adrian Nembach, KNIME.com
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostingLearner {
+
+    private static final int RECOVERY_CONSTANT = 1000;
+
+    private final boolean m_useSafeSoftmax;
+
+    private final boolean m_useLeafReferences;
 
     /**
      * @param config configuration of learner
      * @param data data to learn on
+     * @param useSafeSoftmax set to true if the softmax calculation should be safeguarded against numerical overflow
+     * @param useLeafReferences set to true if the row references stored in leaf nodes should be used for updating
+     * (this was introduced in 4.0.1 because it's faster and fixes AP-12360)
      */
+    public LKGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data,
+        final boolean useSafeSoftmax, final boolean useLeafReferences) {
+        super(config, data, useLeafReferences);
+        m_useSafeSoftmax = useSafeSoftmax;
+        m_useLeafReferences = useLeafReferences;
+    }
+
+    /**
+     * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 and AP-7245 were fixed.
+     * @param config configuration of learner
+     * @param data data to learn on
+     * @deprecated
+     */
+    @Deprecated
     public LKGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
-        super(config, data);
+        this(config, data, false, false);
     }
 
     /**
@@ -115,11 +138,10 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
         final int nrModels = getConfig().getNrModels();
         final int nrRows = target.getNrRows();
         final TreeModelRegression[][] models = new TreeModelRegression[nrModels][numClasses];
-        final ArrayList<ArrayList<Map<TreeNodeSignature, Double>>> coefficientMaps =
-            new ArrayList<ArrayList<Map<TreeNodeSignature, Double>>>(nrModels);
+        final ArrayList<ArrayList<Map<TreeNodeSignature, Double>>> coefficientMaps = new ArrayList<>(nrModels);
         // variables for parallelization
         final ThreadPool tp = KNIMEConstants.GLOBAL_THREAD_POOL;
-        final AtomicReference<Throwable> learnThrowableRef = new AtomicReference<Throwable>();
+        final AtomicReference<Throwable> learnThrowableRef = new AtomicReference<>();
         final int procCount = 3 * Runtime.getRuntime().availableProcessors() / 2;
 
         exec.setMessage("Transforming problem");
@@ -145,20 +167,13 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
         }
 
         exec.setMessage("Learn trees");
+        final double[][] probs = new double[numClasses][nrRows];
         for (int i = 0; i < nrModels; i++) {
             final Semaphore semaphore = new Semaphore(procCount);
-            final ArrayList<Map<TreeNodeSignature, Double>> classCoefficientMaps =
-                new ArrayList<Map<TreeNodeSignature, Double>>(numClasses);
+            final ArrayList<Map<TreeNodeSignature, Double>> classCoefficientMaps = new ArrayList<>(numClasses);
             // prepare calculation of pseudoResiduals
-            final double[][] probs = new double[numClasses][nrRows];
             for (int r = 0; r < nrRows; r++) {
-                double sumExpF = 0;
-                for (int j = 0; j < numClasses; j++) {
-                    sumExpF += Math.exp(previousFunctions[j][r]);
-                }
-                for (int j = 0; j < numClasses; j++) {
-                    probs[j][r] = Math.exp(previousFunctions[j][r]) / sumExpF;
-                }
+                softmax(previousFunctions, probs, r, numClasses);
             }
 
             final Future<?>[] treeCoefficientMapPairs = new Future<?>[numClasses];
@@ -189,7 +204,46 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
             data.getMetaData(), models, data.getTreeType(), 0, numClasses, coefficientMaps, classLabels);
     }
 
-    private void checkThrowable(final AtomicReference<Throwable> learnThrowableRef) throws CanceledExecutionException {
+    /**
+     * Calculates the softmax for <b>row</b> based on the corresponding <b>logits</b>
+     * and stores the resulting probabilities at the appropriate position in <b>target</b>.
+     * @param logits the logits i.e. the accumulated outputs of all previous boosting steps
+     * @param target the array to store the probabilities in
+     * @param row the index of the row for which to calculate the probabilities
+     * @param numClasses the number of classes
+     */
+    private void softmax(final double[][] logits, final double[][] target, final int row, final int numClasses) {
+        final double constant;
+        if (m_useSafeSoftmax) {
+            constant = max(logits, row, numClasses);
+        } else {
+            constant = 0;
+        }
+        double sum = 0.0;
+        for (int i = 0; i < numClasses; i++) {
+            final double exp = Math.exp(logits[i][row] - constant);
+            target[i][row] = exp;
+            sum += exp;
+        }
+        assert sum > 0 : "Exponential sum is zero.";
+        for (int i = 0; i < numClasses; i++) {
+            target[i][row] /= sum;
+        }
+    }
+
+    private static double max(final double[][] logits, final int row, final int numClasses) {
+        double max = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < numClasses; i++) {
+            final double logit = logits[i][row];
+            if (max < logit) {
+                max = logit;
+            }
+        }
+        return max;
+    }
+
+    private static void checkThrowable(final AtomicReference<Throwable> learnThrowableRef)
+            throws CanceledExecutionException {
         Throwable th = learnThrowableRef.get();
         if (th != null) {
             if (th instanceof CanceledExecutionException) {
@@ -224,7 +278,8 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
 
         public TreeLearnerCallable(final RandomData rd, final double[] probs, final TreeData actual,
             final ExecutionMonitor subExec, final int numClasses, final double[] previousFunction,
-            final Semaphore releaseSemaphore, final AtomicReference<Throwable> learnThrowableRef, final TreeNodeSignatureFactory signatureFactory) {
+            final Semaphore releaseSemaphore, final AtomicReference<Throwable> learnThrowableRef,
+            final TreeNodeSignatureFactory signatureFactory) {
             m_rd = rd;
             m_probs = probs;
             m_actual = actual;
@@ -243,20 +298,23 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
         public Pair<TreeModelRegression, Map<TreeNodeSignature, Double>> call() throws Exception {
             try {
                 final int nrRows = m_probs.length;
-                final double residualData[] = new double[nrRows];
-                final TreeTargetNumericColumnData classProbTarget = (TreeTargetNumericColumnData)m_actual.getTargetColumn();
+                final double[] residualData = new double[nrRows];
+                final TreeTargetNumericColumnData classProbTarget =
+                    (TreeTargetNumericColumnData)m_actual.getTargetColumn();
                 for (int r = 0; r < nrRows; r++) {
-                    residualData[r] = classProbTarget.getValueFor(r) - m_probs[r];
+                    double gtProb = classProbTarget.getValueFor(r);
+                    double predictedProb = m_probs[r];
+                    residualData[r] = gtProb - predictedProb;
                 }
                 final TreeData pseudoResiduals = createResidualDataFromArray(residualData, m_actual);
                 final RowSample rowSample = getRowSampler().createRowSample(m_rd);
-                final TreeLearnerRegression treeLearner =
-                    new TreeLearnerRegression(getConfig(), pseudoResiduals, getIndexManager(), m_signatureFactory, m_rd, rowSample);
+                final TreeLearnerRegression treeLearner = new TreeLearnerRegression(getConfig(), pseudoResiduals,
+                    getIndexManager(), m_signatureFactory, m_rd, rowSample);
                 final TreeModelRegression tree = treeLearner.learnSingleTree(m_subExec, m_rd);
                 final Map<TreeNodeSignature, Double> coefficientMap =
                     calculateCoefficientMap(tree, pseudoResiduals, m_numClasses);
                 adaptPreviousFunction(m_previousFunction, tree, coefficientMap);
-                return new Pair<TreeModelRegression, Map<TreeNodeSignature, Double>>(tree, coefficientMap);
+                return new Pair<>(tree, coefficientMap);
             } catch (Throwable t) {
                 m_learnThrowableRef.compareAndSet(null, t);
                 return null;
@@ -269,20 +327,32 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
 
     private void adaptPreviousFunction(final double[] previousFunction, final TreeModelRegression tree,
         final Map<TreeNodeSignature, Double> coefficientMap) {
-        final TreeData data = getData();
-        final IDataIndexManager indexManager = getIndexManager();
-        for (int i = 0; i < previousFunction.length; i++) {
-            final PredictorRecord record = createPredictorRecord(data, indexManager, i);
-            final TreeNodeSignature signature = tree.findMatchingNode(record).getSignature();
-            previousFunction[i] += coefficientMap.get(signature);
+        if (m_useLeafReferences) {
+            for (final TreeNodeRegression leaf : tree.getLeafs()) {
+                final int[] indices = leaf.getRowIndicesInTreeData();
+                final double coefficient = coefficientMap.get(leaf.getSignature());
+                for (int rowIdx : indices) {
+                    previousFunction[rowIdx] += coefficient;
+                }
+            }
+        } else {
+            final TreeData data = getData();
+            final IDataIndexManager indexManager = getIndexManager();
+            for (int i = 0; i < previousFunction.length; i++) {
+                // don't fix the missing value mixup to ensure backwards compatibility of deprecated nodes
+                final PredictorRecord record = createPredictorRecord(data, indexManager, i, false);
+                final TreeNodeSignature signature = tree.findMatchingNode(record).getSignature();
+                previousFunction[i] += coefficientMap.get(signature);
+            }
         }
+
     }
 
     private Map<TreeNodeSignature, Double> calculateCoefficientMap(final TreeModelRegression tree,
         final TreeData pseudoResiduals, final double numClasses) {
 
         final List<TreeNodeRegression> leafs = tree.getLeafs();
-        final Map<TreeNodeSignature, Double> coefficientMap = new HashMap<TreeNodeSignature, Double>();
+        final Map<TreeNodeSignature, Double> coefficientMap = new HashMap<>();
         final TreeTargetNumericColumnData pseudoTarget = (TreeTargetNumericColumnData)pseudoResiduals.getTargetColumn();
         double learningRate = getConfig().getLearningRate();
         for (TreeNodeRegression leaf : leafs) {
@@ -293,9 +363,21 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
                 double val = pseudoTarget.getValueFor(index);
                 sumTop += val;
                 double absVal = Math.abs(val);
-                sumBottom += Math.abs(absVal) * (1 - Math.abs(absVal));
+                sumBottom += absVal * (1 - absVal);
             }
-            final double coefficient = (numClasses - 1) / numClasses * (sumTop / sumBottom);
+            final double classRatio = (numClasses - 1) / numClasses;
+            // if the model saturates the probabilities i.e. predicts exactly 1 or 0,
+            // sumBottom becomes 0 and coefficient becomes NaN
+            // In this case we can simply set the coefficient to 0 because the model is already perfect
+            double coefficient;
+            if (sumBottom == 0) {
+                // The model is already perfect if sumTop is also 0 and completely wrong if sumTop is different from
+                // zero in which case we set the coefficient to a large constant to help the model recover
+                coefficient = sumTop == 0 ? 0 : RECOVERY_CONSTANT;
+            } else {
+                coefficient = sumTop / sumBottom;
+            }
+            coefficient *= classRatio;
             coefficientMap.put(leaf.getSignature(), learningRate * coefficient);
         }
         return coefficientMap;

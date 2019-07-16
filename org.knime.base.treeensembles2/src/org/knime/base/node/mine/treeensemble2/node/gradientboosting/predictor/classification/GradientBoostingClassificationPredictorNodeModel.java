@@ -89,23 +89,53 @@ public class GradientBoostingClassificationPredictorNodeModel extends NodeModel 
 
     private TreeEnsemblePredictorConfiguration m_configuration;
 
-    private final boolean m_pre36;
+    /**
+     * Versions in which changes were made to this class.
+     *
+     * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+     */
+    public enum Version {
+        /**
+         * Nodes created with KNIME Analytics Platform prior to version 3.6.0
+         */
+        PRE360,
+        /**
+         * Nodes created with KNIME Analytics Platform of version 3.6.0 to 4.0.0
+         */
+        V360,
+        /**
+         * Nodes created with KNIME Analytics Platform of version 4.0.1 and later
+         */
+        V401;
+    }
+
+    private final Version m_version;
 
     /**
      * Default constructor that ensures that code written prior to 3.6.0 still compiles.
+     * @deprecated
      */
+    @Deprecated
     public GradientBoostingClassificationPredictorNodeModel() {
         this(true);
     }
 
     /**
      * @param pre36 indicates if the node is created with a version prior to 3.6 when the column output was different
-     *
+     * @deprecated
      */
+    @Deprecated
     public GradientBoostingClassificationPredictorNodeModel(final boolean pre36) {
+        this(pre36 ? Version.PRE360 : Version.V360);
+    }
+
+    /**
+     * @param version the version of the node
+     */
+    public GradientBoostingClassificationPredictorNodeModel(final Version version) {
         super(new PortType[]{GradientBoostingModelPortObject.TYPE, BufferedDataTable.TYPE},
             new PortType[]{BufferedDataTable.TYPE});
-        m_pre36 = pre36;
+        m_version = version;
     }
 
     /** {@inheritDoc} */
@@ -132,8 +162,9 @@ public class GradientBoostingClassificationPredictorNodeModel extends NodeModel 
         PredictionRearrangerCreator crc =
             new PredictionRearrangerCreator(testSpec, new LKGradientBoostedTreesPredictor(model,
                 m_configuration.isAppendClassConfidences() || m_configuration.isAppendPredictionConfidence(),
-                TreeEnsemblePredictionUtil.createRowConverter(modelSpec, model, testSpec)));
-        TreeEnsemblePredictionUtil.setupRearrangerCreatorGBT(m_pre36, crc, modelSpec, model, m_configuration);
+                TreeEnsemblePredictionUtil.createRowConverter(modelSpec, model, testSpec), m_version == Version.V401));
+        TreeEnsemblePredictionUtil.setupRearrangerCreatorGBT(
+            m_version == Version.PRE360, crc, modelSpec, model, m_configuration);
         return crc;
     }
 
