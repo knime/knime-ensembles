@@ -81,12 +81,21 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
 
     private GradientBoostingLearnerConfiguration m_configuration;
 
+    private final boolean m_fixAP12360;
+
     /**
-     * @param inPortTypes
-     * @param outPortTypes
+     * Constructor for versions prior to 4.0.1
      */
     protected GradientBoostingRegressionLearnerNodeModel() {
+        this(true);
+    }
+
+    /**
+     * @param pre401 set to true for versions prior to 4.0.1
+     */
+    protected GradientBoostingRegressionLearnerNodeModel(final boolean pre401) {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{GradientBoostingModelPortObject.TYPE});
+        m_fixAP12360 = !pre401;
     }
 
     /**
@@ -147,7 +156,7 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
         }
         readInExec.setProgress(1.0);
         exec.setMessage("Learning trees");
-        AbstractGradientBoostingLearner learner = new MGradientBoostedTreesLearner(m_configuration, data);
+        AbstractGradientBoostingLearner learner = new MGradientBoostedTreesLearner(m_configuration, data, m_fixAP12360);
         AbstractGradientBoostingModel model;
 //        try {
             model = learner.learn(learnExec);

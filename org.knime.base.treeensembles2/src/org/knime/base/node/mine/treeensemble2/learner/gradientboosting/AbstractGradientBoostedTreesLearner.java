@@ -54,6 +54,7 @@ import org.knime.base.node.mine.treeensemble2.data.PredictorRecord;
 import org.knime.base.node.mine.treeensemble2.data.TreeData;
 import org.knime.base.node.mine.treeensemble2.data.memberships.IDataIndexManager;
 import org.knime.base.node.mine.treeensemble2.model.TreeModelRegression;
+import org.knime.base.node.mine.treeensemble2.model.TreeNodeRegression;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 import org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.GradientBoostingLearnerConfiguration;
 
@@ -64,13 +65,39 @@ import org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.Grad
 public abstract class AbstractGradientBoostedTreesLearner extends AbstractGradientBoostingLearner {
 
     /**
+     * Introduced in 4.0.1.
+     * Before that, each row was predicted after each boosting round which is inefficient
+     * because we already know for each leaf which rows are contained.
+     * If set to true, the leaf references are used for a more efficient update.
+     */
+    private boolean m_useLeafReference;
+
+    /**
+     * Main constructor, for new development this is the constructor you will want to use
+     * with useLeafReference set to true.
+     *
      * @param config the configuration for the learner
      * @param data the data as it is provided by the user
+     * @param useLeafReference set to true if the row references stored in leafs should be used
+     * to update the boosting estimate (introduced in 4.0.1 because it's faster and fixes AP-12360)
      */
-    public AbstractGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
-        super(config, data);
+    public AbstractGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config,
+        final TreeData data, final boolean useLeafReference) {
+        super(config, data, useLeafReference);
+        m_useLeafReference = useLeafReference;
     }
 
+    /**
+     * Legacy constructor resembling functionality prior to 4.0.1 in which AP-12360 was fixed.
+     * @param config the configuration for the learner
+     * @param data the data as it is provided by the user
+     * @deprecated
+     */
+    @Deprecated
+    public AbstractGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config,
+        final TreeData data) {
+        this(config, data, false);
+    }
 
     /**
      * Adapts the previous prediction by adding the predictions of the <b>tree</b> regulated by the respective
@@ -82,11 +109,22 @@ public abstract class AbstractGradientBoostedTreesLearner extends AbstractGradie
      */
     protected void adaptPreviousPrediction(final double[] previousPrediction, final TreeModelRegression tree,
         final Map<TreeNodeSignature, Double> coefficientMap) {
-        TreeData data = getData();
-        IDataIndexManager indexManager = getIndexManager();
-        for (int i = 0; i < data.getNrRows(); i++) {
-            PredictorRecord record = createPredictorRecord(data, indexManager, i);
-            previousPrediction[i] += coefficientMap.get(tree.findMatchingNode(record).getSignature());
+        if (m_useLeafReference) {
+            for (TreeNodeRegression leaf : tree.getLeafs()) {
+                final double coefficient = coefficientMap.get(leaf.getSignature());
+                final int[] indices = leaf.getRowIndicesInTreeData();
+                for (int rowIdx : indices) {
+                    previousPrediction[rowIdx] += coefficient;
+                }
+            }
+        } else {
+            TreeData data = getData();
+            IDataIndexManager indexManager = getIndexManager();
+            for (int i = 0; i < data.getNrRows(); i++) {
+                // don't fix missing value mixup to ensure backwards compatibility of deprecated nodes
+                PredictorRecord record = createPredictorRecord(data, indexManager, i, false);
+                previousPrediction[i] += coefficientMap.get(tree.findMatchingNode(record).getSignature());
+            }
         }
     }
 

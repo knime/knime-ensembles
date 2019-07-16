@@ -77,7 +77,7 @@ import com.google.common.primitives.Doubles;
 /**
  * This class learns a Gradient Boosted Trees model for regression using the Huber loss.
  *
- * @author Adrian Nembach, KNIME.com
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public final class MGradientBoostedTreesLearner extends AbstractGradientBoostedTreesLearner {
 
@@ -85,9 +85,23 @@ public final class MGradientBoostedTreesLearner extends AbstractGradientBoostedT
     /**
      * @param config the configuration for the learner
      * @param data the data on which to learn on
+     * @param useLeafReferences set to true if the updates during learning should use leaf references
+     * (this is preferable because it's faster and was introduced for 4.0.1)
      */
+    public MGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data,
+        final boolean useLeafReferences) {
+        super(config, data, useLeafReferences);
+    }
+
+    /**
+     * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 was fixed.
+     * @param config the configuration for the learner
+     * @param data the data on which to learn on
+     * @deprecated
+     */
+    @Deprecated
     public MGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
-        super(config, data);
+        this(config, data, false);
     }
 
     /**

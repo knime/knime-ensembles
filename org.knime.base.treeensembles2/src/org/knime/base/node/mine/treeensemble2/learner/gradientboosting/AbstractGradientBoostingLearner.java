@@ -71,7 +71,6 @@ import org.knime.base.node.mine.treeensemble2.model.TreeModelRegression;
 import org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.GradientBoostingLearnerConfiguration;
 import org.knime.base.node.mine.treeensemble2.sample.row.RowSample;
 import org.knime.base.node.mine.treeensemble2.sample.row.RowSampler;
-import org.knime.core.data.RowKey;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 
@@ -92,10 +91,19 @@ public abstract class AbstractGradientBoostingLearner {
     private final RowSampler m_rowSampler;
 
     /**
+     * AP-12360
+     * The last value of nominal columns without any missing values was
+     * falsely treated as missing during the prediction after each boosting iteration.
+     */
+    private final boolean m_fixNominalValueMixup;
+
+    /**
      * @param config the configuration for the learner
      * @param data the initial data as it is provided by the user
+     * @param fixNominalValueMixup set to true if AP-12360 should be fixed (recommended)
      */
-    public AbstractGradientBoostingLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
+    public AbstractGradientBoostingLearner(final GradientBoostingLearnerConfiguration config, final TreeData data,
+        final boolean fixNominalValueMixup) {
         m_data = data;
         if (data.getTreeType() == TreeType.BitVector) {
             m_indexManager = new BitVectorDataIndexManager(data.getNrRows());
@@ -104,6 +112,20 @@ public abstract class AbstractGradientBoostingLearner {
         }
         m_config = config;
         m_rowSampler = config.createRowSampler(data);
+        m_fixNominalValueMixup = fixNominalValueMixup;
+    }
+
+    /**
+     * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 was fixed.
+     * Only use in code that requires the old behavior.
+     *
+     * @param config the configuration for the learner
+     * @param data the initial data as it is provided by the user
+     * @deprecated
+     */
+    @Deprecated
+    public AbstractGradientBoostingLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
+        this (config, data, false);
     }
 
     /**
@@ -121,7 +143,7 @@ public abstract class AbstractGradientBoostingLearner {
     }
 
     /**
-     * @return the {@link DataIndexManager} used by the initial {@link TreeData} object
+     * @return the {@link IDataIndexManager} used by the initial {@link TreeData} object
      */
     public IDataIndexManager getIndexManager() {
         return m_indexManager;
@@ -194,13 +216,9 @@ public abstract class AbstractGradientBoostingLearner {
      */
     protected TreeData createResidualDataFromArray(final double[] residualData, final TreeData actualData) {
         TreeTargetNumericColumnData actual = (TreeTargetNumericColumnData)actualData.getTargetColumn();
-        RowKey[] rowKeysAsArray = new RowKey[actual.getNrRows()];
-        for (int i = 0; i < rowKeysAsArray.length; i++) {
-            rowKeysAsArray[i] = actual.getRowKeyFor(i);
-        }
         TreeTargetNumericColumnMetaData metaData = actual.getMetaData();
         TreeTargetNumericColumnData residualTarget =
-            new TreeTargetNumericColumnData(metaData, rowKeysAsArray, residualData);
+            new TreeTargetNumericColumnData(metaData, actual.getRowKeys(), residualData);
         return new TreeData(getData().getColumns(), residualTarget, getData().getTreeType());
     }
 
@@ -210,20 +228,26 @@ public abstract class AbstractGradientBoostingLearner {
      * @param data
      * @param indexManager
      * @param rowIdx
+     * @param fixNominalValueMixup AP-12360
+     * The last value of nominal columns without any missing values was
+     * falsely treated as missing during the prediction after each boosting iteration.
      * @return a PredictorRecord for the row at <b>rowIdx</b> in <b>data</b>
      */
     public static PredictorRecord createPredictorRecord(final TreeData data, final IDataIndexManager indexManager,
-        final int rowIdx) {
-        Map<String, Object> valMap = new HashMap<String, Object>();
+        final int rowIdx, final boolean fixNominalValueMixup) {
+        Map<String, Object> valMap = new HashMap<>();
         for (TreeAttributeColumnData column : data.getColumns()) {
             TreeAttributeColumnMetaData meta = column.getMetaData();
-            valMap.put(meta.getAttributeName(), handleMissingValues(column.getValueAt(indexManager.getPositionsInColumn(meta.getAttributeIndex())[rowIdx]), column));
+            final int[] positionsInColumn = indexManager.getPositionsInColumn(meta.getAttributeIndex());
+            Object value = column.getValueAt(positionsInColumn[rowIdx]);
+            valMap.put(meta.getAttributeName(), handleMissingValues(value, column, fixNominalValueMixup));
         }
         return new PredictorRecord(valMap);
     }
 
-    private static Object handleMissingValues(final Object value, final TreeAttributeColumnData column) {
-//        if (column.containsMissingValues()) {
+    private static Object handleMissingValues(final Object value, final TreeAttributeColumnData column,
+        final boolean fixNominalValueMixup) {
+        if (!fixNominalValueMixup || column.containsMissingValues()) {
             if (column instanceof TreeNumericColumnData) {
                 if (((Double)value).isNaN()) {
                     return PredictorRecord.NULL;
@@ -235,7 +259,7 @@ public abstract class AbstractGradientBoostingLearner {
                     return PredictorRecord.NULL;
                 }
             }
-//        }
+        }
 
         return value;
     }
@@ -248,7 +272,8 @@ public abstract class AbstractGradientBoostingLearner {
     protected double[] predictTreeModel(final TreeModelRegression tree) {
         final double[] prediction = new double[m_data.getNrRows()];
         for (int i = 0; i < prediction.length; i++) {
-            prediction[i] = tree.findMatchingNode(createPredictorRecord(m_data, m_indexManager, i)).getMean();
+            prediction[i] = tree.findMatchingNode(createPredictorRecord(
+                m_data, m_indexManager, i, m_fixNominalValueMixup)).getMean();
         }
         return prediction;
     }
