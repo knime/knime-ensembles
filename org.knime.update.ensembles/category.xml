@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.knime.features.ensembles_4.0.0.qualifier.jar" id="org.knime.features.ensembles" version="4.0.0.qualifier"/>
+   <feature id="org.knime.features.ensembles" version="0.0.0"/>
+
+   <category-def name="knime-ensembles" label="Build artifacts from knime-ensembles">
+       <description>Build artifacts from knime-ensembles</description>
+       <query><expression type="match">id ~= /.+/</expression></query>
+   </category-def>
 </site>
