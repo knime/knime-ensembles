@@ -68,12 +68,12 @@
       </node>
       <node
             category-path="/analytics/mining/treeensemble/gradientboosting/regression"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.regression.GradientBoostingRegressionLearnerNodeFactory"
             >
       </node>
       <node
-            after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.regression.GradientBoostingRegressionLearnerNodeFactory"
+            after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.regression.GradientBoostingRegressionLearnerNodeFactory2"
             category-path="/analytics/mining/treeensemble/gradientboosting/regression"
             deprecated="false"
             factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.regression.GradientBoostingPredictorNodeFactory">
@@ -86,7 +86,7 @@
       </node>
       <node
             category-path="/analytics/mining/treeensemble/gradientboosting/classification"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeFactory"
             >
       </node>
@@ -154,14 +154,36 @@
       <node
             after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeFactory"
             category-path="/analytics/mining/treeensemble/gradientboosting/classification"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeFactory2">
       </node>
       <node
             after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeFactory2"
             category-path="/analytics/mining/treeensemble/gradientboosting/classification"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml.GradientBoostingClassificationPMMLPredictorNodeFactory2">
+      </node>
+      <node
+            category-path="/analytics/mining/treeensemble/gradientboosting/classification"
+            deprecated="false"
+            factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeFactory2">
+      </node>
+      <node
+            after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeFactory2"
+            category-path="/analytics/mining/treeensemble/gradientboosting/classification"
+            deprecated="false"
+            factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeFactory3">
+      </node>
+      <node
+            after="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeFactory3"
+            category-path="/analytics/mining/treeensemble/gradientboosting/classification"
+            deprecated="false"
+            factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml.GradientBoostingClassificationPMMLPredictorNodeFactory3">
+      </node>
+      <node
+            category-path="/analytics/mining/treeensemble/gradientboosting/regression"
+            deprecated="false"
+            factory-class="org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.regression.GradientBoostingRegressionLearnerNodeFactory2">
       </node>
 <!--      <node
             after="org.knime.base.node.mine.treeensemble.node.predictor.regression.TreeEnsembleRegressionPredictorNodeFactory"
