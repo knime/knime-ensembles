@@ -97,7 +97,7 @@ public final class MGradientBoostedTreesLearner extends AbstractGradientBoostedT
      * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 was fixed.
      * @param config the configuration for the learner
      * @param data the data on which to learn on
-     * @deprecated
+     * @deprecated Use {@link MGradientBoostedTreesLearner#MGradientBoostedTreesLearner(GradientBoostingLearnerConfiguration, TreeData, boolean)} instead
      */
     @Deprecated
     public MGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {

@@ -81,7 +81,11 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
 
     private GradientBoostingLearnerConfiguration m_configuration;
 
-    private final boolean m_fixAP12360;
+    /**
+     * If set to true, AP-12360 is fixed. During the update of the model estimates, the last nominal value of
+     * categorical columns without any missing values was treated as missing.
+     */
+    private final boolean m_fixNominalValueMixup;
 
     /**
      * Constructor for versions prior to 4.0.1
@@ -95,7 +99,7 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
      */
     protected GradientBoostingRegressionLearnerNodeModel(final boolean pre401) {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{GradientBoostingModelPortObject.TYPE});
-        m_fixAP12360 = !pre401;
+        m_fixNominalValueMixup = !pre401;
     }
 
     /**
@@ -144,8 +148,8 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
         TreeDataCreator dataCreator = new TreeDataCreator(m_configuration, learnSpec, learnTable.getRowCount());
         exec.setProgress("Reading data into memory");
         TreeData data = dataCreator.readData(learnTable, m_configuration, readInExec);
-//        m_hiliteRowSample = dataCreator.getDataRowsForHilite();
-//        m_viewMessage = dataCreator.getViewMessage();
+        //        m_hiliteRowSample = dataCreator.getDataRowsForHilite();
+        //        m_viewMessage = dataCreator.getViewMessage();
         String dataCreationWarning = dataCreator.getAndClearWarningMessage();
         if (dataCreationWarning != null) {
             if (warn == null) {
@@ -156,17 +160,18 @@ public class GradientBoostingRegressionLearnerNodeModel extends NodeModel {
         }
         readInExec.setProgress(1.0);
         exec.setMessage("Learning trees");
-        AbstractGradientBoostingLearner learner = new MGradientBoostedTreesLearner(m_configuration, data, m_fixAP12360);
+        AbstractGradientBoostingLearner learner =
+            new MGradientBoostedTreesLearner(m_configuration, data, m_fixNominalValueMixup);
         AbstractGradientBoostingModel model;
-//        try {
-            model = learner.learn(learnExec);
-//        } catch (ExecutionException e) {
-//            Throwable cause = e.getCause();
-//            if (cause instanceof Exception) {
-//                throw (Exception)cause;
-//            }
-//            throw e;
-//        }
+        //        try {
+        model = learner.learn(learnExec);
+        //        } catch (ExecutionException e) {
+        //            Throwable cause = e.getCause();
+        //            if (cause instanceof Exception) {
+        //                throw (Exception)cause;
+        //            }
+        //            throw e;
+        //        }
         GradientBoostingModelPortObject modelPortObject = new GradientBoostingModelPortObject(ensembleSpec, model);
         learnExec.setProgress(1.0);
         if (warn != null) {

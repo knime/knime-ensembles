@@ -114,7 +114,7 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
      * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 and AP-7245 were fixed.
      * @param config configuration of learner
      * @param data data to learn on
-     * @deprecated
+     * @deprecated use {@link LKGradientBoostedTreesLearner#LKGradientBoostedTreesLearner(GradientBoostingLearnerConfiguration, TreeData, boolean, boolean)} instead
      */
     @Deprecated
     public LKGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
@@ -340,7 +340,7 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
             final IDataIndexManager indexManager = getIndexManager();
             for (int i = 0; i < previousFunction.length; i++) {
                 // don't fix the missing value mixup to ensure backwards compatibility of deprecated nodes
-                final PredictorRecord record = createPredictorRecord(data, indexManager, i, false);
+                final PredictorRecord record = createPredictorRecord(data, indexManager, i);
                 final TreeNodeSignature signature = tree.findMatchingNode(record).getSignature();
                 previousFunction[i] += coefficientMap.get(signature);
             }

@@ -91,7 +91,7 @@ public abstract class AbstractGradientBoostedTreesLearner extends AbstractGradie
      * Legacy constructor resembling functionality prior to 4.0.1 in which AP-12360 was fixed.
      * @param config the configuration for the learner
      * @param data the data as it is provided by the user
-     * @deprecated
+     * @deprecated use {@link AbstractGradientBoostedTreesLearner#AbstractGradientBoostedTreesLearner(GradientBoostingLearnerConfiguration, TreeData, boolean)} instead
      */
     @Deprecated
     public AbstractGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config,
@@ -122,7 +122,7 @@ public abstract class AbstractGradientBoostedTreesLearner extends AbstractGradie
             IDataIndexManager indexManager = getIndexManager();
             for (int i = 0; i < data.getNrRows(); i++) {
                 // don't fix missing value mixup to ensure backwards compatibility of deprecated nodes
-                PredictorRecord record = createPredictorRecord(data, indexManager, i, false);
+                PredictorRecord record = createPredictorRecord(data, indexManager, i);
                 previousPrediction[i] += coefficientMap.get(tree.findMatchingNode(record).getSignature());
             }
         }

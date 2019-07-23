@@ -81,13 +81,24 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
 
     private GradientBoostingLearnerConfiguration m_configuration;
 
-    private final boolean m_fixAP7245;
-
-    private final boolean m_fixAP12360;
+    /**
+     * If set to true, AP-7245 is fixed. For problems with many classes, it was possible that an overflow
+     * occurred in the softmax which led to NaN values in the model parameters.
+     * The solution is to use a variant of the softmax that is safeguarded against numerical overflow.
+     */
+    private final boolean m_safeSoftmax;
 
     /**
-     *
+     * If set to true, AP-12360 is fixed. During the update of the model estimates, the last nominal value of
+     * categorical columns without any missing values was treated as missing.
      */
+    private final boolean m_fixNominalValueMixup;
+
+    /**
+     * Constructor for nodes created prior to KNIME Analytics Platform 4.0.1
+     * @deprecated Use {@link GradientBoostingClassificationLearnerNodeModel#GradientBoostingClassificationLearnerNodeModel(boolean)} instead.
+     */
+    @Deprecated
     protected GradientBoostingClassificationLearnerNodeModel() {
         this(true);
     }
@@ -97,8 +108,8 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
      */
     protected GradientBoostingClassificationLearnerNodeModel(final boolean pre401) {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{GradientBoostingModelPortObject.TYPE});
-        m_fixAP7245 = !pre401;
-        m_fixAP12360 = !pre401;
+        m_safeSoftmax = !pre401;
+        m_fixNominalValueMixup = !pre401;
     }
 
 
@@ -161,7 +172,7 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
         }
         readInExec.setProgress(1.0);
         exec.setMessage("Learning trees");
-        AbstractGradientBoostingLearner learner = new LKGradientBoostedTreesLearner(m_configuration, data, m_fixAP7245, m_fixAP12360);
+        AbstractGradientBoostingLearner learner = new LKGradientBoostedTreesLearner(m_configuration, data, m_safeSoftmax, m_fixNominalValueMixup);
         AbstractGradientBoostingModel model;
 //        m_configuration.setMissingValueHandling(MissingValueHandling.XGBoost);
 //        try {

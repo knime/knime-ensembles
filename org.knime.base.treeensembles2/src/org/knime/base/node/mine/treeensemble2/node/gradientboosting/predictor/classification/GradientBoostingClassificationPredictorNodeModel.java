@@ -113,7 +113,7 @@ public class GradientBoostingClassificationPredictorNodeModel extends NodeModel 
 
     /**
      * Default constructor that ensures that code written prior to 3.6.0 still compiles.
-     * @deprecated
+     * @deprecated Use {@link GradientBoostingClassificationPredictorNodeModel#GradientBoostingClassificationPredictorNodeModel(Version)} instead
      */
     @Deprecated
     public GradientBoostingClassificationPredictorNodeModel() {
@@ -122,7 +122,7 @@ public class GradientBoostingClassificationPredictorNodeModel extends NodeModel 
 
     /**
      * @param pre36 indicates if the node is created with a version prior to 3.6 when the column output was different
-     * @deprecated
+     * @deprecated Use {@link GradientBoostingClassificationPredictorNodeModel#GradientBoostingClassificationPredictorNodeModel(Version)} instead
      */
     @Deprecated
     public GradientBoostingClassificationPredictorNodeModel(final boolean pre36) {
