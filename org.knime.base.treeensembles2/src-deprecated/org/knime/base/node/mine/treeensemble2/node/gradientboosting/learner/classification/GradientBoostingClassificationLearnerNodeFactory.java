@@ -48,6 +48,8 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification;
 
+import org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeDialogPane;
+import org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification.GradientBoostingClassificationLearnerNodeModel;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
