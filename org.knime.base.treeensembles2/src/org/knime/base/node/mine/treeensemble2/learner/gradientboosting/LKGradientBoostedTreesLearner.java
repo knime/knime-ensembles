@@ -78,6 +78,7 @@ import org.knime.base.node.mine.treeensemble2.sample.row.RowSample;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.Pair;
 import org.knime.core.util.ThreadPool;
 
@@ -225,7 +226,8 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
             target[i][row] = exp;
             sum += exp;
         }
-        assert sum > 0 : "Exponential sum is zero.";
+        CheckUtils.checkState(Double.isFinite(sum), "Exponential sum is not finite.");
+        CheckUtils.checkState(sum > 0, "Exponential sum is zero.");
         for (int i = 0; i < numClasses; i++) {
             target[i][row] /= sum;
         }
