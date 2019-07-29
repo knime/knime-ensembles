@@ -194,7 +194,7 @@ public final class OptionsPanel extends JPanel {
         } else {
             m_minChildNodeSizeSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
         }
-        m_minChildNodeSizeChecker = new JCheckBox("Minimum node size");
+        m_minChildNodeSizeChecker = new JCheckBox("Minimum child node size");
         m_minChildNodeSizeChecker.addItemListener(e ->
         m_minChildNodeSizeSpinner.setEnabled(m_minChildNodeSizeChecker.isSelected()));
         m_minChildNodeSizeChecker.doClick();
