@@ -172,7 +172,7 @@
     <inPort index="0" name="Input Data">The data to be learned from. It must contain at least one nominal target column and 
       either a fingerprint (bit/byte/double vector) column or another numeric or nominal column.
     </inPort>
-    <outPort index="0" name="Out-of-bag predictions">
+    <outPort index="0" name="Out-of-bag Predictions">
       The input data with the out-of-bag predictions, i.e. for each input row the majority vote of all models that 
       did not use the row during their training.
       If the entire data was used to train the individual models then this
