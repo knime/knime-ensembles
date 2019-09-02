@@ -139,8 +139,8 @@ public class TreeDataCreator {
                 }
                 treeType = TreeType.DoubleVector;
             } else {
-                throw new IllegalStateException("Unsupported column at index " + i + " (column \"" + col.getName()
-                    + "\"): " + colType);
+                throw new IllegalStateException(
+                    "Unsupported column at index " + i + " (column \"" + col.getName() + "\"): " + colType);
             }
         }
         final int nrHilitePatterns = configuration.getNrHilitePatterns();
@@ -154,9 +154,8 @@ public class TreeDataCreator {
     }
 
     /**
-     * Reads the data from <b>learnData</b> into memory.
-     * Each column is represented by a TreeColumnData object corresponding to its type
-     * and whether it is a attribute or target column.
+     * Reads the data from <b>learnData</b> into memory. Each column is represented by a TreeColumnData object
+     * corresponding to its type and whether it is a attribute or target column.
      *
      * @param learnData
      * @param configuration
@@ -181,19 +180,14 @@ public class TreeDataCreator {
 
         // sort learnData according to the target column to enable equal size sampling
         final int targetColIdx = learnData.getDataTableSpec().findColumnIndex(m_configuration.getTargetColumn());
-        Comparator<DataCell> targetComp = learnData.getDataTableSpec().getColumnSpec(targetColIdx).getType().getComparator();
-        DataTableSorter sorter = new DataTableSorter(learnData, learnData.size(), new Comparator<DataRow>() {
-
-            @Override
-            public int compare(final DataRow arg0, final DataRow arg1) {
-                return targetComp.compare(arg0.getCell(targetColIdx), arg1.getCell(targetColIdx));
-            }
-
-        });
+        Comparator<DataCell> targetComp =
+            learnData.getDataTableSpec().getColumnSpec(targetColIdx).getType().getComparator();
+        DataTableSorter sorter = new DataTableSorter(learnData, learnData.size(),
+            (arg0, arg1) -> targetComp.compare(arg0.getCell(targetColIdx), arg1.getCell(targetColIdx)));
         final ExecutionMonitor sortExec = exec.createSubProgress(0.5);
         final DataTable sortedTable = sorter.sort(sortExec);
-        final ExecutionMonitor readExec = exec.createSubProgress(0.5);
 
+        final ExecutionMonitor readExec = exec.createSubProgress(0.5);
         for (DataRow r : sortedTable) {
             double progress = index / (double)nrRows;
             readExec.setProgress(progress, "Row " + index + " of " + nrRows + " (\"" + r.getKey() + "\")");
@@ -226,9 +220,8 @@ public class TreeDataCreator {
             index++;
         }
         if (nrHilitePatterns > 0 && index > nrHilitePatterns) {
-            m_viewMessage =
-                "Hilite (& color graphs) are based on a subset of " + "the data (" + nrHilitePatterns + "/" + index
-                    + ")";
+            m_viewMessage = "Hilite (& color graphs) are based on a subset of " + "the data (" + nrHilitePatterns + "/"
+                + index + ")";
         }
         if (rejectedMissings > 0) {
             StringBuffer warnMsgBuilder = new StringBuffer();
