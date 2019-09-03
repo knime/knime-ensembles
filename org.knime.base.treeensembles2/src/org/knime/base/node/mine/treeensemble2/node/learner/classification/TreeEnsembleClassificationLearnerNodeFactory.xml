@@ -93,7 +93,8 @@
     </tab>
     <tab name="Tree Options">
       <option name="Split Criterion">Choose the <a href="http://en.wikipedia.org/wiki/Decision_tree_learning#Formulae">
-        split criterion</a> here. Gini is usually a good choice and is used in CART (as described by Breiman et al); 
+        split criterion</a> here. Gini is usually a good choice and is used in "Classification and Regression Trees" 
+        (Breiman et al, 1984) and the original random forest algorithm (as described by Breiman et al, 2001); 
         information gain is used in C4.5; information gain ratio normalizes the standard information gain by the split
         entropy to overcome some unfair preference for nominal splits with many child nodes.
         </option>

@@ -11,15 +11,15 @@
 		<intro>
 			<p>
 				Learns a single regression tree. The procedure follows the algorithm
-				described in CART
-				("Classification and Regression Trees", Breiman et al, 1984), whereby the current
+				described by
+				"Classification and Regression Trees" (Breiman et al, 1984), whereby the current
 				implementation applies a
 				couple of simplifications, e.g. no pruning, not necessarily binary trees,
 				etc.
 			</p>
 			<p>
 				The currently used missing value handling also differs from the one
-				used in CART.
+				used by Breiman et al, 1984.
 				In each split the algorithm tries to find the best direction for
 				missing values by sending them in each direction and selecting
 				the one that yields the best result (i.e. largest gain). The procedure

@@ -10,8 +10,8 @@
   <fullDescription>
     <intro>
       <p>
-        Learns a single regression tree. The procedures follows the algorithm described in CART 
-        ("Classification and Regression Trees", Breiman et al, 1984), whereby the current implementation applies a 
+        Learns a single regression tree. The procedures follows the algorithm described by 
+        "Classification and Regression Trees" (Breiman et al, 1984), whereby the current implementation applies a 
         couple of simplifications, e.g. no pruning, missing values ignored, not necessarily binary trees, etc. 
       </p>
     </intro>
