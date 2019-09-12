@@ -59,10 +59,10 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.math.random.RandomData;
+import org.knime.base.node.mine.treeensemble2.data.AbstractTreeTargetNominalColumnData;
 import org.knime.base.node.mine.treeensemble2.data.NominalValueRepresentation;
 import org.knime.base.node.mine.treeensemble2.data.PredictorRecord;
 import org.knime.base.node.mine.treeensemble2.data.TreeData;
-import org.knime.base.node.mine.treeensemble2.data.TreeTargetNominalColumnData;
 import org.knime.base.node.mine.treeensemble2.data.TreeTargetNumericColumnData;
 import org.knime.base.node.mine.treeensemble2.data.TreeTargetNumericColumnMetaData;
 import org.knime.base.node.mine.treeensemble2.data.memberships.IDataIndexManager;
@@ -101,8 +101,8 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
      * @param config configuration of learner
      * @param data data to learn on
      * @param useSafeSoftmax set to true if the softmax calculation should be safeguarded against numerical overflow
-     * @param useLeafReferences set to true if the row references stored in leaf nodes should be used for updating
-     * (this was introduced in 4.0.1 because it's faster and fixes AP-12360)
+     * @param useLeafReferences set to true if the row references stored in leaf nodes should be used for updating (this
+     *            was introduced in 4.0.1 because it's faster and fixes AP-12360)
      */
     public LKGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data,
         final boolean useSafeSoftmax, final boolean useLeafReferences) {
@@ -113,9 +113,12 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
 
     /**
      * Legacy constructor for behavior prior to 4.0.1 in which AP-12360 and AP-7245 were fixed.
+     *
      * @param config configuration of learner
      * @param data data to learn on
-     * @deprecated use {@link LKGradientBoostedTreesLearner#LKGradientBoostedTreesLearner(GradientBoostingLearnerConfiguration, TreeData, boolean, boolean)} instead
+     * @deprecated use
+     *             {@link LKGradientBoostedTreesLearner#LKGradientBoostedTreesLearner(GradientBoostingLearnerConfiguration, TreeData, boolean, boolean)}
+     *             instead
      */
     @Deprecated
     public LKGradientBoostedTreesLearner(final GradientBoostingLearnerConfiguration config, final TreeData data) {
@@ -132,7 +135,7 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
     public MultiClassGradientBoostedTreesModel learn(final ExecutionMonitor exec)
         throws CanceledExecutionException, InterruptedException, ExecutionException {
         final TreeData data = getData();
-        final TreeTargetNominalColumnData target = (TreeTargetNominalColumnData)data.getTargetColumn();
+        final AbstractTreeTargetNominalColumnData target = (AbstractTreeTargetNominalColumnData)data.getTargetColumn();
         final NominalValueRepresentation[] classNomVals = target.getMetaData().getValues();
         final int numClasses = classNomVals.length;
         final String[] classLabels = new String[numClasses];
@@ -206,8 +209,9 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
     }
 
     /**
-     * Calculates the softmax for <b>row</b> based on the corresponding <b>logits</b>
-     * and stores the resulting probabilities at the appropriate position in <b>target</b>.
+     * Calculates the softmax for <b>row</b> based on the corresponding <b>logits</b> and stores the resulting
+     * probabilities at the appropriate position in <b>target</b>.
+     *
      * @param logits the logits i.e. the accumulated outputs of all previous boosting steps
      * @param target the array to store the probabilities in
      * @param row the index of the row for which to calculate the probabilities
@@ -245,7 +249,7 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
     }
 
     private static void checkThrowable(final AtomicReference<Throwable> learnThrowableRef)
-            throws CanceledExecutionException {
+        throws CanceledExecutionException {
         Throwable th = learnThrowableRef.get();
         if (th != null) {
             if (th instanceof CanceledExecutionException) {
@@ -385,17 +389,18 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
         return coefficientMap;
     }
 
-    private double[] calculateNewTarget(final TreeTargetNominalColumnData oldTarget, final int classNomValIdx) {
+    private static double[] calculateNewTarget(final AbstractTreeTargetNominalColumnData oldTarget,
+        final int classNomValIdx) {
         double[] newTarget = new double[oldTarget.getNrRows()];
         for (int i = 0; i < newTarget.length; i++) {
-            newTarget[i] = oldTarget.getValueFor(i) == classNomValIdx ? 1.0 : 0.0;
+            newTarget[i] = oldTarget.getProbability(i, classNomValIdx);
         }
         return newTarget;
     }
 
     private TreeData createNumericDataFromArray(final double[] numericData) {
         TreeData data = getData();
-        TreeTargetNominalColumnData nominalTarget = (TreeTargetNominalColumnData)data.getTargetColumn();
+        AbstractTreeTargetNominalColumnData nominalTarget = (AbstractTreeTargetNominalColumnData)data.getTargetColumn();
         TreeTargetNumericColumnMetaData newMeta =
             new TreeTargetNumericColumnMetaData(nominalTarget.getMetaData().getAttributeName());
         TreeTargetNumericColumnData newTarget =

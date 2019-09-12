@@ -49,6 +49,7 @@ package org.knime.base.node.mine.treeensemble2.node.learner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -77,6 +78,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.data.vector.doublevector.DoubleVectorValue;
@@ -84,15 +86,24 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
 import org.knime.core.node.util.filter.column.DataTypeColumnFilter;
+
+import com.google.common.collect.Sets;
 
 /**
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
 public class TreeEnsembleLearnerConfiguration {
+
+    private static final Set<Class<? extends DataValue>> VALID_REGRESSION_TYPES =
+            Collections.singleton(DoubleValue.class);
+
+    private static final HashSet<Class<? extends DataValue>> VALID_CLASSIFICATION_TYPES =
+            Sets.newHashSet(NominalValue.class, ProbabilityDistributionValue.class);
 
     /**  */
     private static final String KEY_NR_HILITE_PATTERNS = "nrHilitePatterns";
@@ -929,7 +940,7 @@ public class TreeEnsembleLearnerConfiguration {
         // guess defaults:
         // traverse columns backwards; assign last (i.e. first-seen) appropriate
         // column as target, use any subsequent as valid learning attribute
-        Class<? extends DataValue> targetClass = getRequiredTargetClass();
+        Set<Class<? extends DataValue>> targetClass = getRequiredTargetClasses();
         for (int i = inSpec.getNumColumns() - 1; i >= 0; i--) {
             DataColumnSpec colSpec = inSpec.getColumnSpec(i);
             DataType colType = colSpec.getType();
@@ -937,8 +948,9 @@ public class TreeEnsembleLearnerConfiguration {
             if (colType.isCompatible(BitVectorValue.class) || colType.isCompatible(ByteVectorValue.class)
                 || colType.isCompatible(DoubleVectorValue.class)) {
                 defFingerprintColumn = colName;
-            } else if (colType.isCompatible(NominalValue.class) || colType.isCompatible(DoubleValue.class)) {
-                if (colType.isCompatible(targetClass)) {
+            } else if (colType.isCompatible(NominalValue.class) || colType.isCompatible(DoubleValue.class) ||
+                    colType.isCompatible(ProbabilityDistributionValue.class)) {
+                if (isValidTarget(colSpec)) {
                     if (defTargetColumn == null) { // first categorical column
                         defTargetColumn = colName;
                     } else {
@@ -962,7 +974,7 @@ public class TreeEnsembleLearnerConfiguration {
         // assign fields:
         m_targetColumn = settings.getString(KEY_TARGET_COLUMN, defTargetColumn);
         DataColumnSpec targetColSpec = inSpec.getColumnSpec(m_targetColumn);
-        if (targetColSpec == null || !targetColSpec.getType().isCompatible(targetClass)) {
+        if (!isValidTarget(targetColSpec)) {
             m_targetColumn = defTargetColumn;
         }
 
@@ -1152,10 +1164,8 @@ public class TreeEnsembleLearnerConfiguration {
             throw new InvalidSettingsException("Target column not set");
         }
         DataColumnSpec targetCol = spec.getColumnSpec(m_targetColumn);
-        if (targetCol == null || !targetCol.getType().isCompatible(getRequiredTargetClass())) {
-            throw new InvalidSettingsException(
-                "Target column \"" + m_targetColumn + "\" does not exist or is not of the " + "correct type");
-        }
+        CheckUtils.checkSetting(isValidTarget(targetCol),
+            "Target column \"%s\" does not exist or is not of the correct type", m_targetColumn);
         FilterResult filterResult = m_columnFilterConfig.applyTo(spec);
         List<String> noDomainColumns = new ArrayList<String>();
         FilterLearnColumnRearranger rearranger = new FilterLearnColumnRearranger(spec);
@@ -1342,8 +1352,17 @@ public class TreeEnsembleLearnerConfiguration {
         return m_isRegression;
     }
 
-    private Class<? extends DataValue> getRequiredTargetClass() {
-        return m_isRegression ? DoubleValue.class : NominalValue.class;
+    private Set<Class<? extends DataValue>> getRequiredTargetClasses() {
+        return m_isRegression ? VALID_REGRESSION_TYPES :
+            VALID_CLASSIFICATION_TYPES;
+    }
+
+    private boolean isValidTarget(final DataColumnSpec potentialTarget) {
+        if (potentialTarget == null) {
+            return false;
+        }
+        final DataType type = potentialTarget.getType();
+        return getRequiredTargetClasses().stream().anyMatch(type::isCompatible);
     }
 
     /** Column rearranger with "warning" field. */

@@ -55,7 +55,7 @@
 				Select the column containing the value to be
 				learned. Rows with missing
 				values in this column will be ignored
-				during the learning process.
+				during the learning process. Besides nominal columns this node also supports probability distribution columns as target.
 			</option>
 			<option name="Attribute Selection">
 				<p>Select the attributes on which the model should be learned. You can choose from two modes.

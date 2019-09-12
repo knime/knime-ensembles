@@ -76,6 +76,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.def.StringCell;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bitvector.DenseBitVectorCell;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
@@ -91,6 +92,8 @@ import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public class OptionsPanel extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     static final DataTableSpec NO_VALID_INPUT_SPEC =
         new DataTableSpec(new DataColumnSpecCreator("<no valid input>", StringCell.TYPE).createSpec(),
@@ -130,7 +133,12 @@ public class OptionsPanel extends JPanel {
     public OptionsPanel(final boolean isRegression) {
         super(new GridBagLayout());
         Class<? extends DataValue> targetClass = isRegression ? DoubleValue.class : NominalValue.class;
-        m_targetColumnBox = new ColumnSelectionComboxBox((Border)null, targetClass);
+        if (isRegression) {
+            m_targetColumnBox = new ColumnSelectionComboxBox((Border)null, DoubleValue.class);
+        } else {
+            m_targetColumnBox = new ColumnSelectionComboxBox(
+                (Border)null, NominalValue.class, ProbabilityDistributionValue.class);
+        }
         m_targetColumnBox.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     newTargetSelected();

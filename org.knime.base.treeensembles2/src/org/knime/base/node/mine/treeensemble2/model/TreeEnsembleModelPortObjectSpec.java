@@ -48,8 +48,10 @@
 package org.knime.base.node.mine.treeensemble2.model;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.knime.base.data.filter.column.FilterColumnRow;
 import org.knime.base.data.filter.column.FilterColumnTable;
@@ -59,6 +61,8 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.node.InvalidSettingsException;
@@ -66,6 +70,7 @@ import org.knime.core.node.ModelContentRO;
 import org.knime.core.node.ModelContentWO;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.port.AbstractSimplePortObjectSpec;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  *
@@ -147,22 +152,41 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
      */
     public Map<String, DataCell> getTargetColumnPossibleValueMap() throws InvalidSettingsException {
         DataColumnSpec targetCol = getTargetColumn();
+        final DataType type = targetCol.getType();
+        if (type.isCompatible(ProbabilityDistributionValue.class)) {
+            return createClassValueMapFromProbabilityDistribution(targetCol);
+        } else {
+            return createTargetValueMapFromOrdinaryColumn(targetCol);
+        }
+    }
+
+    private static Map<String, DataCell> createTargetValueMapFromOrdinaryColumn(final DataColumnSpec targetCol)
+        throws InvalidSettingsException {
         Set<DataCell> values = targetCol.getDomain().getValues();
         if (values == null) {
             return null;
         }
-        Map<String, DataCell> result = new LinkedHashMap<String, DataCell>();
+        Map<String, DataCell> result = new LinkedHashMap<>();
         for (DataCell v : values) {
             String toString = v.toString();
             DataCell old = result.put(toString, v);
-            if (old != null) {
-                throw new InvalidSettingsException(
-                    "The target column contains " + "distinct values whose string representations are "
-                        + "identical and therefore not unique; convert the " + "target column to a plain string first. "
-                        + "(Problematic value: \"" + toString + "\")");
-            }
+            CheckUtils.checkSetting(old == null, "The target column contains distinct values whose string "
+                + "representations are identical and therefore not unique; convert the target column to a plain string"
+                + " first. (Problematic value: \"%s\")", toString);
         }
         return result;
+    }
+
+    private static Map<String, DataCell> createClassValueMapFromProbabilityDistribution(final DataColumnSpec targetCol)
+        throws InvalidSettingsException {
+        final List<String> elementNames = targetCol.getElementNames();
+        CheckUtils.checkSetting(elementNames != null && !elementNames.isEmpty(),
+                "A probability distribution column must always specify its element names.");
+        @SuppressWarnings("null") // it's explicitly checked that element names is not null
+        final Map<String, DataCell> map = elementNames.stream().collect(Collectors.toMap(s -> s, StringCell::new));
+        CheckUtils.checkSetting(map.size() == elementNames.size(),
+                "The probability distribution target column contains duplicate class names.");
+        return map;
     }
 
     /**
@@ -181,14 +205,14 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
      * @throws InvalidSettingsException if the target variable does not match the purpose of the model
      */
     public void assertTargetTypeMatches(final boolean isRegression) throws InvalidSettingsException {
+        final DataType type = getTargetColumn().getType();
         if (isRegression) {
-            if (!getTargetColumn().getType().isCompatible(DoubleValue.class)) {
-                throw new InvalidSettingsException("Can't apply classification model for regression tasks");
-            }
+            CheckUtils.checkSetting(type.isCompatible(DoubleValue.class),
+                "Can't apply classification model for regression tasks");
         } else {
-            if (!getTargetColumn().getType().isCompatible(NominalValue.class)) {
-                throw new InvalidSettingsException("Can't apply regression model for classification tasks");
-            }
+            CheckUtils.checkSetting(type.isCompatible(NominalValue.class) ||
+                type.isCompatible(ProbabilityDistributionValue.class),
+                "Can't apply regression model for classification tasks");
         }
     }
 

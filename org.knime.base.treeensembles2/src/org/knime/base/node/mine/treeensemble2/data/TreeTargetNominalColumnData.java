@@ -55,7 +55,7 @@ import org.knime.core.data.RowKey;
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
-public final class TreeTargetNominalColumnData extends TreeTargetColumnData {
+public final class TreeTargetNominalColumnData extends AbstractTreeTargetNominalColumnData {
 
     final int[] m_data;
 
@@ -140,14 +140,9 @@ public final class TreeTargetNominalColumnData extends TreeTargetColumnData {
      * @param row
      * @return The nominal target value for row <b>row</b>
      */
+    @Override
     public int getValueFor(final int row) {
         return m_data[row];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public TreeTargetNominalColumnMetaData getMetaData() {
-        return (TreeTargetNominalColumnMetaData)super.getMetaData();
     }
 
     /** {@inheritDoc} */
@@ -164,6 +159,14 @@ public final class TreeTargetNominalColumnData extends TreeTargetColumnData {
         }
         b.append(length < m_data.length ? ", ...]" : "]");
         return b.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getProbability(final int row, final int classIdx) {
+        return getValueFor(row) == classIdx ? 1.0 : 0.0;
     }
 
 }

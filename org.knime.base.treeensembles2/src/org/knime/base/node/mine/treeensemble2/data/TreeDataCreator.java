@@ -51,6 +51,7 @@ import java.util.Comparator;
 
 import org.knime.base.node.mine.treeensemble2.model.AbstractTreeEnsembleModel.TreeType;
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
+import org.knime.base.node.mine.treeensemble2.sample.row.RowSamplerFactory.RowSamplingMode;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
@@ -61,6 +62,7 @@ import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.DataContainer;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 import org.knime.core.data.sort.DataTableSorter;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
@@ -105,11 +107,7 @@ public class TreeDataCreator {
         }
         m_attrColCreators = new TreeAttributeColumnDataCreator[nrLearnCols];
         final DataColumnSpec targetCSpec = learnSpec.getColumnSpec(nrLearnCols);
-        if (isRegression) {
-            m_targetColCreator = new TreeTargetNumericColumnDataCreator(targetCSpec);
-        } else {
-            m_targetColCreator = new TreeTargetNominalColumnDataCreator(targetCSpec);
-        }
+        m_targetColCreator = getTargetColumnCreator(isRegression, targetCSpec);
         TreeType treeType = null;
         for (int i = 0; i < nrLearnCols; i++) {
             DataColumnSpec col = learnSpec.getColumnSpec(i);
@@ -153,6 +151,17 @@ public class TreeDataCreator {
         m_treeType = treeType;
     }
 
+    private static TreeTargetColumnDataCreator getTargetColumnCreator(final boolean isRegression,
+        final DataColumnSpec targetCSpec) {
+        if (isRegression) {
+            return new TreeTargetNumericColumnDataCreator(targetCSpec);
+        } else if (targetCSpec.getType().isCompatible(ProbabilityDistributionValue.class)) {
+            return new TreeTargetProbabilisticNominalColumnDataCreator(targetCSpec);
+        } else {
+            return new TreeTargetNominalColumnDataCreator(targetCSpec);
+        }
+    }
+
     /**
      * Reads the data from <b>learnData</b> into memory. Each column is represented by a TreeColumnData object
      * corresponding to its type and whether it is a attribute or target column.
@@ -179,13 +188,12 @@ public class TreeDataCreator {
         final int nrHilitePatterns = m_configuration.getNrHilitePatterns();
 
         // sort learnData according to the target column to enable equal size sampling
-        final int targetColIdx = learnData.getDataTableSpec().findColumnIndex(m_configuration.getTargetColumn());
-        Comparator<DataCell> targetComp =
-            learnData.getDataTableSpec().getColumnSpec(targetColIdx).getType().getComparator();
-        DataTableSorter sorter = new DataTableSorter(learnData, learnData.size(),
-            (arg0, arg1) -> targetComp.compare(arg0.getCell(targetColIdx), arg1.getCell(targetColIdx)));
-        final ExecutionMonitor sortExec = exec.createSubProgress(0.5);
-        final DataTable sortedTable = sorter.sort(sortExec);
+        final DataTable sortedTable;
+        if (m_configuration.getRowSamplingMode() == RowSamplingMode.EqualSize) {
+            sortedTable = sortAccordingToTarget(learnData, exec.createSubProgress(0.5));
+        } else {
+            sortedTable = learnData;
+        }
 
         final ExecutionMonitor readExec = exec.createSubProgress(0.5);
         for (DataRow r : sortedTable) {
@@ -224,7 +232,7 @@ public class TreeDataCreator {
                 + index + ")";
         }
         if (rejectedMissings > 0) {
-            StringBuffer warnMsgBuilder = new StringBuffer();
+            StringBuilder warnMsgBuilder = new StringBuilder();
             warnMsgBuilder.append(rejectedMissings).append("/");
             warnMsgBuilder.append(learnData.size());
             warnMsgBuilder.append(" row(s) were ignored because they ");
@@ -249,6 +257,29 @@ public class TreeDataCreator {
         }
         TreeTargetColumnData targetCol = m_targetColCreator.createColumnData();
         return new TreeData(columns, targetCol, m_treeType);
+    }
+
+    /**
+     * Necessary for the support of equal size sampling. Not supported for probabilistic labels.
+     *
+     * @param learnData
+     * @param exec
+     * @return
+     * @throws CanceledExecutionException
+     */
+    private DataTable sortAccordingToTarget(final BufferedDataTable learnData, final ExecutionMonitor sortExec)
+        throws CanceledExecutionException {
+        final DataTableSpec tableSpec = learnData.getDataTableSpec();
+        final int targetColIdx = tableSpec.findColumnIndex(m_configuration.getTargetColumn());
+        final DataType targetType = tableSpec.getColumnSpec(targetColIdx).getType();
+        CheckUtils.checkState(m_configuration.getRowSamplingMode() != RowSamplingMode.EqualSize,
+            "Method should only be called for equal size sampling.");
+        CheckUtils.checkState(!targetType.isCompatible(ProbabilityDistributionValue.class),
+            "Equal size sampling is not supported for probability distribution targets.");
+        final Comparator<DataCell> targetComp = targetType.getComparator();
+        final DataTableSorter sorter = new DataTableSorter(learnData, learnData.size(),
+            (arg0, arg1) -> targetComp.compare(arg0.getCell(targetColIdx), arg1.getCell(targetColIdx)));
+        return sorter.sort(sortExec);
     }
 
     /**
