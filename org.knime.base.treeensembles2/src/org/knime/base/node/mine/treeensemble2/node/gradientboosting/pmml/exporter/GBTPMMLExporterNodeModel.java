@@ -50,6 +50,7 @@ package org.knime.base.node.mine.treeensemble2.node.gradientboosting.pmml.export
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.knime.base.node.mine.treeensemble2.model.AbstractGradientBoostingModel;
 import org.knime.base.node.mine.treeensemble2.model.GradientBoostedTreesModel;
@@ -59,9 +60,14 @@ import org.knime.base.node.mine.treeensemble2.model.TreeEnsembleModelPortObjectS
 import org.knime.base.node.mine.treeensemble2.model.pmml.AbstractGBTModelPMMLTranslator;
 import org.knime.base.node.mine.treeensemble2.model.pmml.ClassificationGBTModelPMMLTranslator;
 import org.knime.base.node.mine.treeensemble2.model.pmml.RegressionGBTModelPMMLTranslator;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnDomainCreator;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.data.vector.doublevector.DoubleVectorValue;
@@ -78,6 +84,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  *
@@ -102,12 +109,12 @@ class GBTPMMLExporterNodeModel extends NodeModel {
         if (gbtModel instanceof GradientBoostedTreesModel) {
             translator = new RegressionGBTModelPMMLTranslator((GradientBoostedTreesModel)gbtModel,
                 gbtPO.getSpec().getLearnTableSpec());
-        } else if (gbtModel instanceof MultiClassGradientBoostedTreesModel){
+        } else if (gbtModel instanceof MultiClassGradientBoostedTreesModel) {
             translator = new ClassificationGBTModelPMMLTranslator((MultiClassGradientBoostedTreesModel)gbtModel,
                 gbtPO.getSpec().getLearnTableSpec());
         } else {
-            throw new IllegalArgumentException("Unknown gradient boosted trees model type '" +
-                    gbtModel.getClass().getSimpleName() + "'.");
+            throw new IllegalArgumentException(
+                "Unknown gradient boosted trees model type '" + gbtModel.getClass().getSimpleName() + "'.");
         }
         PMMLPortObjectSpec pmmlSpec = createPMMLSpec(gbtPO.getSpec(), gbtModel);
         PMMLPortObject pmmlPO = new PMMLPortObject(pmmlSpec);
@@ -117,22 +124,21 @@ class GBTPMMLExporterNodeModel extends NodeModel {
 
     private PMMLPortObjectSpec createPMMLSpec(final TreeEnsembleModelPortObjectSpec spec,
         final AbstractGradientBoostingModel model) {
-        DataColumnSpec targetSpec = spec.getTargetColumn();
+        DataColumnSpec targetSpec = possiblyConvertProbabilityDistribution(spec.getTargetColumn());
         DataTableSpec learnFeatureSpec = spec.getLearnTableSpec();
         if (containsVector(learnFeatureSpec)) {
             setWarningMessage("The model was learned on a vector column. It's possible to export the model "
-                    + "to PMML but it won't be possible to import it from the exported PMML.");
+                + "to PMML but it won't be possible to import it from the exported PMML.");
         }
         if (model == null && containsVector(learnFeatureSpec)) {
-        	// at this point we don't know how long the vector column is
+            // at this point we don't know how long the vector column is
             return null;
         } else if (model != null) {
             // possibly expand vectors with model
             learnFeatureSpec = model.getLearnAttributeSpec(learnFeatureSpec);
         }
         DataTableSpec completeLearnSpec = new DataTableSpec(learnFeatureSpec, new DataTableSpec(targetSpec));
-        PMMLPortObjectSpecCreator pmmlSpecCreator =
-                new PMMLPortObjectSpecCreator(completeLearnSpec);
+        PMMLPortObjectSpecCreator pmmlSpecCreator = new PMMLPortObjectSpecCreator(completeLearnSpec);
         try {
             pmmlSpecCreator.setLearningCols(learnFeatureSpec);
         } catch (InvalidSettingsException e) {
@@ -144,12 +150,34 @@ class GBTPMMLExporterNodeModel extends NodeModel {
         return pmmlSpecCreator.createSpec();
     }
 
+    private static DataColumnSpec possiblyConvertProbabilityDistribution(final DataColumnSpec targetSpec) {
+        final DataType type = targetSpec.getType();
+        if (type.isCompatible(ProbabilityDistributionValue.class)) {
+            return createEquivalentNominalSpec(targetSpec);
+        } else {
+            // the spec can still be incompatible but an according error is thrown by the PMML framework then
+            return targetSpec;
+        }
+    }
+
+    private static DataColumnSpec createEquivalentNominalSpec(final DataColumnSpec targetSpec) {
+        assert targetSpec.getType().isCompatible(ProbabilityDistributionValue.class);
+        final DataColumnSpecCreator creator = new DataColumnSpecCreator(targetSpec.getName(), StringCell.TYPE);
+        final List<String> elementNames = targetSpec.getElementNames();
+        CheckUtils.checkArgument(elementNames != null && !elementNames.isEmpty(),
+            "The element names of a probability distribution column must always be present and non-empty.");
+        @SuppressWarnings("null") // explicitly checked above
+        final DataColumnDomainCreator domainCreator =
+            new DataColumnDomainCreator(elementNames.stream().map(StringCell::new).toArray(DataCell[]::new));
+        creator.setDomain(domainCreator.createDomain());
+        return creator.createSpec();
+    }
+
     private static boolean containsVector(final DataTableSpec learnFeatureSpec) {
         for (DataColumnSpec colSpec : learnFeatureSpec) {
             DataType type = colSpec.getType();
-            boolean isVector = type.isCompatible(BitVectorValue.class) ||
-                    type.isCompatible(DoubleVectorValue.class) ||
-                    type.isCompatible(ByteVectorValue.class);
+            boolean isVector = type.isCompatible(BitVectorValue.class) || type.isCompatible(DoubleVectorValue.class)
+                || type.isCompatible(ByteVectorValue.class);
             if (isVector) {
                 return true;
             }
@@ -163,9 +191,8 @@ class GBTPMMLExporterNodeModel extends NodeModel {
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         TreeEnsembleModelPortObjectSpec treeSpec = (TreeEnsembleModelPortObjectSpec)inSpecs[0];
-        return new PortObjectSpec[] {createPMMLSpec(treeSpec, null)};
+        return new PortObjectSpec[]{createPMMLSpec(treeSpec, null)};
     }
-
 
     /**
      * {@inheritDoc}
