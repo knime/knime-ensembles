@@ -51,14 +51,16 @@ package org.knime.base.node.mine.treeensemble2.data;
 import org.knime.core.data.RowKey;
 
 /**
+ * Abstract implementation of a target column for classification problems.
+ * Handles the meta data and defines the interface for nominal target columns.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public abstract class AbstractTreeTargetNominalColumnData extends TreeTargetColumnData {
 
     /**
-     * @param metaData
-     * @param rowKeysAsArray
+     * @param metaData of the target column
+     * @param rowKeysAsArray array of {@link RowKey RowKeys}
      */
     AbstractTreeTargetNominalColumnData(final TreeTargetColumnMetaData metaData, final RowKey[] rowKeysAsArray) {
         super(metaData, rowKeysAsArray);
@@ -70,8 +72,17 @@ public abstract class AbstractTreeTargetNominalColumnData extends TreeTargetColu
         return (TreeTargetNominalColumnMetaData)super.getMetaData();
     }
 
+    /**
+     * @param row the index of the row for which to retrieve the class
+     * @return the integer encoded class of <b>row</b>
+     */
     public abstract int getValueFor(final int row);
 
+    /**
+     * @param row the index of the row for which to retrieve the probability of it being of class <b>classIdx</b>
+     * @param classIdx the index of the class for which to retrieve the probability
+     * @return the probability of <b>row</b> being of class <b>classIdx</b>
+     */
     public abstract double getProbability(final int row, final int classIdx);
 
 }

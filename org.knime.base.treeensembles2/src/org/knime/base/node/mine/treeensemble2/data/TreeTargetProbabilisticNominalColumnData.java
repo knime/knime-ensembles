@@ -49,21 +49,23 @@
 package org.knime.base.node.mine.treeensemble2.data;
 
 import org.knime.core.data.RowKey;
+import org.knime.core.data.probability.ProbabilityDistributionValue;
 
 /**
+ * Stores probabilistic targets for classification.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetNominalColumnData {
 
-    private final double[][] m_probabilities;
+    private final ProbabilityDistributionValue[] m_probabilities;
 
     /**
      * @param metaData
      * @param rowKeysAsArray
      */
     TreeTargetProbabilisticNominalColumnData(final TreeTargetColumnMetaData metaData, final RowKey[] rowKeysAsArray,
-        final double[][] probabilities) {
+        final ProbabilityDistributionValue[] probabilities) {
         super(metaData, rowKeysAsArray);
         m_probabilities = probabilities;
     }
@@ -73,19 +75,7 @@ final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetN
      */
     @Override
     public int getValueFor(final int row) {
-        return argmax(m_probabilities[row]);
-    }
-
-    private static int argmax(final double[] array) {
-        double max = Double.NEGATIVE_INFINITY;
-        int argMax = 0;
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] > max) {
-                max = array[i];
-                argMax = i;
-            }
-        }
-        return argMax;
+        return m_probabilities[row].getMaxProbIndex();
     }
 
     /**
@@ -93,7 +83,7 @@ final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetN
      */
     @Override
     public double getProbability(final int row, final int classIdx) {
-        return m_probabilities[row][classIdx];
+        return m_probabilities[row].getProbability(classIdx);
     }
 
 }

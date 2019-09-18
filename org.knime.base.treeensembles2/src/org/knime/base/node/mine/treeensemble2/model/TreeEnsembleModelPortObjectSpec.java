@@ -51,6 +51,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.knime.base.data.filter.column.FilterColumnRow;
@@ -183,7 +184,7 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
         CheckUtils.checkSetting(elementNames != null && !elementNames.isEmpty(),
                 "A probability distribution column must always specify its element names.");
         @SuppressWarnings("null") // it's explicitly checked that element names is not null
-        final Map<String, DataCell> map = elementNames.stream().collect(Collectors.toMap(s -> s, StringCell::new));
+        final Map<String, DataCell> map = elementNames.stream().collect(Collectors.toMap(Function.identity(), StringCell::new));
         CheckUtils.checkSetting(map.size() == elementNames.size(),
                 "The probability distribution target column contains duplicate class names.");
         return map;

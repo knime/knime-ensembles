@@ -940,7 +940,6 @@ public class TreeEnsembleLearnerConfiguration {
         // guess defaults:
         // traverse columns backwards; assign last (i.e. first-seen) appropriate
         // column as target, use any subsequent as valid learning attribute
-        Set<Class<? extends DataValue>> targetClass = getRequiredTargetClasses();
         for (int i = inSpec.getNumColumns() - 1; i >= 0; i--) {
             DataColumnSpec colSpec = inSpec.getColumnSpec(i);
             DataType colType = colSpec.getType();

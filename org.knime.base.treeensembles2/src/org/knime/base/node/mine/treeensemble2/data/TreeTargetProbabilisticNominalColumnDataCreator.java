@@ -66,7 +66,7 @@ import org.knime.core.node.util.CheckUtils;
  */
 final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetColumnDataCreator {
 
-    private final List<double[]> m_data = new ArrayList<>();
+    private final List<ProbabilityDistributionValue> m_data = new ArrayList<>();
 
     private final NominalValueRepresentation[] m_nomValReps;
 
@@ -95,20 +95,8 @@ final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetCo
         CheckUtils.checkArgument(p.size() == m_nomValReps.length,
             "Encountered probability distribution value has not the expected number of probabilities. %s vs %s",
             p.size(), m_nomValReps.length);
-        final double[] probabilities = new double[m_nomValReps.length];
-        double max = Double.NEGATIVE_INFINITY;
-        NominalValueRepresentation maxRep = null;
-        for (int i = 0; i < p.size(); i++) {
-            final double probability = p.getProbability(i);
-            final NominalValueRepresentation classRep = m_nomValReps[i];
-            probabilities[classRep.getAssignedInteger()] = probability;
-            if (probability > max) {
-                max = probability;
-                maxRep = classRep;
-            }
-        }
-        incrementFrequency(maxRep);
-        m_data.add(probabilities);
+        incrementFrequency(m_nomValReps[p.getMaxProbIndex()]);
+        m_data.add(p);
     }
 
     private static void incrementFrequency(final NominalValueRepresentation maxRep) {
@@ -125,7 +113,7 @@ final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetCo
         TreeTargetNominalColumnMetaData metaData =
             new TreeTargetNominalColumnMetaData(getColumnSpec().getName(), m_nomValReps);
         return new TreeTargetProbabilisticNominalColumnData(metaData, getRowKeys(),
-            m_data.stream().sequential().toArray(double[][]::new));
+            m_data.toArray(new ProbabilityDistributionValue[0]));
     }
 
 }

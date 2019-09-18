@@ -51,13 +51,14 @@ import java.util.Comparator;
 
 import org.knime.base.node.mine.treeensemble2.model.AbstractTreeEnsembleModel.TreeType;
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
-import org.knime.base.node.mine.treeensemble2.sample.row.RowSamplerFactory.RowSamplingMode;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.DataValue;
+import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowKey;
@@ -188,13 +189,7 @@ public class TreeDataCreator {
         final int nrHilitePatterns = m_configuration.getNrHilitePatterns();
 
         // sort learnData according to the target column to enable equal size sampling
-        final DataTable sortedTable;
-        if (m_configuration.getRowSamplingMode() == RowSamplingMode.EqualSize) {
-            sortedTable = sortAccordingToTarget(learnData, exec.createSubProgress(0.5));
-        } else {
-            sortedTable = learnData;
-        }
-
+        final DataTable sortedTable = sortAccordingToTarget(learnData, exec.createSubProgress(0.5));
         final ExecutionMonitor readExec = exec.createSubProgress(0.5);
         for (DataRow r : sortedTable) {
             double progress = index / (double)nrRows;
@@ -260,26 +255,56 @@ public class TreeDataCreator {
     }
 
     /**
-     * Necessary for the support of equal size sampling. Not supported for probabilistic labels.
+     * Necessary for the support of equal size and stratified sampling. Not supported for probabilistic labels.
      *
-     * @param learnData
-     * @param exec
-     * @return
+     * TODO: This dependency between sampling and data creation is easily overlooked and could hence cause bugs
+     * when adding new features in the future. Therefore we should consider removing it. Unfortunately, this
+     * removal will break backwards compatibility, which is why we should only do it in case we have to deprecate
+     * the learner nodes anyway. (NOTE: This requires a rewrite of the sampling).
+     *
+     * @param learnData learning table
+     * @param exec progress monitor for sorting
+     * @return the sorted table
      * @throws CanceledExecutionException
      */
     private DataTable sortAccordingToTarget(final BufferedDataTable learnData, final ExecutionMonitor sortExec)
         throws CanceledExecutionException {
         final DataTableSpec tableSpec = learnData.getDataTableSpec();
         final int targetColIdx = tableSpec.findColumnIndex(m_configuration.getTargetColumn());
-        final DataType targetType = tableSpec.getColumnSpec(targetColIdx).getType();
-        CheckUtils.checkState(m_configuration.getRowSamplingMode() != RowSamplingMode.EqualSize,
-            "Method should only be called for equal size sampling.");
-        CheckUtils.checkState(!targetType.isCompatible(ProbabilityDistributionValue.class),
-            "Equal size sampling is not supported for probability distribution targets.");
-        final Comparator<DataCell> targetComp = targetType.getComparator();
+        final Comparator<DataCell> targetComp = getTargetComparator(tableSpec.getColumnSpec(targetColIdx));
         final DataTableSorter sorter = new DataTableSorter(learnData, learnData.size(),
             (arg0, arg1) -> targetComp.compare(arg0.getCell(targetColIdx), arg1.getCell(targetColIdx)));
         return sorter.sort(sortExec);
+    }
+
+    private static Comparator<DataCell> getTargetComparator(final DataColumnSpec targetColumnSpec) {
+        final DataType type = targetColumnSpec.getType();
+        if (type.isCompatible(ProbabilityDistributionValue.class)) {
+            return ProbabilityDistributionComparator.INSTANCE;
+        } else {
+            return type.getComparator();
+        }
+    }
+
+    private static class ProbabilityDistributionComparator extends DataValueComparator {
+
+        static final ProbabilityDistributionComparator INSTANCE = new ProbabilityDistributionComparator();
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected int compareDataValues(final DataValue v1, final DataValue v2) {
+            return compareProbabilityDistributions((ProbabilityDistributionValue)v1,(ProbabilityDistributionValue) v2);
+        }
+
+    }
+
+    private static int compareProbabilityDistributions(final ProbabilityDistributionValue left,
+        final ProbabilityDistributionValue right) {
+        final int argMaxLeft = left.getMaxProbIndex();
+        final int argMaxRight = right.getMaxProbIndex();
+        return Integer.compare(argMaxLeft, argMaxRight);
     }
 
     /**
