@@ -224,9 +224,10 @@ public final class TreeEnsembleClassificationLearnerNodeModel extends NodeModel
             }
             throw e;
         }
+        learnExec.setProgress(1.0);
+        exec.setMessage("Writing ensemble to disk");
         TreeEnsembleModelPortObject modelPortObject =TreeEnsembleModelPortObject.createPortObject(ensembleSpec, model,
             exec.createFileStore(UUID.randomUUID().toString() + ""));
-        learnExec.setProgress(1.0);
         exec.setMessage("Out of bag prediction");
         ColumnRearranger outOfBagRearranger = TreeEnsemblePredictionUtil.createPRCForClassificationRF(
             spec, ensembleSpec, model, learner.getRowSamples(), data.getTargetColumn(), createOOBConfig(), m_pre36)
