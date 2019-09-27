@@ -72,6 +72,8 @@ import org.knime.core.node.NodeLogger;
  */
 public class TreeEnsembleModel extends AbstractTreeEnsembleModel {
 
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TreeEnsembleModel.class);
+
     /**
      * Tracks the version of the tree ensemble.
      * The version is only updated when some changes are made to the tree ensembles.
@@ -262,6 +264,9 @@ public class TreeEnsembleModel extends AbstractTreeEnsembleModel {
         dataOutput.writeInt(m_models.length);
         dataOutput.writeBoolean(m_containsClassDistribution);
         for (int i = 0; i < m_models.length; i++) {
+            if (i % 10 == 0) {
+                LOGGER.infoWithFormat("Writing tree %s of %s.", i + 1, m_models.length);
+            }
             AbstractTreeModel singleModel = m_models[i];
             try {
                 singleModel.save(dataOutput);
