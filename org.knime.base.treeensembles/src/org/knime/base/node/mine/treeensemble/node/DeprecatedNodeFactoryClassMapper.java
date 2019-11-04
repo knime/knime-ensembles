@@ -48,28 +48,31 @@
  */
 package org.knime.base.node.mine.treeensemble.node;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.knime.base.node.mine.treeensemble.node.learner.classification.TreeEnsembleClassificationLearnerNodeFactory;
 import org.knime.base.node.mine.treeensemble.node.predictor.classification.TreeEnsembleClassificationPredictorNodeFactory;
+import org.knime.core.node.MapNodeFactoryClassMapper;
 import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeFactoryClassMapper;
 import org.knime.core.node.NodeModel;
 
 /**
  * Fixes fully qualified name from 2.5.x into current version - factory was renamed.
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
-public final class DeprecatedNodeFactoryClassMapper extends NodeFactoryClassMapper {
+public final class DeprecatedNodeFactoryClassMapper extends MapNodeFactoryClassMapper {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public NodeFactory<? extends NodeModel> mapFactoryClassName(final String factoryClassName) {
-        switch (factoryClassName) {
-            case "org.knime.base.node.mine.treeensemble.node.learner.TreeEnsembleLearnerNodeFactory":
-                return new TreeEnsembleClassificationLearnerNodeFactory();
-            case "org.knime.base.node.mine.treeensemble.node.predictor.TreeEnsemblePredictorNodeFactory":
-                return new TreeEnsembleClassificationPredictorNodeFactory();
-            default:
-                return null;
-        }
+    protected Map<String, Class<? extends NodeFactory<? extends NodeModel>>> getMapInternal() {
+        final Map<String, Class<? extends NodeFactory<? extends NodeModel>>> map = new HashMap<>(2);
+        map.put("org.knime.base.node.mine.treeensemble.node.learner.TreeEnsembleLearnerNodeFactory",
+            TreeEnsembleClassificationLearnerNodeFactory.class);
+        map.put("org.knime.base.node.mine.treeensemble.node.predictor.TreeEnsemblePredictorNodeFactory",
+            TreeEnsembleClassificationPredictorNodeFactory.class);
+        return map;
     }
-
 }
