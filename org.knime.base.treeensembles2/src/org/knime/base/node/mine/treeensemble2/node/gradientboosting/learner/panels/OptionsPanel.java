@@ -76,7 +76,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bitvector.DenseBitVectorCell;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
@@ -137,7 +137,7 @@ public class OptionsPanel extends JPanel {
             m_targetColumnBox = new ColumnSelectionComboxBox((Border)null, DoubleValue.class);
         } else {
             m_targetColumnBox = new ColumnSelectionComboxBox(
-                (Border)null, NominalValue.class, ProbabilityDistributionValue.class);
+                (Border)null, NominalValue.class, NominalDistributionValue.class);
         }
         m_targetColumnBox.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {

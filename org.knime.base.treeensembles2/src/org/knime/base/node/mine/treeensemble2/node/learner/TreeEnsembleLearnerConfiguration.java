@@ -78,7 +78,7 @@ import org.knime.core.data.DataValue;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.container.ColumnRearranger;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.data.vector.doublevector.DoubleVectorValue;
@@ -103,7 +103,7 @@ public class TreeEnsembleLearnerConfiguration {
             Collections.singleton(DoubleValue.class);
 
     private static final HashSet<Class<? extends DataValue>> VALID_CLASSIFICATION_TYPES =
-            Sets.newHashSet(NominalValue.class, ProbabilityDistributionValue.class);
+            Sets.newHashSet(NominalValue.class, NominalDistributionValue.class);
 
     /**  */
     private static final String KEY_NR_HILITE_PATTERNS = "nrHilitePatterns";
@@ -948,7 +948,7 @@ public class TreeEnsembleLearnerConfiguration {
                 || colType.isCompatible(DoubleVectorValue.class)) {
                 defFingerprintColumn = colName;
             } else if (colType.isCompatible(NominalValue.class) || colType.isCompatible(DoubleValue.class) ||
-                    colType.isCompatible(ProbabilityDistributionValue.class)) {
+                    colType.isCompatible(NominalDistributionValue.class)) {
                 if (isValidTarget(colSpec)) {
                     if (defTargetColumn == null) { // first categorical column
                         defTargetColumn = colName;

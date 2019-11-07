@@ -48,7 +48,6 @@
 package org.knime.base.node.mine.treeensemble2.model;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -63,7 +62,8 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.node.InvalidSettingsException;
@@ -154,7 +154,7 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
     public Map<String, DataCell> getTargetColumnPossibleValueMap() throws InvalidSettingsException {
         DataColumnSpec targetCol = getTargetColumn();
         final DataType type = targetCol.getType();
-        if (type.isCompatible(ProbabilityDistributionValue.class)) {
+        if (type.isCompatible(NominalDistributionValue.class)) {
             return createClassValueMapFromProbabilityDistribution(targetCol);
         } else {
             return createTargetValueMapFromOrdinaryColumn(targetCol);
@@ -178,16 +178,9 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
         return result;
     }
 
-    private static Map<String, DataCell> createClassValueMapFromProbabilityDistribution(final DataColumnSpec targetCol)
-        throws InvalidSettingsException {
-        final List<String> elementNames = targetCol.getElementNames();
-        CheckUtils.checkSetting(elementNames != null && !elementNames.isEmpty(),
-                "A probability distribution column must always specify its element names.");
-        @SuppressWarnings("null") // it's explicitly checked that element names is not null
-        final Map<String, DataCell> map = elementNames.stream().collect(Collectors.toMap(Function.identity(), StringCell::new));
-        CheckUtils.checkSetting(map.size() == elementNames.size(),
-                "The probability distribution target column contains duplicate class names.");
-        return map;
+    private static Map<String, DataCell> createClassValueMapFromProbabilityDistribution(final DataColumnSpec targetCol) {
+        final NominalDistributionValueMetaData metaData = NominalDistributionValueMetaData.extractFromSpec(targetCol);
+        return metaData.getValues().stream().collect(Collectors.toMap(Function.identity(), StringCell::new));
     }
 
     /**
@@ -212,7 +205,7 @@ public class TreeEnsembleModelPortObjectSpec extends AbstractSimplePortObjectSpe
                 "Can't apply classification model for regression tasks");
         } else {
             CheckUtils.checkSetting(type.isCompatible(NominalValue.class) ||
-                type.isCompatible(ProbabilityDistributionValue.class),
+                type.isCompatible(NominalDistributionValue.class),
                 "Can't apply regression model for classification tasks");
         }
     }

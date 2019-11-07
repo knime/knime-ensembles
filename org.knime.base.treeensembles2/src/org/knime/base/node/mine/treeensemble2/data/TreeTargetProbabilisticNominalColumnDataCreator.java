@@ -50,40 +50,39 @@ package org.knime.base.node.mine.treeensemble2.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Map;
 
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
 import org.knime.core.node.util.CheckUtils;
 
 /**
- * Creates TreeTargetProbabilisticNominalColumnData from {@link ProbabilityDistributionValue
- * ProbabilityDistributionValues}.
+ * Creates TreeTargetProbabilisticNominalColumnData from {@link NominalDistributionValue NominalDistributionValues}.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetColumnDataCreator {
 
-    private final List<ProbabilityDistributionValue> m_data = new ArrayList<>();
+    private final List<NominalDistributionValue> m_data = new ArrayList<>();
 
-    private final NominalValueRepresentation[] m_nomValReps;
+    private final Map<String, NominalValueRepresentation> m_nomValReps;
 
     /**
      * @param colSpec
      */
-    @SuppressWarnings("null") // it is explicitly checked that elementNames is not null
     TreeTargetProbabilisticNominalColumnDataCreator(final DataColumnSpec colSpec) {
         super(colSpec);
-        CheckUtils.checkArgument(colSpec.getType().isCompatible(ProbabilityDistributionValue.class),
+        CheckUtils.checkArgument(colSpec.getType().isCompatible(NominalDistributionValue.class),
             "Type is not probabilistic: %s", colSpec.getName());
-        final List<String> elementNames = colSpec.getElementNames();
-        CheckUtils.checkArgument(elementNames != null && !elementNames.isEmpty(),
-            "A probability distribution column must always specify its element names.");
-        m_nomValReps = IntStream.range(0, elementNames.size())
-            .mapToObj(i -> new NominalValueRepresentation(elementNames.get(i), i, 0.0))
-            .toArray(NominalValueRepresentation[]::new);
+        final NominalDistributionValueMetaData metaData = NominalDistributionValueMetaData.extractFromSpec(colSpec);
+        m_nomValReps = new LinkedHashMap<>();
+        for (String value : metaData.getValues()) {
+            m_nomValReps.put(value, new NominalValueRepresentation(value, m_nomValReps.size(), 0));
+        }
     }
 
     /**
@@ -91,11 +90,8 @@ final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetCo
      */
     @Override
     void add(final DataCell c) {
-        final ProbabilityDistributionValue p = (ProbabilityDistributionValue)c;
-        CheckUtils.checkArgument(p.size() == m_nomValReps.length,
-            "Encountered probability distribution value has not the expected number of probabilities. %s vs %s",
-            p.size(), m_nomValReps.length);
-        incrementFrequency(m_nomValReps[p.getMaxProbIndex()]);
+        final NominalDistributionValue p = (NominalDistributionValue)c;
+        incrementFrequency(m_nomValReps.get(p.getMostLikelyValue()));
         m_data.add(p);
     }
 
@@ -110,10 +106,12 @@ final class TreeTargetProbabilisticNominalColumnDataCreator extends TreeTargetCo
     @Override
     TreeTargetProbabilisticNominalColumnData createColumnData() {
         assert !Arrays.asList(m_nomValReps).contains(null);
-        TreeTargetNominalColumnMetaData metaData =
-            new TreeTargetNominalColumnMetaData(getColumnSpec().getName(), m_nomValReps);
+        TreeTargetNominalColumnMetaData metaData = new TreeTargetNominalColumnMetaData(getColumnSpec().getName(),
+            m_nomValReps.values().toArray(new NominalValueRepresentation[0]));
+        final int[] mostLikelyClasses =
+            m_data.stream().mapToInt(p -> m_nomValReps.get(p.getMostLikelyValue()).getAssignedInteger()).toArray();
         return new TreeTargetProbabilisticNominalColumnData(metaData, getRowKeys(),
-            m_data.toArray(new ProbabilityDistributionValue[0]));
+            m_data.toArray(new NominalDistributionValue[0]), mostLikelyClasses);
     }
 
 }

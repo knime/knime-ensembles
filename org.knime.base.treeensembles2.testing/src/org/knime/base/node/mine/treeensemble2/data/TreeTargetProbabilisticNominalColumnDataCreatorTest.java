@@ -57,8 +57,10 @@ import org.junit.Test;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.def.DoubleCell;
-import org.knime.core.data.probability.ProbabilityDistributionCell;
-import org.knime.core.data.probability.ProbabilityDistributionCellFactory;
+import org.knime.core.data.filestore.FileStoreFactory;
+import org.knime.core.data.probability.nominal.NominalDistributionCell;
+import org.knime.core.data.probability.nominal.NominalDistributionCellFactory;
+import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
 
 /**
  *
@@ -68,48 +70,40 @@ public class TreeTargetProbabilisticNominalColumnDataCreatorTest {
 
     private TreeTargetProbabilisticNominalColumnDataCreator m_creator;
 
-    private static ProbabilityDistributionCell prob(final double... ds) {
-        return ProbabilityDistributionCellFactory.createCell(ds);
+    private static final String[] VALUES = {"A", "B", "C"};
+
+    private static final NominalDistributionCellFactory FACTORY =
+        new NominalDistributionCellFactory(FileStoreFactory.createNotInWorkflowFileStoreFactory(), VALUES);
+
+    private static NominalDistributionCell prob(final double... ds) {
+        assert ds.length == VALUES.length;
+        return FACTORY.createCell(ds, 1e-5);
     }
 
     @Before
     public void init() {
         final DataColumnSpecCreator specCreator =
-            new DataColumnSpecCreator("test", ProbabilityDistributionCellFactory.TYPE);
-        specCreator.setElementNames(new String[]{"A", "B", "C"});
+            new DataColumnSpecCreator("test", NominalDistributionCellFactory.TYPE);
+        specCreator.addMetaData(new NominalDistributionValueMetaData(VALUES), true);
         final DataColumnSpec spec = specCreator.createSpec();
         m_creator = new TreeTargetProbabilisticNominalColumnDataCreator(spec);
     }
 
     @Test
     public void testCreate() throws Exception {
-        ProbabilityDistributionCell[] cells =
-            new ProbabilityDistributionCell[]{prob(0.3, 0.2, 0.5), prob(0.7, 0.1, 0.2), prob(0.2, 0.8, 0)};
+        NominalDistributionCell[] cells = {prob(0.3, 0.2, 0.5), prob(0.7, 0.1, 0.2), prob(0.2, 0.8, 0)};
         Arrays.stream(cells).forEach(m_creator::add);
         final TreeTargetProbabilisticNominalColumnData target = m_creator.createColumnData();
         for (int i = 0; i < cells.length; i++) {
             for (int c = 0; c < 3; c++) {
-                assertEquals(cells[i].getProbability(c), target.getProbability(i, c), 1e-6);
+                assertEquals(cells[i].getProbability(VALUES[c]), target.getProbability(i, c), 1e-6);
             }
         }
     }
 
-    @Test (expected = IllegalArgumentException.class)
-    public void testIncorrectNumberOfClasses() throws Exception {
-        m_creator.add(prob(0.2, 0.8));
-    }
-
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIncompatibleTypeInConstructor() throws Exception {
-        final DataColumnSpecCreator specCreator =
-                new DataColumnSpecCreator("test", DoubleCell.TYPE);
-        new TreeTargetProbabilisticNominalColumnDataCreator(specCreator.createSpec());
-    }
-
-    @Test (expected = IllegalArgumentException.class)
-    public void testNoElementNamesInConstructor() throws Exception {
-        final DataColumnSpecCreator specCreator =
-                new DataColumnSpecCreator("test", ProbabilityDistributionCellFactory.TYPE);
+        final DataColumnSpecCreator specCreator = new DataColumnSpecCreator("test", DoubleCell.TYPE);
         new TreeTargetProbabilisticNominalColumnDataCreator(specCreator.createSpec());
     }
 

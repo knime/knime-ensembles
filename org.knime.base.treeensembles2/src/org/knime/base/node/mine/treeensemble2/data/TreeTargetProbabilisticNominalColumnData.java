@@ -49,7 +49,7 @@
 package org.knime.base.node.mine.treeensemble2.data;
 
 import org.knime.core.data.RowKey;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
 
 /**
  * Stores probabilistic targets for classification.
@@ -58,16 +58,20 @@ import org.knime.core.data.probability.ProbabilityDistributionValue;
  */
 final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetNominalColumnData {
 
-    private final ProbabilityDistributionValue[] m_probabilities;
+    private final NominalDistributionValue[] m_probabilities;
+
+    private final int[] m_mostLikelyClasses;
 
     /**
      * @param metaData
      * @param rowKeysAsArray
      */
-    TreeTargetProbabilisticNominalColumnData(final TreeTargetColumnMetaData metaData, final RowKey[] rowKeysAsArray,
-        final ProbabilityDistributionValue[] probabilities) {
+    TreeTargetProbabilisticNominalColumnData(final TreeTargetNominalColumnMetaData metaData,
+        final RowKey[] rowKeysAsArray, final NominalDistributionValue[] probabilities, final int[] mostLikelyClasses) {
         super(metaData, rowKeysAsArray);
+        assert probabilities.length == mostLikelyClasses.length;
         m_probabilities = probabilities;
+        m_mostLikelyClasses = mostLikelyClasses;
     }
 
     /**
@@ -75,7 +79,7 @@ final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetN
      */
     @Override
     public int getValueFor(final int row) {
-        return m_probabilities[row].getMaxProbIndex();
+        return m_mostLikelyClasses[row];
     }
 
     /**
@@ -83,7 +87,7 @@ final class TreeTargetProbabilisticNominalColumnData extends AbstractTreeTargetN
      */
     @Override
     public double getProbability(final int row, final int classIdx) {
-        return m_probabilities[row].getProbability(classIdx);
+        return m_probabilities[row].getProbability(getMetaData().getValues()[classIdx].getNominalValue());
     }
 
 }

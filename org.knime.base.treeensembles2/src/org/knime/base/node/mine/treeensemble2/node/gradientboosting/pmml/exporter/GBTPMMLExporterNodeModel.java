@@ -50,7 +50,6 @@ package org.knime.base.node.mine.treeensemble2.node.gradientboosting.pmml.export
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.knime.base.node.mine.treeensemble2.model.AbstractGradientBoostingModel;
 import org.knime.base.node.mine.treeensemble2.model.GradientBoostedTreesModel;
@@ -67,7 +66,8 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.def.StringCell;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.data.vector.doublevector.DoubleVectorValue;
@@ -84,7 +84,6 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.pmml.PMMLPortObject;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
-import org.knime.core.node.util.CheckUtils;
 
 /**
  *
@@ -152,7 +151,7 @@ class GBTPMMLExporterNodeModel extends NodeModel {
 
     private static DataColumnSpec possiblyConvertProbabilityDistribution(final DataColumnSpec targetSpec) {
         final DataType type = targetSpec.getType();
-        if (type.isCompatible(ProbabilityDistributionValue.class)) {
+        if (type.isCompatible(NominalDistributionValue.class)) {
             return createEquivalentNominalSpec(targetSpec);
         } else {
             // the spec can still be incompatible but an according error is thrown by the PMML framework then
@@ -161,14 +160,11 @@ class GBTPMMLExporterNodeModel extends NodeModel {
     }
 
     private static DataColumnSpec createEquivalentNominalSpec(final DataColumnSpec targetSpec) {
-        assert targetSpec.getType().isCompatible(ProbabilityDistributionValue.class);
+        assert targetSpec.getType().isCompatible(NominalDistributionValue.class);
         final DataColumnSpecCreator creator = new DataColumnSpecCreator(targetSpec.getName(), StringCell.TYPE);
-        final List<String> elementNames = targetSpec.getElementNames();
-        CheckUtils.checkArgument(elementNames != null && !elementNames.isEmpty(),
-            "The element names of a probability distribution column must always be present and non-empty.");
-        @SuppressWarnings("null") // explicitly checked above
+        final NominalDistributionValueMetaData metaData = NominalDistributionValueMetaData.extractFromSpec(targetSpec);
         final DataColumnDomainCreator domainCreator =
-            new DataColumnDomainCreator(elementNames.stream().map(StringCell::new).toArray(DataCell[]::new));
+            new DataColumnDomainCreator(metaData.getValues().stream().map(StringCell::new).toArray(DataCell[]::new));
         creator.setDomain(domainCreator.createDomain());
         return creator.createSpec();
     }

@@ -48,6 +48,8 @@
 package org.knime.base.node.mine.treeensemble2.data;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.knime.base.node.mine.treeensemble2.model.AbstractTreeEnsembleModel.TreeType;
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
@@ -63,7 +65,8 @@ import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowKey;
 import org.knime.core.data.container.DataContainer;
-import org.knime.core.data.probability.ProbabilityDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValue;
+import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
 import org.knime.core.data.sort.DataTableSorter;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
@@ -156,7 +159,7 @@ public class TreeDataCreator {
         final DataColumnSpec targetCSpec) {
         if (isRegression) {
             return new TreeTargetNumericColumnDataCreator(targetCSpec);
-        } else if (targetCSpec.getType().isCompatible(ProbabilityDistributionValue.class)) {
+        } else if (targetCSpec.getType().isCompatible(NominalDistributionValue.class)) {
             return new TreeTargetProbabilisticNominalColumnDataCreator(targetCSpec);
         } else {
             return new TreeTargetNominalColumnDataCreator(targetCSpec);
@@ -279,33 +282,42 @@ public class TreeDataCreator {
 
     private static Comparator<DataCell> getTargetComparator(final DataColumnSpec targetColumnSpec) {
         final DataType type = targetColumnSpec.getType();
-        if (type.isCompatible(ProbabilityDistributionValue.class)) {
-            return ProbabilityDistributionComparator.INSTANCE;
+        if (type.isCompatible(NominalDistributionValue.class)) {
+            return new NominalDistributionComparator(targetColumnSpec);
         } else {
             return type.getComparator();
         }
     }
 
-    private static class ProbabilityDistributionComparator extends DataValueComparator {
+    private static class NominalDistributionComparator extends DataValueComparator {
 
-        static final ProbabilityDistributionComparator INSTANCE = new ProbabilityDistributionComparator();
+        private final Map<String, Integer> m_classIdxMap = new HashMap<>();
+
+        NominalDistributionComparator(final DataColumnSpec spec) {
+            final NominalDistributionValueMetaData metaData = NominalDistributionValueMetaData.extractFromSpec(spec);
+            for (String value : metaData.getValues()) {
+                m_classIdxMap.put(value, m_classIdxMap.size());
+            }
+        }
 
         /**
          * {@inheritDoc}
          */
         @Override
         protected int compareDataValues(final DataValue v1, final DataValue v2) {
-            return compareProbabilityDistributions((ProbabilityDistributionValue)v1,(ProbabilityDistributionValue) v2);
+            return compareNominalDistributions((NominalDistributionValue)v1,(NominalDistributionValue) v2);
+        }
+
+        private int compareNominalDistributions(final NominalDistributionValue left,
+            final NominalDistributionValue right) {
+            final int argMaxLeft = m_classIdxMap.get(left.getMostLikelyValue());
+            final int argMaxRight = m_classIdxMap.get(right.getMostLikelyValue());
+            return Integer.compare(argMaxLeft, argMaxRight);
         }
 
     }
 
-    private static int compareProbabilityDistributions(final ProbabilityDistributionValue left,
-        final ProbabilityDistributionValue right) {
-        final int argMaxLeft = left.getMaxProbIndex();
-        final int argMaxRight = right.getMaxProbIndex();
-        return Integer.compare(argMaxLeft, argMaxRight);
-    }
+
 
     /**
      * @return the warning message
