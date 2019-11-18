@@ -80,13 +80,13 @@ public final class PMMLPredictorNodeFactory3 extends NodeFactory<PMMLPredictorNo
     /** {@inheritDoc} */
     @Override
     protected boolean hasDialog() {
-        return false;
+        return true;
     }
 
     /** {@inheritDoc} */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return null;
+        return new PMMLPredictorNodeDialog();
     }
 
 }

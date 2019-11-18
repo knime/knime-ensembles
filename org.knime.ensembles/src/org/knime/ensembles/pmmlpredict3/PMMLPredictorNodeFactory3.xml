@@ -13,7 +13,19 @@
 			GradientBoostingModel (Gradient Boosted Trees),
 			SupportVectorMachineModel and 
 			NeuralNetwork </intro>
-       
+       <option name="Change prediction column name">
+			When set, you can change the name of the prediction column.
+		</option>
+		<option name="Prediction Column">
+			The possibly overridden column name for the predicted column. (The default depends on the model)
+		</option>
+		<option name="Append probability value column per class instance">
+			When classification is done and this option is set, the class probabilities are appended.
+		</option>
+		<option name="Suffix for probability columns">
+			Suffix for the normalized distribution columns. Their names are like:
+			<tt>P (</tt>trainingColumn<tt>=</tt>value<tt>)</tt>.
+		</option>
 	</fullDescription>
 	<ports>
 		<inPort name="PMML Model" index="0">PMML Model</inPort>		
