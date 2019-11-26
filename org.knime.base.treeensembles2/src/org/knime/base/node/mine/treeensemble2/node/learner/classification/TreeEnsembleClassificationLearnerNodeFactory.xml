@@ -10,7 +10,7 @@
   <fullDescription>
     <intro>
       <p>
-        Learns an ensemble of decision trees (such as random forest variants). Each of the decision tree models is
+        Learns an ensemble of decision trees (such as random forest* variants). Each of the decision tree models is
         learned on a different set of rows (records) and/or a different set of columns (describing attributes), whereby 
         the latter can also be a bit/byte/double-vector descriptor (e.g. molecular fingerprint). The output model describes an
         ensemble of decision tree models and is applied in the corresponding predictor node using the selected aggregation mode
@@ -18,13 +18,13 @@
       </p>
       <p>
         The following configuration settings learn a model that is similar to the
-        <a href="http://en.wikipedia.org/wiki/Random_forest">Random Forest</a>&#x2122; classifier described by 
+        <a href="http://en.wikipedia.org/wiki/Random_forest">random forest</a>&#x2122; classifier described by 
         Leo Breiman and Adele Cutler:
         <ul>
           <li>Tree Options - Split Criterion: Gini Index</li>
           <li>Tree Options - Limit number of levels (tree depth): unlimited</li>
           <li>Tree Options - Minimum node size: unlimited</li>
-          <li>Ensemble Configuration - Number of models: Arbitrary (Random Forest arguably does not overfit)</li>
+          <li>Ensemble Configuration - Number of models: Arbitrary (random forest arguably does not overfit)</li>
           <li>Ensemble Configuration - Data Sampling: Use all rows (fraction = 1) but choose sampling 
             with replacement (bootstrapping)
           </li>
@@ -33,7 +33,7 @@
           </li>
         </ul>
         Experiments have shown the results on different data sets are very similar to the 
-        <a href="http://cran.r-project.org/web/packages/randomForest/">Random Forest implementation available in R</a>.
+        <a href="http://cran.r-project.org/web/packages/randomForest/">random forest implementation available in R</a>.
       </p>
       <p>
         The decision tree construction takes place in main memory (all data and all models are kept in memory).
@@ -52,7 +52,10 @@
       		<li>For multi-class classification problems the method described in "Partitioning Nominal Attributes in Decision Trees" by Coppersmith et al. (1999) is used.</li>
       	</ul>
       </p>
+      <br/>
+      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
+    
     <tab name="Attribute Selection">
       <option name="Target Column">
         Select the column containing the value to be learned. Rows with missing values in this column will be ignored

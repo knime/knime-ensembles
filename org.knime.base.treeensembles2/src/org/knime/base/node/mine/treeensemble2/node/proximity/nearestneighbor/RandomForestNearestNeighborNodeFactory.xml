@@ -16,7 +16,7 @@
 				each
 				row in the first table based on the proximity measure induced by
 				an
-				ensemble of trees.
+				random forest*.
 			</p>
 			<p>
 				The proximity of two data points is the number of times that
@@ -24,7 +24,10 @@
 				points end up in the same leaf node of a tree in a forest of trees
 				divided by the number of trees in the forest.
 			</p>
+			<br/>
+			(*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 		</intro>
+		
 		<option name="Number of nearest neighbors">
 			Number of nearest neighbors
 		</option>

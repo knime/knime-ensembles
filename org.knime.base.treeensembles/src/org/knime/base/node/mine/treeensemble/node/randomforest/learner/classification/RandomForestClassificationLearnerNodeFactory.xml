@@ -10,7 +10,7 @@
   <fullDescription>
     <intro>
       <p>
-        Learns a random forest, which consists of a chosen number of decision trees. Each of the decision tree models is
+        Learns a random forest*, which consists of a chosen number of decision trees. Each of the decision tree models is
         learned on a different set of rows (records) and a different set of columns (describing attributes), whereby 
         the latter can also be a bit-vector or byte-vector descriptor (e.g. molecular fingerprint).
         The row sets for each decision tree are created by bootstrapping and have the same size as the original input table.
@@ -26,15 +26,18 @@
       </p>
       <p>
         Experiments have shown the results on different data sets are very similar to the 
-        <a href="http://cran.r-project.org/web/packages/randomForest/">Random Forest implementation available in R</a>.
+        <a href="http://cran.r-project.org/web/packages/randomForest/">random Forest implementation available in R</a>.
         Known differences are in the missing value handling (currently not available in this node) and the split 
-        creation for nominal attributes (the original Random Forest classifier uses binary nominal splits; this 
+        creation for nominal attributes (the original random forest classifier uses binary nominal splits; this 
         implementation creates child nodes for each possible split attribute).
       </p>
       <p>
         The decision tree construction takes place in main memory (all data and all models are kept in memory).
       </p>
+      <br/>
+      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
+    
     <tab name="Attribute Selection">
       <option name="Target Column">
         Select the column containing the value to be learned. Rows with missing values in this column will be ignored

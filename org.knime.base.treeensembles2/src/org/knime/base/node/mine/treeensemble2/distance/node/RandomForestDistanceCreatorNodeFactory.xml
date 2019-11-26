@@ -5,25 +5,25 @@
 
 	<shortDescription>
 		Creates a distance measure based on the proximity
-		induced by the given Random
-		Forest model.
+		induced by the given random forest model.
 	</shortDescription>
 
 	<fullDescription>
 		<intro>
 			Creates a distance measure based on the proximity induced by
-			the given
-			Random Forest model.
+			the given random forest* model.
 			<br />
 			The proximity of two rows is the number of trees in which the two rows end up
 			in the same leaf divided by the total number of trees.
+			<br/><br/>
+			(*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 		</intro>
 	</fullDescription>
 
 	<ports>
 		<inPort index="0" name="Tree EnsembleModel">The output of the learner.</inPort>
 		<outPort index="0" name="Random Forest Distance Measure">The distance measure induced by the
-			random forest that is provided in the inport.
+			random forest model that is provided in the inport.
 		</outPort>
 	</ports>
 </knimeNode>

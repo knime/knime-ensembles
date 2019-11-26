@@ -9,7 +9,9 @@
 
     <fullDescription>
         <intro>
-            Predicts patterns according to an aggregation of the predictions of the individual trees in a random forest model.
+            Predicts patterns according to an aggregation of the predictions of the individual trees in a random forest* model.
+            <br/><br/>
+            (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
         </intro>
         <option name="Change prediction column name">
            Select if you want to change the name of the column containing the prediction.

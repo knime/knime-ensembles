@@ -44,12 +44,15 @@
 			<p>
 				This node allows to perform row sampling (bagging) and attribute
 				sampling (attribute bagging)
-				similar to the random forest and tree ensemble nodes.
+				similar to the random forest* and tree ensemble nodes.
 				If sampling is used this is usually referred to as <i>Stochastic Gradient
 				Boosted Trees</i>.
 				The respective settings can be found in the <i>Advanced Options</i> tab.
-			</p>	
+			</p>
+			<br/>
+			(*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 		</intro>
+		
 		<tab name="Options">
 			<option name="Target Column">
 				Select the column containing the value to be
@@ -171,7 +174,7 @@
 				<p>
 					<i>Use different set of attributes for each tree node</i>
 					This strategy draws a new attribute sample per tree node.
-					Random forests typically use this strategy to make the trees more diverse.
+					A random forests typically uses this strategy to make the trees more diverse.
 					(Note that diversity is not important for gradient boosted trees so the effect won't be as large)
 				</p>
 			</option>

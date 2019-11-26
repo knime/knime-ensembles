@@ -10,7 +10,7 @@
   <fullDescription>
     <intro>
       <p>
-        Learns an ensemble of decision trees (such as random forest variants). Each of the decision tree models is
+        Learns an ensemble of decision trees (such as random forest* variants). Each of the decision tree models is
         learned on a different set of rows (records) and/or a different set of columns (describing attributes), whereby 
         the latter can also be a bit/byte/double-vector descriptor (e.g. molecular fingerprint). The output model describes an
         ensemble of decision tree models and is applied in the corresponding predictor node using the selected aggregation mode
@@ -18,7 +18,7 @@
       </p>
       <p>
         The following configuration settings learn a model that is similar to the
-        <a href="http://en.wikipedia.org/wiki/Random_forest">Random Forest</a>&#x2122; classifier described by 
+        <a href="http://en.wikipedia.org/wiki/Random_forest">random forest</a>&#x2122; classifier described by 
         Leo Breiman and Adele Cutler:
         <ul>
           <li>Tree Options - Split Criterion: Gini Index</li>
@@ -52,7 +52,10 @@
       		<li>For multi-class classification problems the method described in "Partitioning Nominal Attributes in Decision Trees" by Coppersmith et al. (1999) is used.</li>
       	</ul>
       </p>
+      <br/>
+      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
+    
     <tab name="Attribute Selection">
       <option name="Target Column">
         Select the column containing the value to be learned. Rows with missing values in this column are ignored

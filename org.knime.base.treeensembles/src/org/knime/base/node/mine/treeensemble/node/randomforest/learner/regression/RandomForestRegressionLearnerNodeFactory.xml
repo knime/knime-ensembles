@@ -10,7 +10,7 @@
   <fullDescription>
     <intro>
       <p>
-        Learns a random forest (an ensemble of decision trees) for regression. Each of the regression tree models is
+        Learns a random forest* (an ensemble of decision trees) for regression. Each of the regression tree models is
         learned on a different set of rows (records) and/or a different set of columns (describing attributes), whereby 
         the latter can also be a bit-vector or byte-vector descriptor (e.g. molecular fingerprint). The output model describes an
         ensemble of regression tree models and is applied in the corresponding predictor node using a simply mean
@@ -18,12 +18,14 @@
       </p>
       <p>
         For a more general description and suggested default parameters see the node description of the classification 
-        <i>Random Forest Learner</i>.
+        <i>Random Forest Learner</i> node.
       </p>
       <p>
       	This node provides a subset of the functionality of the <i>Tree Ensemble Learner (Regression)</i>. If you need additional
       	functionality, please check out the <i>Tree Ensemble Learner (Regression)</i>
       </p>
+      <br/>
+      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
     <tab name="Attribute Selection">
       <option name="Target Column">
