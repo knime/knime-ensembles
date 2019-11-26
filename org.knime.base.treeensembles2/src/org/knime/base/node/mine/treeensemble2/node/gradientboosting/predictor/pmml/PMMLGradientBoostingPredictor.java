@@ -194,8 +194,9 @@ public class PMMLGradientBoostingPredictor<M extends AbstractGradientBoostingMod
                     cfg.isAppendClassConfidences() || cfg.isAppendPredictionConfidence(),
                 TreeEnsemblePredictionUtil.createRowConverter(modelSpec, model, predictSpec),
                 m_version == Version.V401));
+            // AP-13118: Always use the column name "Confidence" for backwards compatibility
             TreeEnsemblePredictionUtil.setupRearrangerCreatorGBT(
-                m_version == Version.PRE360, prc, modelSpec, gbt, cfg);
+                m_version == Version.PRE360, prc, modelSpec, gbt, cfg, "Confidence");
         }
         return prc;
     }

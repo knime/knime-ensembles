@@ -190,7 +190,7 @@ public class PMMLPredictorNodeModel3 extends NodeModel {
             if (isGradientBoostedTreesModel(models.get(0))) {
                     String functionName = models.get(0).getAttributes().getNamedItem("functionName").getNodeValue();
                     boolean isRegression = functionName.equals("regression");
-                    predictor = new PMMLGradientBoostingPredictor(Version.PRE360, isRegression,
+                    predictor = new PMMLGradientBoostingPredictor(Version.V401, isRegression,
                         new PMMLGradientBoostingPredictorOptions(false, false, true,
                             m_overridePrediction.getBooleanValue() ? target : null,
                             m_appendProbs.getBooleanValue(), m_suffix.getStringValue()));

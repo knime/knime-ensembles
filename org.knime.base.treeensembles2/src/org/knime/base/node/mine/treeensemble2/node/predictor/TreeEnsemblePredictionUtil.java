@@ -67,10 +67,29 @@ public final class TreeEnsemblePredictionUtil {
     public static void setupRearrangerCreatorGBT(final boolean pre36, final PredictionRearrangerCreator crc,
         final TreeEnsembleModelPortObjectSpec modelSpec, final MultiClassGradientBoostedTreesModel model,
         final TreeEnsemblePredictorConfiguration config) throws InvalidSettingsException {
+        setupRearrangerCreatorGBT(pre36, crc, modelSpec, model, config,
+            pre36 ? "Confidence" : config.getPredictionColumnName() + CONFIDENCE_SUFFIX);
+    }
+
+    /**
+     * Sets up the PredictionRearrangerCreator for classification gbts.
+     *
+     * @param pre36 indicates if the model was build prior to version 3.6.0
+     * @param crc the creator
+     * @param modelSpec the spec of the model
+     * @param model the gbt
+     * @param config the predictor configuration
+     * @param confidenceColumnName name of the confidence column
+     * @throws InvalidSettingsException if something goes wrong
+     */
+    public static void setupRearrangerCreatorGBT(final boolean pre36, final PredictionRearrangerCreator crc,
+        final TreeEnsembleModelPortObjectSpec modelSpec, final MultiClassGradientBoostedTreesModel model,
+        final TreeEnsemblePredictorConfiguration config, final String confidenceColumnName)
+        throws InvalidSettingsException {
         if (pre36) {
             crc.addClassPrediction(config.getPredictionColumnName());
             if (config.isAppendPredictionConfidence()) {
-                crc.addPredictionConfidence("Confidence");
+                crc.addPredictionConfidence(confidenceColumnName);
             }
             if (config.isAppendClassConfidences()) {
                 crc.addClassProbabilities(modelSpec.getTargetColumnPossibleValueMap(),
@@ -83,7 +102,7 @@ public final class TreeEnsemblePredictionUtil {
             }
             crc.addClassPrediction(config.getPredictionColumnName());
             if (config.isAppendPredictionConfidence()) {
-                crc.addPredictionConfidence(config.getPredictionColumnName() + CONFIDENCE_SUFFIX);
+                crc.addPredictionConfidence(confidenceColumnName);
             }
         }
     }
