@@ -50,6 +50,7 @@ package org.knime.base.node.mine.treeensemble2.model.pmml;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,10 +69,12 @@ import org.knime.base.node.mine.treeensemble2.model.AbstractTreeNodeSurrogateCon
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeColumnCondition;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeCondition;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.port.pmml.PMMLMiningSchemaTranslator;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpec;
 import org.knime.core.node.port.pmml.PMMLPortObjectSpecCreator;
 import org.knime.core.node.port.pmml.preproc.DerivedFieldMapper;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  * Handles the export of {@link AbstractTreeModel} objects to PMML.
@@ -147,6 +150,16 @@ abstract class AbstractTreeModelExporter<T extends AbstractTreeNode> extends Abs
         PMMLPortObjectSpecCreator creator = new PMMLPortObjectSpecCreator(pmmlSpec);
         Set<String> usedFields = new HashSet<>();
         recursivelyCheckUsedFields(m_treeModel.getRootNode(), pmmlSpec.getLearningFields().size(), usedFields);
+        // AP-13025: A mining schema must have at least one field in order for the pmml to be valid
+        if (usedFields.isEmpty()) {
+            final List<String> learningFields = pmmlSpec.getLearningFields();
+            CheckUtils.checkState(!learningFields.isEmpty(),
+                "Invalid PMML: There must be at least one learning field.");
+            final String learningField = pmmlSpec.getLearningFields().get(0);
+            NodeLogger.getLogger(AbstractTreeModelExporter.class)
+                .infoWithFormat("Automatically including the learning field '%s' to ensure valid PMML.", learningField);
+            usedFields.add(learningField);
+        }
         creator.setLearningCols(pmmlSpec.getLearningCols().stream()
             .filter(s -> usedFields.contains(s.getName())).collect(Collectors.toList()));
         if (removeTargetFromMiningSchema()) {
