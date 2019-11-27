@@ -12,7 +12,7 @@
 			Calculates the proximities induced by a random forest* for two tables.
 			The proximity of two data points is the number of times that the points end up in the same leaf node of a tree in the forest.
 			<br/>
-			(*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+			(*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 		</intro>
 	</fullDescription>
 

@@ -11,7 +11,7 @@
 		<intro>
             Applies regression from a random forest* model by using the mean of the individual predictions.
             <br/><br/>
-            (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+            (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 		</intro>
 	    <option name="Response Column Name">
 	       Name of the 1st output column. It contains the mean response of all models. A second column with the suffix

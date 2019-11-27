@@ -25,7 +25,7 @@
       	functionality, please check out the <i>Tree Ensemble Learner (Regression)</i>
       </p>
       <br/>
-      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+      (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
     <tab name="Options">
       <option name="Target Column">

@@ -35,7 +35,7 @@
         The decision tree construction takes place in main memory (all data and all models are kept in memory).
       </p>
       <br/>
-      (*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+      (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
     </intro>
     
     <tab name="Attribute Selection">

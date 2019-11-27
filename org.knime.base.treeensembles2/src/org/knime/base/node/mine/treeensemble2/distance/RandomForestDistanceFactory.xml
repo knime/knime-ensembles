@@ -10,6 +10,6 @@ A distance measure based on random forest proximity.
 		The proximity of two rows is the number of trees in which the rows end
 		up in the same leaf divided by the total number of trees.
 		<br/>
-		(*) RANDOM FOREST is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+		(*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
 	</fullDescription>
 </distance>
