@@ -54,8 +54,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -64,6 +62,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
+ * Dialog panel for predictor nodes.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
@@ -113,30 +112,20 @@ public final class TreeEnsemblePredictorPanel extends JPanel {
         });
         m_changePredictionColNameChecker = new JCheckBox("Change prediction column name");
         m_changePredictionColNameChecker.doClick();
-        m_changePredictionColNameChecker.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(final ChangeEvent e) {
+        m_changePredictionColNameChecker.addChangeListener( e -> {
                 JCheckBox source = (JCheckBox)e.getSource();
                 m_predictionColNameField.setEnabled(source.isSelected());
-            }
-
-        });
+            });
         m_appendClassProbabilitiesColChecker = new JCheckBox("Append individual class probabilities");
         m_suffixForClassProbabilitiesTextField = new JTextField(20);
         m_suffixLabel = new JLabel("Suffix for probability columns");
         m_suffixLabel.setEnabled(false);
         m_suffixForClassProbabilitiesTextField.setEnabled(false);
-        m_appendClassProbabilitiesColChecker.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(final ChangeEvent e) {
+        m_appendClassProbabilitiesColChecker.addChangeListener(e -> {
                 JCheckBox source = (JCheckBox)e.getSource();
                 m_suffixForClassProbabilitiesTextField.setEnabled(source.isSelected());
                 m_suffixLabel.setEnabled(source.isSelected());
-            }
-
-        });
+            });
         m_appendOverallConfidenceColChecker = new JCheckBox("Append overall prediction confidence");
         m_useSoftVotingChecker = new JCheckBox("Use soft voting");
         initLayout();

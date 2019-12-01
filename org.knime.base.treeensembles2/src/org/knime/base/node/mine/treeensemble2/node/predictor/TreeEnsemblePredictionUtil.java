@@ -28,6 +28,9 @@ import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.InvalidSettingsException;
 
 /**
+ * Provides utility methods for predictions with tree ensemble based methods such as random forests and gradient boosted
+ * trees.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public final class TreeEnsemblePredictionUtil {

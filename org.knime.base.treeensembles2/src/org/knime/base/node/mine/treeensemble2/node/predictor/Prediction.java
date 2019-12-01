@@ -49,10 +49,10 @@
 package org.knime.base.node.mine.treeensemble2.node.predictor;
 
 /**
- * Marker interface.
+ * The super interface for predictions of any kind.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public interface Prediction {
-
+    // marker interface
 }

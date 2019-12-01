@@ -78,6 +78,7 @@ import org.knime.core.node.streamable.StreamableFunction;
 import org.knime.core.node.streamable.StreamableOperator;
 
 /**
+ * Node model of the Tree Ensemble Predictor node.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany

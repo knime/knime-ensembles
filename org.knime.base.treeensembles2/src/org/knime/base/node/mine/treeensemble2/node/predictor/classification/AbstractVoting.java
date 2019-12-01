@@ -60,7 +60,7 @@ import org.knime.core.node.util.CheckUtils;
  * Contains the logic that maps the target values to the internally index used
  * for the class distributions.
  *
- * @author Adrian Nembach, University of Konstanz
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 abstract class AbstractVoting implements Voting {
 

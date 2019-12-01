@@ -53,8 +53,9 @@ import java.util.Map;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeClassification;
 
 /**
+ * In hard voting each tree votes only for its majority class.
  *
- * @author Adrian Nembach, KNIME.com
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 final class HardVoting extends AbstractVoting {
 

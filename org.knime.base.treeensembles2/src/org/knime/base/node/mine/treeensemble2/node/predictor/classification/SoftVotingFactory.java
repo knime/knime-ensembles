@@ -53,12 +53,17 @@ import java.util.Map;
 /**
  * Factory for SoftVoting objects.
  *
- * @author Adrian Nembach, KNIME.com
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public final class SoftVotingFactory implements VotingFactory {
 
     private final Map<String, Integer> m_targetValueToIndexMap;
 
+    /**
+     * Constructs a new SoftVotingFactory object.
+     *
+     * @param targetValueToIndexMap maps classes to their indices used by the model
+     */
     public SoftVotingFactory(final Map<String, Integer> targetValueToIndexMap) {
         m_targetValueToIndexMap = targetValueToIndexMap;
     }

@@ -51,21 +51,41 @@ package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeClassification;
 
 /**
- * Used by {@link TreeEnsembleClassificationPredictorCellFactory} to aggregate the votes of trees in an ensemble
+ * Used to aggregate the votes of trees in classification random forests.
  *
- * @author Adrian Nembach, KNIME.com
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface Voting {
+public interface Voting {
 
+    /**
+     * @param leaf the {@link TreeNodeClassification leaf} the current record ended up in in the current tree
+     */
     public void addVote(final TreeNodeClassification leaf);
 
+    /**
+     * @return the majority class according to the observed leafs
+     */
     public String getMajorityClass();
 
+    /**
+     * @return the index of the majority class according to the observed leafs
+     */
     public int getMajorityClassIdx();
 
+    /**
+     * @param classValue the class for which the probability is required
+     * @return the probability of class <b>classValue</b>
+     */
     public float getClassProbabilityForClass(String classValue);
 
+    /**
+     * @param classIdx the index of the class for which the probability is required
+     * @return the probability of the class at index <b>classIdx</b>
+     */
     public float getClassProbabilityForClass(int classIdx);
 
+    /**
+     * @return the number of trees that voted
+     */
     public int getNrVotes();
 }

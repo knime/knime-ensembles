@@ -49,14 +49,15 @@
 package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
 
 /**
- * Implementing classes provide {@link Voting} objects
+ * Implementing classes provide {@link Voting} objects.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
+@FunctionalInterface
 public interface VotingFactory {
 
     /**
-     * @return creates a new voting object.
+     * @return creates a new voting object
      */
     public Voting createVoting();
 }

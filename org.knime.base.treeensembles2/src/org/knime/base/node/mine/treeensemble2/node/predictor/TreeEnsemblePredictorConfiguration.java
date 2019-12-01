@@ -56,21 +56,28 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 
 /**
+ * The configuration for predictions made with a tree ensemble based model e.g. random forests or gradient boosted
+ * trees.
  *
  * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class TreeEnsemblePredictorConfiguration extends AbstractPredictorConfiguration {
+public class TreeEnsemblePredictorConfiguration extends AbstractPredictorConfiguration {
 
     private static final String CFG_APPEND_PREDICTION_CONFIDENCE = "appendPredictionConfidence";
+
     private static final String CFG_APPEND_CLASS_CONFIDENCES = "appendClassConfidences";
+
     private static final String CFG_SUFFIX_FOR_CLASS_PROBABILITIES = "suffixForClassProbabilities";
+
     private static final String CFG_APPEND_MODEL_COUNT = "appendModelCount";
+
     private static final String CFG_USE_SOFT_VOTING = "useSoftVoting";
 
     /**
      * @param targetColName name of the target column
-     * @return the default name for the Prediction column  */
+     * @return the default name for the Prediction column
+     */
     public static final String getPredictColumnName(final String targetColName) {
         return "Prediction (" + targetColName + ")";
     }
@@ -170,8 +177,10 @@ public final class TreeEnsemblePredictorConfiguration extends AbstractPredictorC
         return m_useSoftVoting;
     }
 
-    /** In case the configuration is set to {@link #isUseSoftVoting() soft voting} and the model contains no
-     * class distribution, return a warning message. Otherwise return an empty optional.
+    /**
+     * In case the configuration is set to {@link #isUseSoftVoting() soft voting} and the model contains no class
+     * distribution, return a warning message. Otherwise return an empty optional.
+     *
      * @param model The non-null model to check.
      * @return An optional warning message.
      */
@@ -192,6 +201,7 @@ public final class TreeEnsemblePredictorConfiguration extends AbstractPredictorC
 
     /**
      * Saves the configuration settings
+     *
      * @param settings
      */
     @Override

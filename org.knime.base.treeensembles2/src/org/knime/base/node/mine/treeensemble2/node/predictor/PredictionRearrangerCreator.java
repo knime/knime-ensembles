@@ -19,9 +19,11 @@ import org.knime.core.data.DataTableSpecCreator;
 import org.knime.core.data.container.ColumnRearranger;
 
 /**
+ * Creates the {@link ColumnRearranger} that creates the output table in a predictor node.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public class PredictionRearrangerCreator {
+public final class PredictionRearrangerCreator {
 
     private List<PredictionItemParser<? extends Prediction>> m_itemParsers = new ArrayList<>();
 
@@ -102,7 +104,7 @@ public class PredictionRearrangerCreator {
      *
      * @param itemParser
      */
-    private void addPredictionItemParser(final PredictionItemParser<? extends Prediction> itemParser) {
+    public void addPredictionItemParser(final PredictionItemParser<? extends Prediction> itemParser) {
         m_itemParsers.add(itemParser);
     }
 

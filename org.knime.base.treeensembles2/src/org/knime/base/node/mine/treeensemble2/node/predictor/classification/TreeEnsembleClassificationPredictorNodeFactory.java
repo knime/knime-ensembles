@@ -52,9 +52,12 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
+ * Node factory of the Tree Ensemble Predictor node.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @deprecated use {@link TreeEnsembleClassificationPredictorNodeFactory2} instead
  */
+@Deprecated
 public class TreeEnsembleClassificationPredictorNodeFactory extends
     NodeFactory<TreeEnsembleClassificationPredictorNodeModel> {
 

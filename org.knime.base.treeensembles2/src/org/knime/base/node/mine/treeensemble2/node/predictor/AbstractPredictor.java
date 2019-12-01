@@ -9,6 +9,9 @@ import org.knime.base.node.mine.treeensemble2.data.PredictorRecord;
 import org.knime.core.data.DataRow;
 
 /**
+ * Abstract implementation of a {@link Predictor} that handles the conversion from
+ * {@link DataRow DataRows} to {@link PredictorRecord PredictorRecords}.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction
  */
@@ -25,9 +28,6 @@ public abstract class AbstractPredictor <P extends Prediction> implements Predic
         m_rowConverter = rowConverter;
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.Predictor#predict(org.knime.core.data.DataRow)
-     */
     @Override
     public P predict(final DataRow row) {
         return predictRecord(m_rowConverter.apply(row));

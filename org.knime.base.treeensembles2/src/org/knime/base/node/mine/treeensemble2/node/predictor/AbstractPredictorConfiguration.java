@@ -55,6 +55,8 @@ import org.knime.core.node.NotConfigurableException;
 
 
 /**
+ * Abstract implementation of a {@link PredictorConfiguration} that handles the settings for
+ * changing the prediction column name.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */

@@ -14,9 +14,12 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.util.UniqueNameGenerator;
 
 /**
+ * {@link PredictionItemParser} that parses ClassificationPredictions to create the probability columns in a
+ * classification prediction.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public class ProbabilityItemParser implements PredictionItemParser<ClassificationPrediction> {
+public final class ProbabilityItemParser implements PredictionItemParser<ClassificationPrediction> {
 
     private final Map<String, DataCell> m_targetValueMap;
 
@@ -46,9 +49,6 @@ public class ProbabilityItemParser implements PredictionItemParser<Classificatio
         m_classValues = classValues == null ? null : classValues.clone();
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionItemParser#appendSpecs(org.knime.core.util.UniqueNameGenerator, java.util.List)
-     */
     @Override
     public void appendSpecs(final UniqueNameGenerator nameGenerator, final List<DataColumnSpec> specs) {
         final String targetColName = m_classColName;
@@ -59,9 +59,6 @@ public class ProbabilityItemParser implements PredictionItemParser<Classificatio
 
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionItemParser#appendCells(java.util.List, org.knime.base.node.mine.treeensemble2.node.predictor.Prediction)
-     */
     @Override
     public void appendCells(final List<DataCell> cells, final ClassificationPrediction prediction) {
         if (m_classValues == null) {
@@ -69,13 +66,13 @@ public class ProbabilityItemParser implements PredictionItemParser<Classificatio
         }
         int nrClasses = m_targetValueMap.size();
         // the map is necessary to ensure that the probabilities are correctly associated with the column header
-           final Map<String, Double> classProbMap = new HashMap<>((int)(nrClasses * 1.5));
-           for (int i = 0; i < nrClasses; i++) {
-               classProbMap.put(m_classValues[i], prediction.getProbability(i));
-           }
-           for (final String className : m_targetValueMap.keySet()) {
-               cells.add(new DoubleCell(classProbMap.get(className)));
-           }
+        final Map<String, Double> classProbMap = new HashMap<>((int)(nrClasses * 1.5));
+        for (int i = 0; i < nrClasses; i++) {
+            classProbMap.put(m_classValues[i], prediction.getProbability(i));
+        }
+        for (final String className : m_targetValueMap.keySet()) {
+            cells.add(new DoubleCell(classProbMap.get(className)));
+        }
     }
 
 }

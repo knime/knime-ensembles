@@ -11,6 +11,8 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.util.UniqueNameGenerator;
 
 /**
+ * Parses a {@link Prediction} object and creates {@link DataCell cells} based on the {@link Prediction}.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction this parser requires
  */

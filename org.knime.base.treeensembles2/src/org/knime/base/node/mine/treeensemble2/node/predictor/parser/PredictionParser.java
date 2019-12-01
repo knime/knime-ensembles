@@ -8,6 +8,8 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 
 /**
+ * Parses {@link Prediction Predictions} and creates the cells for display in the KNIME AP.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of {@link Prediction} this parser parses
  */

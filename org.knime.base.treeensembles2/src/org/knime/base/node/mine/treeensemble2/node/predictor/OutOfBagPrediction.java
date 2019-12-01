@@ -4,6 +4,7 @@
 package org.knime.base.node.mine.treeensemble2.node.predictor;
 
 /**
+ * A type of {@link Prediction} that contains information on out-of-bag statistics in the case of random forest models.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */

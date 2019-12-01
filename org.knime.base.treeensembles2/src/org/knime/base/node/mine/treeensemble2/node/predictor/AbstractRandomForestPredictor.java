@@ -18,6 +18,9 @@ import org.knime.core.data.RowKey;
 import org.knime.core.node.InvalidSettingsException;
 
 /**
+ * An abstract implementation of {@link Predictor} that does predictions based on a random forest (tree ensemble)
+ * model.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction
  */
@@ -27,6 +30,9 @@ public abstract class AbstractRandomForestPredictor<P extends OutOfBagPrediction
 
     private Map<RowKey, Integer> m_rowKeyToLearnIndex;
 
+    /**
+     * The {@link TreeEnsembleModel} that should be used for predictions.
+     */
     protected final TreeEnsembleModel m_model;
 
     private final DataTableSpec m_learnSpec;

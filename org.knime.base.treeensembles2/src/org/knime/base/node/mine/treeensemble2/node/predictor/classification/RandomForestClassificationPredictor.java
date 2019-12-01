@@ -17,6 +17,8 @@ import org.knime.core.data.RowKey;
 import org.knime.core.node.InvalidSettingsException;
 
 /**
+ * Predictor for classification random forests.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
 public final class RandomForestClassificationPredictor
@@ -25,12 +27,14 @@ public final class RandomForestClassificationPredictor
     private final VotingFactory m_votingFactory;
 
     /**
-     * @param model
-     * @param modelSpec
-     * @param predictSpec
-     * @param modelRowSamples
-     * @param targetColumnData
-     * @param votingFactory
+     * Constructor for out-of-bag predictions.
+     *
+     * @param model the random forest {@link TreeEnsembleModel model}
+     * @param modelSpec the spec of the random forest model
+     * @param predictSpec the {@link DataTableSpec} of the input model
+     * @param modelRowSamples the row samples used for each tree in {@link TreeEnsembleModel model}
+     * @param targetColumnData the {@link TreeTargetColumnData} of the class column
+     * @param votingFactory the {@link VotingFactory} used for predictions
      * @throws InvalidSettingsException
      */
     public RandomForestClassificationPredictor(final TreeEnsembleModel model,
@@ -42,10 +46,12 @@ public final class RandomForestClassificationPredictor
     }
 
     /**
-     * @param model
-     * @param modelSpec
-     * @param predictSpec
-     * @param votingFactory
+     * Constructor for normal predictions i.e. no out-of-bag information is available.
+     *
+     * @param model the random forest {@link TreeEnsembleModel model}
+     * @param modelSpec the spec of the random forest model
+     * @param predictSpec the {@link DataTableSpec} of the input model
+     * @param votingFactory the {@link VotingFactory} used for predictions
      * @throws InvalidSettingsException
      */
     public RandomForestClassificationPredictor(final TreeEnsembleModel model,
@@ -55,9 +61,6 @@ public final class RandomForestClassificationPredictor
         m_votingFactory = votingFactory;
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.AbstractRandomForestPredictor#predictRecord(org.knime.base.node.mine.treeensemble2.data.PredictorRecord, org.knime.core.data.RowKey)
-     */
     @Override
     protected RandomForestClassificationPrediction predictRecord(final PredictorRecord record, final RowKey key) {
         return new RFClassificationPrediction(record, key, hasOutOfBagFilter());
@@ -81,33 +84,21 @@ public final class RandomForestClassificationPredictor
             }
         }
 
-        /* (non-Javadoc)
-         * @see org.knime.base.node.mine.treeensemble2.node.predictor.ClassificationPrediction#getClassPrediction()
-         */
         @Override
         public String getClassPrediction() {
             return m_voting.getMajorityClass();
         }
 
-        /* (non-Javadoc)
-         * @see org.knime.base.node.mine.treeensemble2.node.predictor.ClassificationPrediction#getWinningClassIdx()
-         */
         @Override
         public int getWinningClassIdx() {
             return m_voting.getMajorityClassIdx();
         }
 
-        /* (non-Javadoc)
-         * @see org.knime.base.node.mine.treeensemble2.node.predictor.ClassificationPrediction#getProbability(int)
-         */
         @Override
         public double getProbability(final int classIdx) {
             return m_voting.getClassProbabilityForClass(classIdx);
         }
 
-        /* (non-Javadoc)
-         * @see org.knime.base.node.mine.treeensemble2.node.predictor.OutOfBagPrediction#getModelCount()
-         */
         @Override
         public int getModelCount() {
             return m_voting.getNrVotes();

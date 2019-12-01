@@ -19,6 +19,9 @@ import org.knime.core.util.UniqueNameGenerator;
 import com.google.common.collect.Lists;
 
 /**
+ * Default implementation of {@link PredictionParser} that parses predictions based on a collection of
+ * {@link PredictionItemParser PredictionItemParsers} which is provided in the constructor.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction this parser parses
  */
@@ -56,9 +59,6 @@ public final class DefaultPredictionParser<P extends Prediction> implements Pred
         return specs.toArray(new DataColumnSpec[specs.size()]);
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionParser#parse(org.knime.base.node.mine.treeensemble2.node.predictor.Prediction)
-     */
     @Override
     public DataCell[] parse(final P prediction) {
         List<DataCell> cells = new ArrayList<>(m_appendSpecs.length);
@@ -76,9 +76,6 @@ public final class DefaultPredictionParser<P extends Prediction> implements Pred
     }
 
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionParser#getAppendSpecs()
-     */
     @Override
     public DataColumnSpec[] getAppendSpecs() {
         return m_appendSpecs;

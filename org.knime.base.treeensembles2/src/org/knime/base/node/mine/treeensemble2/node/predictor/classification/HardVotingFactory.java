@@ -59,6 +59,11 @@ public final class HardVotingFactory implements VotingFactory {
 
     private final Map<String, Integer> m_targetValueToIndexMap;
 
+    /**
+     * Constructs a new factory.
+     *
+     * @param targetValueToIndexMap maps classes to their index used by the model
+     */
     public HardVotingFactory(final Map<String, Integer> targetValueToIndexMap) {
         m_targetValueToIndexMap = targetValueToIndexMap;
     }

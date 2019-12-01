@@ -8,12 +8,15 @@ import org.knime.base.node.mine.treeensemble2.node.predictor.parser.PredictionPa
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.container.AbstractCellFactory;
+import org.knime.core.data.container.CellFactory;
 
 /**
+ * A {@link CellFactory} that appends predictions of a tree ensemble model.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction
  */
-public class PredictionCellFactory<P extends Prediction> extends AbstractCellFactory {
+public final class PredictionCellFactory<P extends Prediction> extends AbstractCellFactory {
 
     private final Predictor<P> m_predictor;
 
@@ -32,9 +35,6 @@ public class PredictionCellFactory<P extends Prediction> extends AbstractCellFac
         m_predictionParser = predictionParser;
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.core.data.container.CellFactory#getCells(org.knime.core.data.DataRow)
-     */
     @Override
     public final DataCell[] getCells(final DataRow row) {
         P prediction = m_predictor.predict(row);

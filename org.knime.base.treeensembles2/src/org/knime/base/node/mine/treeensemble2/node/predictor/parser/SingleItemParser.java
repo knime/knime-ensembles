@@ -13,13 +13,16 @@ import org.knime.core.data.DataType;
 import org.knime.core.util.UniqueNameGenerator;
 
 /**
+ * A generic {@link PredictionItemParser} that extracts a single {@link DataCell} from a {@link Prediction} using a user
+ * provided {@link Function}.
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  * @param <P> the type of prediction
  * @param <C> the type of cell that is produced
  */
-public class SingleItemParser <P extends Prediction, C extends DataCell> implements PredictionItemParser<P> {
+public final class SingleItemParser<P extends Prediction, C extends DataCell> implements PredictionItemParser<P> {
 
-    private final String m_spec;
+    private final String m_name;
 
     private final Function<P, C> m_parseFn;
 
@@ -33,22 +36,16 @@ public class SingleItemParser <P extends Prediction, C extends DataCell> impleme
      * @param parseFn function from prediction to DataCell
      */
     public SingleItemParser(final String name, final DataType type, final Function<P, C> parseFn) {
-        m_spec = name;
+        m_name = name;
         m_parseFn = parseFn;
         m_type = type;
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionItemParser#appendSpecs(org.knime.core.util.UniqueNameGenerator, java.util.List)
-     */
     @Override
     public void appendSpecs(final UniqueNameGenerator nameGenerator, final List<DataColumnSpec> specs) {
-        specs.add(nameGenerator.newColumn(m_spec, m_type));
+        specs.add(nameGenerator.newColumn(m_name, m_type));
     }
 
-    /* (non-Javadoc)
-     * @see org.knime.base.node.mine.treeensemble2.node.predictor.PredictionItemParser#appendCells(java.util.List, org.knime.base.node.mine.treeensemble2.node.predictor.Prediction)
-     */
     @Override
     public void appendCells(final List<DataCell> cells, final P prediction) {
         cells.add(m_parseFn.apply(prediction));

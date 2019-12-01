@@ -56,6 +56,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
+ * Dialog of the Tree Ensemble Predictor node.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
