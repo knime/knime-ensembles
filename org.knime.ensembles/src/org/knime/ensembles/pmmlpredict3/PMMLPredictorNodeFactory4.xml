@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="./pmmlpredict.png" type="Predictor">
+	<name>PMML Predictor</name>
+	<shortDescription>Can predict the data using the PMML object.</shortDescription>
+	<fullDescription>
+		<intro>
+		Applies PMML model including any preprocessing and transformation steps.
+		Can predict the following PMML models:
+		    ClusteringModel,
+			GeneralRegressionModel,
+			RegressionModel,
+			TreeModel ,
+			RegressionTreeModel (Simple Regression Tree),
+			GradientBoostingModel (Gradient Boosted Trees),
+			SupportVectorMachineModel and 
+			NeuralNetwork </intro>
+       <option name="Change prediction column name">
+			When set, you can change the name of the prediction column.
+		</option>
+		<option name="Prediction Column">
+			The possibly overridden column name for the predicted column. (The default depends on the model)
+		</option>
+		<option name="Append probability value column per class instance">
+			When classification is done and this option is set, the class probabilities are appended.
+		</option>
+		<option name="Suffix for probability columns">
+			Suffix for the normalized distribution columns. Their names are like:
+			<tt>P (</tt>trainingColumn<tt>=</tt>value<tt>)</tt>.
+		</option>
+	</fullDescription>
+	<ports>
+		<inPort name="PMML Model" index="0">PMML Model</inPort>		
+		<inPort name="Data" index="1">Data to be predicted.</inPort>
+		<outPort name="Predicted Data" index="0">Data with assigned prediction.</outPort>
+	</ports>
+
+</knimeNode>

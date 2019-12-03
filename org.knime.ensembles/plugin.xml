@@ -102,13 +102,18 @@
       </node>
       <node
             category-path="/analytics/mining/mining-pmml"
-            deprecated="false"
+            deprecated="true"
             factory-class="org.knime.ensembles.pmmlpredict3.PMMLPredictorNodeFactory3">
       </node>
       <node
             category-path="/analytics/mining/ensembles/ensembles-combine"
             deprecated="false"
             factory-class="org.knime.ensembles.pmml.predictor3.PMMLEnsemblePredictorNodeFactory3">
+      </node>
+      <node
+            category-path="/analytics/mining/mining-pmml"
+            deprecated="false"
+            factory-class="org.knime.ensembles.pmmlpredict3.PMMLPredictorNodeFactory4">
       </node>
    </extension>
    <extension

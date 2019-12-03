@@ -111,7 +111,7 @@ import org.w3c.dom.Document;
  *
  * @author Mark Ortmann, KNIME GmbH, Berlin, Germany
  */
-final class PMMLEnsemblePredictorNodeModel3 extends NodeModel {
+public final class PMMLEnsemblePredictorNodeModel3 extends NodeModel {
 
     private final SettingsModelString m_tieBreak = createTieBreakSettingsModel();
 
