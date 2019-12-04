@@ -50,13 +50,10 @@ package org.knime.ensembles.pmmlpredict3;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.dmg.pmml.DerivedFieldDocument.DerivedField;
 import org.knime.base.node.mine.bayes.naivebayes.predictor4.PMMLNaiveBayesPredictor;
 import org.knime.base.node.mine.cluster.assign.PMMLClusterAssigner;
 import org.knime.base.node.mine.cluster.assign.PMMLClusterAssigner.PMMLClusterAssignerOptions;
@@ -76,8 +73,6 @@ import org.knime.base.predict.PMMLClassificationPredictorOptions;
 import org.knime.base.predict.PMMLRegressionPredictorOptions;
 import org.knime.base.predict.PMMLTablePredictor;
 import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataColumnSpecCreator;
-import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -96,9 +91,6 @@ import org.knime.core.pmml.PMMLModelType;
 import org.knime.ensembles.pmml.predictor2.PMMLEnsemblePredictor2NodeModel;
 import org.knime.ensembles.pmml.predictor3.PMMLEnsemblePredictorNodeModel3;
 import org.w3c.dom.Node;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 /**
  * Node model of the PMML Predictor node.
@@ -149,42 +141,6 @@ public class PMMLPredictorNodeModel3 extends NodeModel {
         return new SettingsModelBoolean(CFGKEY_APPEND_PROBS, DEFAULT_APPEND_PROBS);
     }
 
-    private static class DerivedNameMapper {
-        private final BiMap<String, String> m_nameMap;
-
-        DerivedNameMapper(final PMMLPortObject port) {
-            final DerivedField[] derivedFields = port.getDerivedFields();
-            final Map<String, String> nameMap = new HashMap<>();
-            for (DerivedField derivedField : derivedFields) {
-                nameMap.put(derivedField.getDisplayName(), derivedField.getName());
-            }
-            m_nameMap = HashBiMap.create(nameMap);
-        }
-
-        DataTableSpec renameDerivedFields(final DataTableSpec spec) {
-            return renameColumns(m_nameMap, spec);
-        }
-
-        DataTableSpec reverseRenaming(final DataTableSpec spec) {
-            return renameColumns(m_nameMap.inverse(), spec);
-        }
-
-        private static DataTableSpec renameColumns(final Map<String, String> nameMap, final DataTableSpec tableSpec) {
-            final DataColumnSpec[] cspecs = new DataColumnSpec[tableSpec.getNumColumns()];
-            for (int i = 0; i < cspecs.length; i++) {
-                final DataColumnSpec columnSpec = tableSpec.getColumnSpec(i);
-                final DataColumnSpecCreator cc = new DataColumnSpecCreator(columnSpec);
-                if (nameMap.containsKey(columnSpec.getName())) {
-                    cc.setName(nameMap.get(columnSpec.getName()));
-                }
-                cspecs[i] = cc.createSpec();
-            }
-            return new DataTableSpec(cspecs);
-        }
-    }
-
-
-
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
@@ -192,15 +148,11 @@ public class PMMLPredictorNodeModel3 extends NodeModel {
 
         BufferedDataTable table = (BufferedDataTable)inObjects[1];
         double predictionProgress = 1.0;
-        DerivedNameMapper derivedNameMapper = null;
         if (port.getDerivedFields().length > 0 && m_applyPreprocessing) {
             final PmmlPreprocessorNodeModel preprocessor = new PmmlPreprocessorNodeModel();
             table = (BufferedDataTable)preprocessor.execute(new PortObject[]{table, port},
                 exec.createSubExecutionContext(0.5))[0];
             predictionProgress = 0.5;
-            derivedNameMapper = new DerivedNameMapper(port);
-            table =
-                exec.createSpecReplacerTable(table, derivedNameMapper.renameDerivedFields(table.getDataTableSpec()));
         }
 
         Set<PMMLModelType> types = port.getPMMLValue().getModelTypes();
@@ -272,9 +224,8 @@ public class PMMLPredictorNodeModel3 extends NodeModel {
                 // because that node model also calls node models again.
                 if (m_applyPreprocessing) {
                     PMMLEnsemblePredictorNodeModel3 model = new PMMLEnsemblePredictorNodeModel3();
-                    BufferedDataTable dt = (BufferedDataTable)model.execute(new PortObject[]{table, port},
-                        exec.createSubExecutionContext(predictionProgress))[0];
-                    return postprocess(exec, derivedNameMapper, dt);
+                    return model.execute(new PortObject[]{table, port},
+                        exec.createSubExecutionContext(predictionProgress));
                 } else {
                     PMMLEnsemblePredictor2NodeModel model = new PMMLEnsemblePredictor2NodeModel();
                     return model.execute(inObjects, exec);
@@ -289,15 +240,6 @@ public class PMMLPredictorNodeModel3 extends NodeModel {
         // Use the determined predictor to create the output table
         BufferedDataTable dt = predictor.predict(table, port,
             new DefaultPredictorContext(exec.createSubExecutionContext(predictionProgress), this::setWarningMessage));
-        return postprocess(exec, derivedNameMapper, dt);
-    }
-
-    private static PortObject[] postprocess(final ExecutionContext exec, final DerivedNameMapper derivedNameMapper,
-        BufferedDataTable dt) {
-        if (derivedNameMapper != null) {
-            // undo the renaming of the input columns in case we had some transformations
-            dt = exec.createSpecReplacerTable(dt, derivedNameMapper.reverseRenaming(dt.getDataTableSpec()));
-        }
         return new PortObject[] {dt};
     }
 
