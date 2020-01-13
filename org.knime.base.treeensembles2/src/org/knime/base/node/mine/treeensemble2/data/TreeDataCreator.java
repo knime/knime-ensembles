@@ -64,6 +64,7 @@ import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowKey;
+import org.knime.core.data.container.ContainerTable;
 import org.knime.core.data.container.DataContainer;
 import org.knime.core.data.probability.nominal.NominalDistributionValue;
 import org.knime.core.data.probability.nominal.NominalDistributionValueMetaData;
@@ -224,6 +225,9 @@ public class TreeDataCreator {
             }
             m_targetColCreator.add(key, targetCell);
             index++;
+        }
+        if (sortedTable instanceof ContainerTable) {
+            ((ContainerTable)sortedTable).clear();
         }
         if (nrHilitePatterns > 0 && index > nrHilitePatterns) {
             m_viewMessage = "Hilite (& color graphs) are based on a subset of " + "the data (" + nrHilitePatterns + "/"
