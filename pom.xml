@@ -25,6 +25,7 @@
 	<modules>
 		<module>org.knime.base.treeensembles</module>
 		<module>org.knime.base.treeensembles2</module>
+		<module>org.knime.base.treeensembles2.tests</module>
 		<module>org.knime.ensembles</module>
 		<module>org.knime.features.ensembles</module>
 		<module>org.knime.update.ensembles</module>
