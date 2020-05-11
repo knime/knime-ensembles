@@ -19,7 +19,12 @@ try {
     knimetools.defaultTychoBuild('org.knime.update.ensembles')
 
     workflowTests.runTests(
-        dependencies: [ repositories: ["knime-ensembles", "knime-streaming","knime-jep", "knime-datageneration", "knime-r", "knime-pmml", "knime-wide-data"] ]
+        dependencies: [
+            repositories: [
+                "knime-ensembles", "knime-streaming","knime-jep", "knime-datageneration", 
+                "knime-r", "knime-pmml", "knime-wide-data", "knime-js-core", "knime-js-base"
+            ]
+        ]
     )
 
     stage('Sonarqube analysis') {
