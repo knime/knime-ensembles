@@ -10,6 +10,7 @@ properties([
         upstream('knime-distance/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
         upstream('knime-javasnippet/' + env.BRANCH_NAME.replaceAll('/', '%2F'))
     ]),
+    parameters(workflowTests.getConfigurationsAsParameters()),
     buildDiscarder(logRotator(numToKeepStr: '5')),
     disableConcurrentBuilds()
 ])
