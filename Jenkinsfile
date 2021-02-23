@@ -5,8 +5,6 @@ library "knime-pipeline@$BN"
 
 properties([
     pipelineTriggers([
-        // knime-base -> knime-distance -> knime-ensembles
-        // knime-base -> knime-javasnippet -> knime-distance -> knime-ensembles
         upstream("knime-svg/${env.BRANCH_NAME.replaceAll('/', '%2F')}" +
             ", knime-distance/${env.BRANCH_NAME.replaceAll('/', '%2F')}")
     ]),
