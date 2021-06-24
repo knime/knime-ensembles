@@ -10,11 +10,18 @@
   <fullDescription>
     <intro>
       <p>
-        Learns a random forest* (an ensemble of decision trees) for regression. Each of the regression tree models is
-        learned on a different set of rows (records) and/or a different set of columns (describing attributes), whereby 
-        the latter can also be a bit/byte/double vector descriptor (e.g. molecular fingerprint). The output model describes an
-        ensemble of regression tree models and is applied in the corresponding predictor node using a simple mean
-        of the individual predictions. 
+        Learns a random forest* (an ensemble of decision trees) for regression.
+        Each of the decision tree models is build with a different set of rows (records) and for each split within a tree a randomly chosen set of columns (describing attributes) is used.
+        The row sets for each decision tree are created by bootstrapping and have the same size as the original input table.
+        The attribute set for an individual split in a decision tree is determined by randomly selecting sqrt(m) attributes from the available attributes where
+        m is the total number of learning columns.
+        The attributes can also be provided as, bit (fingerprint), byte, or double vector.
+        The output model describes an ensemble of regression tree models and is applied in the corresponding predictor node.
+      </p>
+      <p>
+        In a regression tree the predicted value for a leaf node is the mean target value of the records within the leaf.
+        Hence the predictions are best (with respect to the training data) if the variance of target values within a leaf is minimal.
+        This is achieved by splits that minimize the sum of squared errors in their respective children.
       </p>
       <p>
         For a more general description and suggested default parameters see the node description of the classification 

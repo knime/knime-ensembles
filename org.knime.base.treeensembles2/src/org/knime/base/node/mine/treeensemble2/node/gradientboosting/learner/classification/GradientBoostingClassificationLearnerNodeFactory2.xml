@@ -37,6 +37,11 @@
 				for missing values to go to by testing each possible direction and
 				selecting the one yielding the best result (i.e. largest gain).
 			</p>
+			<p>
+        		In a regression tree the predicted value for a leaf node is the mean target value of the records within the leaf.
+        		Hence the predictions are best (with respect to the training data) if the variance of target values within a leaf is minimal.
+        		This is achieved by splits that minimize the sum of squared errors in their respective children.
+      		</p>
 			
 			<h4>
 				Sampling
