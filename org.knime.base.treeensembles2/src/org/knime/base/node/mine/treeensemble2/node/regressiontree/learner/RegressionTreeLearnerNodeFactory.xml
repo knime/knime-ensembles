@@ -18,6 +18,11 @@
 				etc.
 			</p>
 			<p>
+        		In a regression tree the predicted value for a leaf node is the mean target value of the records within the leaf.
+        		Hence the predictions are best (with respect to the training data) if the variance of target values within a leaf is minimal.
+        		This is achieved by splits that minimize the sum of squared errors in their respective children.
+      		</p>
+			<p>
 				The currently used missing value handling also differs from the one
 				used by Breiman et al, 1984.
 				In each split the algorithm tries to find the best direction for

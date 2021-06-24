@@ -24,6 +24,11 @@
 				Jerome H. Friedman (1999).
 				For more information you can also take a look at <a href="https://en.wikipedia.org/wiki/Gradient_boosting">this</a>.
 			</p>
+			<p>
+        		In a regression tree the predicted value for a leaf node is the mean target value of the records within the leaf.
+        		Hence the predictions are best (with respect to the training data) if the variance of target values within a leaf is minimal.
+        		This is achieved by splits that minimize the sum of squared errors in their respective children.
+      		</p>
 			
 			<h4>
 				Sampling
