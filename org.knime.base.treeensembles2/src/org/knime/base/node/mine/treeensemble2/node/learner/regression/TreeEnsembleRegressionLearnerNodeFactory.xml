@@ -11,9 +11,9 @@
     <intro>
       <p>
         Learns an ensemble of regression trees (such as random forest* variants).
-        Typically, each tree is build with a different set of rows (records) and/or columns (attributes).
+        Typically, each tree is built with a different set of rows (records) and/or columns (attributes).
         See the options for <i>Data Sampling</i> and <i>Attribute Sampling</i> for more details.
-        The attributes can also be provided as, bit (fingerprint), byte, or double vector.
+        The attributes can also be provided as bit (fingerprint), byte, or double vector.
         The output model describes an ensemble of regression tree models and is applied in the corresponding predictor node using a simple mean
         of the individual predictions. 
       </p>

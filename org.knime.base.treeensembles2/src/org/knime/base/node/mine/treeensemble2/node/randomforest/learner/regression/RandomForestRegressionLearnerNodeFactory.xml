@@ -11,11 +11,11 @@
     <intro>
       <p>
         Learns a random forest* (an ensemble of decision trees) for regression.
-        Each of the decision tree models is build with a different set of rows (records) and for each split within a tree a randomly chosen set of columns (describing attributes) is used.
+        Each of the decision tree models is built with a different set of rows (records) and for each split within a tree a randomly chosen set of columns (describing attributes) is used.
         The row sets for each decision tree are created by bootstrapping and have the same size as the original input table.
         The attribute set for an individual split in a decision tree is determined by randomly selecting sqrt(m) attributes from the available attributes where
         m is the total number of learning columns.
-        The attributes can also be provided as, bit (fingerprint), byte, or double vector.
+        The attributes can also be provided as bit (fingerprint), byte, or double vector.
         The output model describes an ensemble of regression tree models and is applied in the corresponding predictor node.
       </p>
       <p>
