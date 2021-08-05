@@ -50,7 +50,7 @@ import java.io.IOException;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.model.PortObjectCell;
+import org.knime.core.data.model.PortObjectValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -104,7 +104,7 @@ public class TableToModelNodeModel extends NodeModel {
                                 + "taking first row \"" + row.getKey() + "\".");
                     }
                 }
-                final PortObjectCell model = (PortObjectCell) dc;
+                final PortObjectValue model = (PortObjectValue) dc;
                 return new PortObject[] {model.getPortObject()};
             }
             rowCount++;
