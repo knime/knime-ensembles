@@ -263,6 +263,7 @@ public class VotingLoopEndNodeModel extends NodeModel implements LoopEndNode {
                       + rowCount + " (\"" + r.getKey() + "\")");
               exec.checkCanceled();
           }
+          exec.clearTable(data);
           container.close();
           return container.getTable();
     }
