@@ -113,7 +113,7 @@
             specSerializer="org.knime.base.node.mine.treeensemble.model.TreeEnsembleModelPortObjectSpec$Serializer">
       </portType>
       <portType
-            hidden="false"
+            hidden="true"
             name="Regression Tree"
             objectClass="org.knime.base.node.mine.treeensemble.model.RegressionTreeModelPortObject"
             objectSerializer="org.knime.base.node.mine.treeensemble.model.RegressionTreeModelPortObject$Serializer"
