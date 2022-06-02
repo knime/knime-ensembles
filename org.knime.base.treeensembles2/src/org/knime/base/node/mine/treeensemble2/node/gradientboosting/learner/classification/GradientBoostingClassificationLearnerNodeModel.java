@@ -50,6 +50,10 @@ package org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.cla
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.knime.base.node.mine.treeensemble2.data.TreeData;
 import org.knime.base.node.mine.treeensemble2.data.TreeDataCreator;
@@ -151,25 +155,15 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
         BufferedDataTable t = (BufferedDataTable)inData[0];
         DataTableSpec spec = t.getDataTableSpec();
         final FilterLearnColumnRearranger learnRearranger = m_configuration.filterLearnColumns(spec);
-        String warn = learnRearranger.getWarning();
+        List<String> warnings = new ArrayList<>();
+        warnings.add(learnRearranger.getWarning());
         BufferedDataTable learnTable = exec.createColumnRearrangeTable(t, learnRearranger, exec.createSubProgress(0.0));
         DataTableSpec learnSpec = learnTable.getDataTableSpec();
         TreeEnsembleModelPortObjectSpec ensembleSpec = m_configuration.createPortObjectSpec(learnSpec);
         ExecutionMonitor readInExec = exec.createSubProgress(0.1);
         ExecutionMonitor learnExec = exec.createSubProgress(0.8);
-        TreeDataCreator dataCreator = new TreeDataCreator(m_configuration, learnSpec, learnTable.getRowCount());
         exec.setProgress("Reading data into memory");
-        TreeData data = dataCreator.readData(learnTable, m_configuration, readInExec);
-//        m_hiliteRowSample = dataCreator.getDataRowsForHilite();
-//        m_viewMessage = dataCreator.getViewMessage();
-        String dataCreationWarning = dataCreator.getAndClearWarningMessage();
-        if (dataCreationWarning != null) {
-            if (warn == null) {
-                warn = dataCreationWarning;
-            } else {
-                warn = warn + "\n" + dataCreationWarning;
-            }
-        }
+        TreeData data = createTreeData(warnings, learnTable, readInExec);
         readInExec.setProgress(1.0);
         exec.setMessage("Learning trees");
         AbstractGradientBoostingLearner learner = new LKGradientBoostedTreesLearner(m_configuration, data, m_safeSoftmax, m_fixNominalValueMixup);
@@ -186,10 +180,24 @@ public class GradientBoostingClassificationLearnerNodeModel extends NodeModel {
 //        }
         GradientBoostingModelPortObject modelPortObject = new GradientBoostingModelPortObject(ensembleSpec, model);
         learnExec.setProgress(1.0);
-        if (warn != null) {
+        var warn = warnings.stream()//
+            .filter(Objects::nonNull)//
+            .filter(s -> !s.isBlank())//
+            .collect(Collectors.joining("\n"));
+        if (!warn.isBlank()) {
             setWarningMessage(warn);
         }
         return new PortObject[]{modelPortObject};
+    }
+
+    private TreeData createTreeData(final List<String> warnings, final BufferedDataTable learnTable,
+        final ExecutionMonitor readInExec) throws CanceledExecutionException {
+        TreeDataCreator dataCreator =
+            new TreeDataCreator(m_configuration, learnTable.getDataTableSpec(), learnTable.getRowCount());
+        TreeData data = dataCreator.readData(learnTable, m_configuration, readInExec);
+        String dataCreationWarning = dataCreator.getAndClearWarningMessage();
+        warnings.add(dataCreationWarning);
+        return data;
     }
 
     /**
