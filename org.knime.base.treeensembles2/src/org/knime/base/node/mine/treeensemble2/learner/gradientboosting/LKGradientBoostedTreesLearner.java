@@ -376,7 +376,7 @@ public final class LKGradientBoostedTreesLearner extends AbstractGradientBoostin
             // sumBottom becomes 0 and coefficient becomes NaN
             // In this case we can simply set the coefficient to 0 because the model is already perfect
             double coefficient;
-            if (sumBottom == 0) {
+            if (sumBottom < 1e-10) {
                 // The model is already perfect if sumTop is also 0 and completely wrong if sumTop is different from
                 // zero in which case we set the coefficient to a large constant to help the model recover
                 coefficient = sumTop == 0 ? 0 : RECOVERY_CONSTANT;
