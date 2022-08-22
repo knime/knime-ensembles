@@ -17,7 +17,8 @@
         <revision>4.6.0</revision>
 		<changelist>-SNAPSHOT</changelist>
 		<feature-branch-extension.branchListProperty>git.branch</feature-branch-extension.branchListProperty>
-        <feature-branch-extension.appendArtifactoryProperties>false</feature-branch-extension.appendArtifactoryProperties>
+		<feature-branch-extension.appendArtifactoryProperties>false</feature-branch-extension.appendArtifactoryProperties>
+		<knime.sonar-env>Sonarcloud</knime.sonar-env>
 	</properties>
 	<modules>
 		<module>org.knime.base.treeensembles</module>
