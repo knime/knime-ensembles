@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
 <knimeNode icon="./celltopmml.png" type="Other">
-	<name>Cell To PMML</name>
+	<name>Cell to PMML</name>
 	<shortDescription>Converts the PMML cell in the first Row to the PMML Port.</shortDescription>
 	<fullDescription>
 		<intro>Converts the PMML cell in the first Row to the PMML Port.</intro>
