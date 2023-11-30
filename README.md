@@ -1,4 +1,9 @@
-# ![Image](https://www.knime.com/files/knime_logo_github_40x40_4layers.png) KNIME® Ensemble Learning Wrappers
+# KNIME® Ensemble Learning Wrappers
+
+[![Jenkins](https://jenkins.knime.com/buildStatus/icon?job=knime-ensembles%2Fmaster)](https://jenkins.knime.com/job/knime-ensembles/job/master/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KNIME_knime-ensembles&metric=alert_status&token=55129ac721eacd76417f57921368ed587ad8339d)](https://sonarcloud.io/summary/new_code?id=KNIME_knime-ensembles)
+
+This repository is maintained by the [KNIME Team Rakete](mailto:team-rakete@knime.com).
 
 This repository contains:
 
