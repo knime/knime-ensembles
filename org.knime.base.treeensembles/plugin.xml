@@ -106,7 +106,7 @@
          point="org.knime.core.PortType">
       <portType
             hidden="true"
-            name="Tree Ensembles"
+            name="Tree Ensemble"
             objectClass="org.knime.base.node.mine.treeensemble.model.TreeEnsembleModelPortObject"
             objectSerializer="org.knime.base.node.mine.treeensemble.model.TreeEnsembleModelPortObject$Serializer"
             specClass="org.knime.base.node.mine.treeensemble.model.TreeEnsembleModelPortObjectSpec"
