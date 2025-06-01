@@ -79,7 +79,7 @@ import org.knime.core.node.KNIMEConstants;
 import org.knime.core.util.ThreadPool;
 
 /**
- * 
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
 public class TreeEnsembleLearner {
@@ -106,7 +106,7 @@ public class TreeEnsembleLearner {
     }
 
     public TreeEnsembleModel learnEnsemble(final ExecutionMonitor exec) throws CanceledExecutionException,
-        ExecutionException {
+        ExecutionException, InterruptedException {
         final int nrModels = m_config.getNrModels();
         final RandomData rd = m_config.createRandomData();
         final ThreadPool tp = KNIMEConstants.GLOBAL_THREAD_POOL;
