@@ -47,16 +47,36 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
 import org.knime.base.node.mine.treeensemble2.node.predictor.regression.TreeEnsembleRegressionPredictorNodeModel;
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
- *
+ * 
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
-public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel> {
+@SuppressWarnings("restriction")
+public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
     /** {@inheritDoc} */
     @Override
@@ -72,6 +92,7 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738","removal"})
     public final NodeView<TreeEnsembleRegressionPredictorNodeModel> createNodeView(final int viewIndex,
         final TreeEnsembleRegressionPredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
@@ -79,14 +100,58 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738","removal"})
     protected final boolean hasDialog() {
         return true;
     }
 
     /** {@inheritDoc} */
+    private static final String NODE_NAME = "Random Forest Predictor (Regression)";
+
+    private static final String NODE_ICON = "treeensemble_predictor_regression.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Applies regression from a random forest model by using the mean of the individual predictions.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            Applies regression from a random forest* model by using the mean of the individual predictions.
+            <br/><br/>
+            (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Model", """
+            The random forest model as produced by the Random Forest Learner (Regression) node.
+            """), fixedPort("Input Data", """
+            The data to be predicted.
+            """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(fixedPort("Prediction output", """
+            The input data along with prediction columns.
+            """));
+
     @Override
-    protected final NodeDialogPane createNodeDialogPane() {
-        return new RandomForestRegressionPredictorNodeDialogPane();
+    @SuppressWarnings({"java:S5738","removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, TreeEnsemblePredictorOptions.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), TreeEnsemblePredictorOptions.class, null,
+            NodeType.Predictor, List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, TreeEnsemblePredictorOptions.class));
     }
 
 }
