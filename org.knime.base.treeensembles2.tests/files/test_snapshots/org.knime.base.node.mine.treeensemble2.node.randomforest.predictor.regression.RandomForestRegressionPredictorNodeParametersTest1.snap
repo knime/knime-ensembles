@@ -1,0 +1,107 @@
+{
+  "data" : {
+    "model" : {
+      "changePredictionColumnName" : false,
+      "predictionColumnName" : "wlwlwl",
+      "appendPredictionConfidence" : true,
+      "appendClassConfidences" : false,
+      "appendModelCount" : false,
+      "suffixForClassProbabilities" : "",
+      "useSoftVoting" : false
+    }
+  },
+  "schema" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "appendClassConfidences" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "appendModelCount" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "appendPredictionConfidence" : {
+            "type" : "boolean",
+            "default" : true
+          },
+          "changePredictionColumnName" : {
+            "type" : "boolean",
+            "title" : "Change prediction column name",
+            "description" : "Check if you want to alter the name of the column that will contain the prediction.",
+            "default" : true
+          },
+          "predictionColumnName" : {
+            "type" : "string",
+            "title" : "Prediction column name",
+            "description" : "Name of the 1st output column. It contains the mean response of all models.\nA second column with the suffix \"(Variance)\" is appended containing the variance of all model\nresponses.\n",
+            "default" : "Prediction ()"
+          },
+          "suffixForClassProbabilities" : {
+            "type" : "string",
+            "default" : ""
+          },
+          "useSoftVoting" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        }
+      }
+    }
+  },
+  "ui_schema" : {
+    "elements" : [ {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/changePredictionColumnName",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/predictionColumnName",
+      "rule" : {
+        "effect" : "ENABLE",
+        "condition" : {
+          "scope" : "#/properties/model/properties/changePredictionColumnName",
+          "schema" : {
+            "const" : true
+          }
+        }
+      }
+    } ]
+  },
+  "persist" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "changePredictionColumnName" : {
+            "configKey" : "changePredictionColumnName"
+          },
+          "predictionColumnName" : {
+            "configKey" : "predictionColumnName"
+          },
+          "appendPredictionConfidence" : {
+            "configKey" : "appendPredictionConfidence"
+          },
+          "appendClassConfidences" : {
+            "configKey" : "appendClassConfidences"
+          },
+          "appendModelCount" : {
+            "configKey" : "appendModelCount"
+          },
+          "suffixForClassProbabilities" : {
+            "configKey" : "suffixForClassProbabilities"
+          },
+          "useSoftVoting" : {
+            "configKey" : "useSoftVoting"
+          }
+        }
+      }
+    }
+  }
+}

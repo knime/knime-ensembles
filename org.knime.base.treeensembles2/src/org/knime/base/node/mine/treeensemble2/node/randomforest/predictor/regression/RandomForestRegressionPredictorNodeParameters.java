@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -41,46 +42,45 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- *
- * History
- *   Jan 10, 2012 (wiswedel): created
  */
 package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
 
-import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorPanel;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
+ * Node parameters for Random Forest Predictor (Regression).
  *
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
-public final class RandomForestRegressionPredictorNodeDialogPane extends NodeDialogPane {
+@SuppressWarnings("restriction")
+@LoadDefaultsForAbsentFields
+@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
+final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
-    private final TreeEnsemblePredictorPanel m_predictorPanel;
+    static final class WidgetModifier implements Modification.Modifier {
 
-    /**
-     *  */
-    public RandomForestRegressionPredictorNodeDialogPane() {
-        m_predictorPanel = new TreeEnsemblePredictorPanel(true, true);
-        addTab(TreeEnsemblePredictorPanel.PANEL_NAME, m_predictorPanel);
+        @Override
+        public void modify(final Modification.WidgetGroupModifier group) {
+            group.find(ChangePredictionColumnNameRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Change prediction column name") //
+                .withProperty("description",
+                    "Check if you want to alter the name of the column that will contain the prediction.") //
+                .modify();
+
+            group.find(PredictionColumnNameRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Prediction column name") //
+                .withProperty("description",
+                    """
+                    Name of the 1st output column. It contains the mean response of all models.
+                    A second column with the suffix "(Variance)" is appended containing the variance of all model
+                    responses.
+                    """) //
+                .modify();
+        }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-        throws NotConfigurableException {
-        m_predictorPanel.loadSettingsFrom(settings, specs);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        m_predictorPanel.saveSettingsTo(settings);
-    }
-
 }
