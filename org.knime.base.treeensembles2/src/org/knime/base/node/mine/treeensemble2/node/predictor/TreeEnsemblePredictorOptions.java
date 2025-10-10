@@ -43,12 +43,10 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor;
+package org.knime.base.node.mine.treeensemble2.node.predictor;
 
-import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorConfiguration;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParameters;
-import org.knime.node.parameters.WidgetGroup;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 import org.knime.node.parameters.persistence.Persist;
 import org.knime.node.parameters.updates.Effect;
@@ -62,7 +60,7 @@ import org.knime.node.parameters.updates.util.BooleanReference;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-public class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
+public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /** Annotator reference used when exposing {@link #m_changePredictionColumnName}. */
     public interface ChangePredictionColumnNameRef extends Modification.Reference {
@@ -117,11 +115,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup
     @Modification.WidgetReference(AppendClassConfidencesRef.class)
     @Persist(configKey = "appendClassConfidences")
     @ValueReference(AppendClassConfidencesEffectRef.class)
-    boolean m_appendClassConfidences = false;
+    boolean m_appendClassConfidences;
 
     @Modification.WidgetReference(AppendModelCountRef.class)
     @Persist(configKey = "appendModelCount")
-    boolean m_appendModelCount = false;
+    boolean m_appendModelCount;
 
     @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
     @Persist(configKey = "suffixForClassProbabilities")
@@ -130,5 +128,5 @@ public class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup
 
     @Modification.WidgetReference(UseSoftVotingRef.class)
     @Persist(configKey = "useSoftVoting")
-    boolean m_useSoftVoting = false;
+    boolean m_useSoftVoting;
 }

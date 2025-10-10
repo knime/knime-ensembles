@@ -45,7 +45,7 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.classification;
 
-import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
+import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;

@@ -48,58 +48,108 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification;
 
-import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.GradientBoostingPredictorNodeDialogPane;
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
 import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeModel.Version;
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
+@SuppressWarnings("restriction")
 public class GradientBoostingClassificationPredictorNodeFactory3
-extends NodeFactory<GradientBoostingClassificationPredictorNodeModel> {
+    extends NodeFactory<GradientBoostingClassificationPredictorNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-    /**
-     * {@inheritDoc}
-     */
+    private static final String NODE_NAME = "Gradient Boosted Trees Predictor";
+
+    private static final String NODE_ICON = "GradientBoostingPredictor.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Classifies data using a Gradient Boosted Trees model.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            Classifies data using a Gradient Boosted Trees model. The implementation follows the algorithm described in
+                "Greedy Function Approximation: A Gradient Boosting Machine" by Jerome H. Friedman (1999).
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+        fixedPort("Model", """
+                Gradient Boosted Trees model as produced by the Gradient Boosted Trees Learner node.
+                """),
+        fixedPort("Input Data", """
+                The data to predict.
+                """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+        fixedPort("Output Data", """
+                The predicted data.
+                """));
+
     @Override
     public GradientBoostingClassificationPredictorNodeModel createNodeModel() {
         return new GradientBoostingClassificationPredictorNodeModel(Version.V401);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected int getNrNodeViews() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     public NodeView<GradientBoostingClassificationPredictorNodeModel> createNodeView(final int viewIndex,
         final GradientBoostingClassificationPredictorNodeModel nodeModel) {
-        return null;
+        throw new IndexOutOfBoundsException();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     protected boolean hasDialog() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new GradientBoostingPredictorNodeDialogPane(false);
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
     }
 
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, GradientBoostingClassificationPredictorNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(),
+            GradientBoostingClassificationPredictorNodeParameters.class, null, NodeType.Predictor, List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, GradientBoostingClassificationPredictorNodeParameters.class));
+    }
 }

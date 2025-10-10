@@ -1,0 +1,137 @@
+{
+  "data" : {
+    "model" : {
+      "changePredictionColumnName" : false,
+      "predictionColumnName" : "Prediction (Cluster Membership)",
+      "appendPredictionConfidence" : true,
+      "appendClassConfidences" : false,
+      "appendModelCount" : false,
+      "suffixForClassProbabilities" : "",
+      "useSoftVoting" : false
+    }
+  },
+  "schema" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "appendClassConfidences" : {
+            "type" : "boolean",
+            "title" : "Append individual class probabilities",
+            "description" : "Appends one column per class with the probability that the row belongs to that class.",
+            "default" : false
+          },
+          "appendModelCount" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "appendPredictionConfidence" : {
+            "type" : "boolean",
+            "title" : "Append overall prediction confidence",
+            "description" : "Appends a column containing the model's confidence in the predicted class.",
+            "default" : true
+          },
+          "changePredictionColumnName" : {
+            "type" : "boolean",
+            "title" : "Change prediction column name",
+            "description" : "Select this option to customize the name of the column that contains the prediction.",
+            "default" : true
+          },
+          "predictionColumnName" : {
+            "type" : "string",
+            "title" : "Prediction column name",
+            "description" : "Name of the output column that stores the predicted class.",
+            "default" : "Prediction ()"
+          },
+          "suffixForClassProbabilities" : {
+            "type" : "string",
+            "title" : "Suffix for probability columns",
+            "description" : "Suffix that is appended to the class probability column names.",
+            "default" : ""
+          },
+          "useSoftVoting" : {
+            "type" : "boolean",
+            "default" : false
+          }
+        }
+      }
+    }
+  },
+  "ui_schema" : {
+    "elements" : [ {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/changePredictionColumnName",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/predictionColumnName",
+      "rule" : {
+        "effect" : "ENABLE",
+        "condition" : {
+          "scope" : "#/properties/model/properties/changePredictionColumnName",
+          "schema" : {
+            "const" : true
+          }
+        }
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/appendPredictionConfidence",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/appendClassConfidences",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/suffixForClassProbabilities",
+      "rule" : {
+        "effect" : "ENABLE",
+        "condition" : {
+          "scope" : "#/properties/model/properties/appendClassConfidences",
+          "schema" : {
+            "const" : true
+          }
+        }
+      }
+    } ]
+  },
+  "persist" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "changePredictionColumnName" : {
+            "configKey" : "changePredictionColumnName"
+          },
+          "predictionColumnName" : {
+            "configKey" : "predictionColumnName"
+          },
+          "appendPredictionConfidence" : {
+            "configKey" : "appendPredictionConfidence"
+          },
+          "appendClassConfidences" : {
+            "configKey" : "appendClassConfidences"
+          },
+          "appendModelCount" : {
+            "configKey" : "appendModelCount"
+          },
+          "suffixForClassProbabilities" : {
+            "configKey" : "suffixForClassProbabilities"
+          },
+          "useSoftVoting" : {
+            "configKey" : "useSoftVoting"
+          }
+        }
+      }
+    }
+  }
+}

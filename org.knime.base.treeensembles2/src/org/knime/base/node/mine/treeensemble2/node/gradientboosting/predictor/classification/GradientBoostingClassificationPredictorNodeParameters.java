@@ -43,7 +43,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -51,36 +51,54 @@ import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
- * Node parameters for Random Forest Predictor (Regression).
+ * Node parameters for Gradient Boosted Trees Predictor.
  *
  * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
  * @author AI Migration Pipeline v1.1
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
-final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+@Modification(GradientBoostingClassificationPredictorNodeParameters.WidgetModifier.class)
+final class GradientBoostingClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
+        @SuppressWarnings("java:S1192") // duplicate string literals "title", "description"
         public void modify(final Modification.WidgetGroupModifier group) {
             group.find(ChangePredictionColumnNameRef.class) //
                 .addAnnotation(Widget.class) //
                 .withProperty("title", "Change prediction column name") //
                 .withProperty("description",
-                    "Check if you want to alter the name of the column that will contain the prediction.") //
+                    "Select this option to customize the name of the column that contains the prediction.") //
                 .modify();
 
             group.find(PredictionColumnNameRef.class) //
                 .addAnnotation(Widget.class) //
                 .withProperty("title", "Prediction column name") //
                 .withProperty("description",
-                    """
-                    Name of the 1st output column. It contains the mean response of all models.
-                    A second column with the suffix "(Variance)" is appended containing the variance of all model
-                    responses.
-                    """) //
+                    "Name of the output column that stores the predicted class.") //
+                .modify();
+
+            group.find(AppendPredictionConfidenceRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append overall prediction confidence") //
+                .withProperty("description",
+                    "Appends a column containing the model's confidence in the predicted class.") //
+                .modify();
+
+            group.find(AppendClassConfidencesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append individual class probabilities") //
+                .withProperty("description",
+                    "Appends one column per class with the probability that the row belongs to that class.") //
+                .modify();
+
+            group.find(SuffixForClassProbabilitiesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Suffix for probability columns") //
+                .withProperty("description",
+                    "Suffix that is appended to the class probability column names.") //
                 .modify();
         }
     }
