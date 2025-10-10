@@ -43,7 +43,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorConfiguration;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -62,7 +62,12 @@ import org.knime.node.parameters.updates.util.BooleanReference;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-class TreeEnsemblePredictorOptions implements NodeParameters {
+public class TreeEnsemblePredictorOptions implements NodeParameters {
+
+    public final static String MINITAB_COPYRIGHT = """
+            <br/><br/>
+            RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s
+            permission.""";
 
     /** Annotator reference used when exposing {@link #m_changePredictionColumnName}. */
     public interface ChangePredictionColumnNameRef extends Modification.Reference {
@@ -117,11 +122,11 @@ class TreeEnsemblePredictorOptions implements NodeParameters {
 
     @Modification.WidgetReference(AppendClassConfidencesRef.class)
     @Persist(configKey = "appendClassConfidences")
-    boolean m_appendClassConfidences = false;
+    boolean m_appendClassConfidences;
 
     @Modification.WidgetReference(AppendModelCountRef.class)
     @Persist(configKey = "appendModelCount")
-    boolean m_appendModelCount = false;
+    boolean m_appendModelCount;
 
     @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
     @Persist(configKey = "suffixForClassProbabilities")
@@ -129,5 +134,48 @@ class TreeEnsemblePredictorOptions implements NodeParameters {
 
     @Modification.WidgetReference(UseSoftVotingRef.class)
     @Persist(configKey = "useSoftVoting")
-    boolean m_useSoftVoting = false;
+    boolean m_useSoftVoting;
+
+    public static void useAppendPredictionConfidence(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(AppendPredictionConfidenceRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Append overall prediction confidence") //
+            .withProperty("description", """
+                    Adds the confidence of the predicted class; this is the maximum of all class confidence values,
+                    which can also be appended individually.
+                    """) //
+            .modify();
+    }
+
+    public static void useAppendClassConfidences(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(AppendClassConfidencesRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Append individual class probabilities") //
+            .withProperty("description", """
+                    Adds one column per class containing its prediction confidence: the number of trees voting for that
+                    class divided by the total number of trees.
+                    """) //
+            .modify();
+    }
+
+    public static void useSuffixForClassProbabilities(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(SuffixForClassProbabilitiesRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Suffix for probability columns") //
+            .withProperty("description", "Suffix appended to the column names containing class probabilities.") //
+            .modify();
+    }
+
+    public static void useSoftVoting(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(UseSoftVotingRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Use soft voting") //
+            .withProperty("description", """
+                    Switches from hard voting (the most votes win) to soft voting, which aggregates class probabilities
+                    from all trees. Requires the random forest model to store class distributions ("Save target
+                    distribution in tree nodes" in the learner); enabling this without stored distributions triggers a
+                    warning.
+                    """) //
+            .modify();
+    }
 }

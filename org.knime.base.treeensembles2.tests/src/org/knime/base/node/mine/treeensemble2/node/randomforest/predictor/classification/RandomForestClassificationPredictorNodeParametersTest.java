@@ -43,16 +43,16 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.classification;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.knime.base.node.mine.treeensemble2.model.TreeEnsembleModelPortObjectSpec;
-import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.StringCell;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.port.PortObjectSpec;
@@ -62,19 +62,19 @@ import org.knime.testing.node.dialog.DefaultNodeSettingsSnapshotTest;
 import org.knime.testing.node.dialog.SnapshotTestConfiguration;
 
 /**
- * Snapshot test for {@link TreeEnsemblePredictorOptions}.
+ * Snapshot test for {@link RandomForestClassificationPredictorNodeParameters}.
  */
 @SuppressWarnings("restriction")
-final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNodeSettingsSnapshotTest {
+final class RandomForestClassificationPredictorNodeParametersTest extends DefaultNodeSettingsSnapshotTest {
 
-    RandomForestRegressionPredictorNodeParametersTest() {
+    RandomForestClassificationPredictorNodeParametersTest() {
         super(getConfig());
     }
 
     private static SnapshotTestConfiguration getConfig() {
         return SnapshotTestConfiguration.builder() //
             .withInputPortObjectSpecs(createInputPortSpecs()) //
-            .testJsonFormsForModel(TreeEnsemblePredictorOptions.class) //
+            .testJsonFormsForModel(RandomForestClassificationPredictorNodeParameters.class) //
             .testJsonFormsWithInstance(SettingsType.MODEL, () -> readSettings()) //
             .testNodeSettingsStructure(() -> readSettings()) //
             .build();
@@ -90,23 +90,23 @@ final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNod
 
     private static DataTableSpec createTrainingTableSpec() {
         return new DataTableSpec(new String[]{"Feature", "Target"},
-            new DataType[]{DataType.getType(DoubleCell.class), DataType.getType(DoubleCell.class)});
+            new DataType[]{DataType.getType(DoubleCell.class), DataType.getType(StringCell.class)});
     }
 
     private static DataTableSpec createDataTableSpec() {
         return new DataTableSpec(new String[]{"Feature"}, new DataType[]{DataType.getType(DoubleCell.class)});
     }
 
-    private static TreeEnsemblePredictorOptions readSettings() {
+    private static RandomForestClassificationPredictorNodeParameters readSettings() {
         try {
-            var path = getSnapshotPath(RandomForestRegressionPredictorNodeParametersTest.class).getParent()
+            var path = getSnapshotPath(RandomForestClassificationPredictorNodeParameters.class).getParent()
                 .resolve("node_settings")
-                .resolve("RandomForestRegressionPredictorNodeParameters.xml");
+                .resolve("RandomForestClassificationPredictorNodeParameters.xml");
             try (var fis = new FileInputStream(path.toFile())) {
                 var nodeSettings = NodeSettings.loadFromXML(fis);
                 return NodeParametersUtil.loadSettings(
                     nodeSettings.getNodeSettings(SettingsType.MODEL.getConfigKey()),
-                    TreeEnsemblePredictorOptions.class);
+                    RandomForestClassificationPredictorNodeParameters.class);
             }
         } catch (IOException | InvalidSettingsException e) {
             throw new IllegalStateException(e);
