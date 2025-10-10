@@ -1,0 +1,136 @@
+{
+  "data" : {
+    "model" : {
+      "changePredictionColumnName" : true,
+      "predictionColumnName" : "Prediction ()",
+      "appendPredictionConfidence" : true,
+      "appendClassConfidences" : false,
+      "appendModelCount" : false,
+      "suffixForClassProbabilities" : "",
+      "useSoftVoting" : false
+    }
+  },
+  "schema" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "appendClassConfidences" : {
+            "type" : "boolean",
+            "title" : "Append individual class probabilities",
+            "description" : "Adds one column per class containing its prediction confidence: the number of trees voting for that\nclass divided by the total number of trees.\n",
+            "default" : false
+          },
+          "appendModelCount" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "appendPredictionConfidence" : {
+            "type" : "boolean",
+            "title" : "Append overall prediction confidence",
+            "description" : "Adds the confidence of the predicted class; this is the maximum of all class confidence values,\nwhich can also be appended individually.\n",
+            "default" : true
+          },
+          "changePredictionColumnName" : {
+            "type" : "boolean",
+            "title" : "Change prediction column name",
+            "description" : "Select to customize the name of the column containing the prediction.",
+            "default" : true
+          },
+          "predictionColumnName" : {
+            "type" : "string",
+            "title" : "Prediction column name",
+            "description" : "The name of the column that will contain the prediction of the tree ensemble model.",
+            "default" : "Prediction ()"
+          },
+          "suffixForClassProbabilities" : {
+            "type" : "string",
+            "title" : "Suffix for probability columns",
+            "description" : "Suffix appended to the column names containing class probabilities.",
+            "default" : ""
+          },
+          "useSoftVoting" : {
+            "type" : "boolean",
+            "title" : "Use soft voting",
+            "description" : "Switches from hard voting (the most votes win) to soft voting, which aggregates class probabilities\nfrom all trees. Requires the random forest model to store class distributions (\"Save target\ndistribution in tree nodes\" in the learner); enabling this without stored distributions triggers a\nwarning.\n",
+            "default" : false
+          }
+        }
+      }
+    }
+  },
+  "ui_schema" : {
+    "elements" : [ {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/changePredictionColumnName",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/predictionColumnName",
+      "rule" : {
+        "effect" : "ENABLE",
+        "condition" : {
+          "scope" : "#/properties/model/properties/changePredictionColumnName",
+          "schema" : {
+            "const" : true
+          }
+        }
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/appendPredictionConfidence",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/appendClassConfidences",
+      "options" : {
+        "format" : "checkbox"
+      }
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/suffixForClassProbabilities"
+    }, {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/useSoftVoting",
+      "options" : {
+        "format" : "checkbox"
+      }
+    } ]
+  },
+  "persist" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "changePredictionColumnName" : {
+            "configKey" : "changePredictionColumnName"
+          },
+          "predictionColumnName" : {
+            "configKey" : "predictionColumnName"
+          },
+          "appendPredictionConfidence" : {
+            "configKey" : "appendPredictionConfidence"
+          },
+          "appendClassConfidences" : {
+            "configKey" : "appendClassConfidences"
+          },
+          "appendModelCount" : {
+            "configKey" : "appendModelCount"
+          },
+          "suffixForClassProbabilities" : {
+            "configKey" : "suffixForClassProbabilities"
+          },
+          "useSoftVoting" : {
+            "configKey" : "useSoftVoting"
+          }
+        }
+      }
+    }
+  }
+}
