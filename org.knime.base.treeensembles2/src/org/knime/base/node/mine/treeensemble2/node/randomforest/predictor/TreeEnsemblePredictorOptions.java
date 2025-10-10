@@ -43,12 +43,11 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorConfiguration;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParameters;
-import org.knime.node.parameters.WidgetGroup;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 import org.knime.node.parameters.persistence.Persist;
 import org.knime.node.parameters.updates.Effect;
@@ -62,7 +61,7 @@ import org.knime.node.parameters.updates.util.BooleanReference;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
+public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /** Annotator reference used when exposing {@link #m_changePredictionColumnName}. */
     public interface ChangePredictionColumnNameRef extends Modification.Reference {
@@ -96,6 +95,10 @@ class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
     public static final class ChangePredictionColumnNameEffectRef implements BooleanReference {
     }
 
+    /** Boolean reference used for effects depending on {@link #m_appendClassConfidences}. */
+    public static final class AppendClassConfidencesEffectRef implements BooleanReference {
+    }
+
     @Modification.WidgetReference(ChangePredictionColumnNameRef.class)
     @Persist(configKey = "changePredictionColumnName")
     @ValueReference(ChangePredictionColumnNameEffectRef.class)
@@ -112,17 +115,19 @@ class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
 
     @Modification.WidgetReference(AppendClassConfidencesRef.class)
     @Persist(configKey = "appendClassConfidences")
-    boolean m_appendClassConfidences = false;
+    @ValueReference(AppendClassConfidencesEffectRef.class)
+    boolean m_appendClassConfidences;
 
     @Modification.WidgetReference(AppendModelCountRef.class)
     @Persist(configKey = "appendModelCount")
-    boolean m_appendModelCount = false;
+    boolean m_appendModelCount;
 
     @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
     @Persist(configKey = "suffixForClassProbabilities")
+    @Effect(predicate = AppendClassConfidencesEffectRef.class, type = EffectType.ENABLE)
     String m_suffixForClassProbabilities = "";
 
     @Modification.WidgetReference(UseSoftVotingRef.class)
     @Persist(configKey = "useSoftVoting")
-    boolean m_useSoftVoting = false;
+    boolean m_useSoftVoting;
 }
