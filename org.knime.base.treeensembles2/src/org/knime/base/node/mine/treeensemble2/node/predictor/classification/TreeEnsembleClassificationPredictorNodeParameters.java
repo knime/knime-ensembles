@@ -1,0 +1,123 @@
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  Copyright by KNIME AG, Zurich, Switzerland
+ *  Website: http://www.knime.com; Email: contact@knime.com
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License, Version 3, as
+ *  published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, see <http://www.gnu.org/licenses>.
+ *
+ *  Additional permission under GNU GPL version 3 section 7:
+ *
+ *  KNIME interoperates with ECLIPSE solely via ECLIPSE's plug-in APIs.
+ *  Hence, KNIME and ECLIPSE are both independent programs and are not
+ *  derived from each other. Should, however, the interpretation of the
+ *  GNU GPL Version 3 ("License") under any applicable laws result in
+ *  KNIME and ECLIPSE being a combined program, KNIME AG herewith grants
+ *  you the additional permission to use and propagate KNIME together with
+ *  ECLIPSE with only the license terms in place for ECLIPSE applying to
+ *  ECLIPSE and the GNU GPL Version 3 applying for KNIME, provided the
+ *  license terms of ECLIPSE themselves allow for the respective use and
+ *  propagation of ECLIPSE together with KNIME.
+ *
+ *  Additional permission relating to nodes for KNIME that extend the Node
+ *  Extension (and in particular that are based on subclasses of NodeModel,
+ *  NodeDialog, and NodeView) and that only interoperate with KNIME through
+ *  standard APIs ("Nodes"):
+ *  Nodes are deemed to be separate and independent programs and to not be
+ *  covered works.  Notwithstanding anything to the contrary in the
+ *  License, the License does not apply to Nodes, you are not required to
+ *  license Nodes under the License, and you are granted a license to
+ *  prepare and propagate Nodes, in each case even if such Nodes are
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  may freely choose the license terms applicable to such Node, including
+ *  when such Node is propagated with or for interoperation with KNIME.
+ * ------------------------------------------------------------------------
+ */
+    
+package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
+
+import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorOptions;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.parameters.Widget;
+import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+
+/**
+ * Node parameters for Tree Ensemble Predictor.
+ *
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
+ */
+@SuppressWarnings("restriction")
+@LoadDefaultsForAbsentFields
+@Modification(TreeEnsembleClassificationPredictorNodeParameters.WidgetModifier.class)
+final class TreeEnsembleClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+
+    static final class WidgetModifier implements Modification.Modifier {
+
+        @Override
+        @SuppressWarnings("java:S1192") // duplicate string literals "title", "description"
+        public void modify(final Modification.WidgetGroupModifier group) {
+            group.find(ChangePredictionColumnNameRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Change prediction column name") //
+                .withProperty("description",
+                    "Select this option to change the name of the column containing the prediction.") //
+                .modify();
+
+            group.find(PredictionColumnNameRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Prediction column name") //
+                .withProperty("description",
+                    "Name of the column that will contain the prediction of the tree ensemble model.") //
+                .modify();
+
+            group.find(AppendPredictionConfidenceRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append overall prediction confidence") //
+                .withProperty("description",
+                    """
+                    Appends a column with the confidence of the predicted class—equal to the maximum of all class
+                    confidence values (which can also be appended individually).
+                    """) //
+                .modify();
+
+            group.find(AppendClassConfidencesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append individual class probabilities") //
+                .withProperty("description",
+                    """
+                    Appends one column per class containing its prediction confidence: the number of trees voting for 
+                    the class divided by the total number of trees.
+                    """) //
+                .modify();
+
+            group.find(SuffixForClassProbabilitiesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Suffix for probability columns") //
+                .withProperty("description",
+                    "Suffix that is appended to the class probability column names.") //
+                .modify();
+
+            group.find(UseSoftVotingRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Use soft voting") //
+                .withProperty("description",
+                    """
+                    Switches from hard voting (most votes win) to soft voting, which aggregates class probabilities from
+                    all trees. Requires the model to store class distributions (“Save target distribution in tree nodes”
+                    in the learner); enabling this without stored distributions triggers a warning.
+                    """) //
+                .modify();
+        }
+    }
+}
