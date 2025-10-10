@@ -43,7 +43,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorConfiguration;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -62,7 +62,7 @@ import org.knime.node.parameters.updates.util.BooleanReference;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
+public class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
 
     /** Annotator reference used when exposing {@link #m_changePredictionColumnName}. */
     public interface ChangePredictionColumnNameRef extends Modification.Reference {
@@ -96,6 +96,10 @@ class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
     public static final class ChangePredictionColumnNameEffectRef implements BooleanReference {
     }
 
+    /** Boolean reference used for effects depending on {@link #m_appendClassConfidences}. */
+    public static final class AppendClassConfidencesEffectRef implements BooleanReference {
+    }
+
     @Modification.WidgetReference(ChangePredictionColumnNameRef.class)
     @Persist(configKey = "changePredictionColumnName")
     @ValueReference(ChangePredictionColumnNameEffectRef.class)
@@ -112,6 +116,7 @@ class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
 
     @Modification.WidgetReference(AppendClassConfidencesRef.class)
     @Persist(configKey = "appendClassConfidences")
+    @ValueReference(AppendClassConfidencesEffectRef.class)
     boolean m_appendClassConfidences = false;
 
     @Modification.WidgetReference(AppendModelCountRef.class)
@@ -120,6 +125,7 @@ class TreeEnsemblePredictorOptions implements NodeParameters, WidgetGroup {
 
     @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
     @Persist(configKey = "suffixForClassProbabilities")
+    @Effect(predicate = AppendClassConfidencesEffectRef.class, type = EffectType.ENABLE)
     String m_suffixForClassProbabilities = "";
 
     @Modification.WidgetReference(UseSoftVotingRef.class)

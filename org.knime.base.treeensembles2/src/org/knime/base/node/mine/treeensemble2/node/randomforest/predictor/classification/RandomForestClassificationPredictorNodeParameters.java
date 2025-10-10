@@ -43,7 +43,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.classification;
 
 import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -51,35 +51,71 @@ import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
- * Node parameters for Random Forest Predictor (Regression).
+ * Node parameters for Random Forest Predictor.
  *
  * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
  * @author AI Migration Pipeline v1.1
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
-final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+@Modification(RandomForestClassificationPredictorNodeParameters.WidgetModifier.class)
+final class RandomForestClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
+        @SuppressWarnings("java:S1192")  // duplicate string literals "title", "description"
         public void modify(final Modification.WidgetGroupModifier group) {
             group.find(ChangePredictionColumnNameRef.class) //
                 .addAnnotation(Widget.class) //
                 .withProperty("title", "Change prediction column name") //
                 .withProperty("description",
-                    "Check if you want to alter the name of the column that will contain the prediction.") //
+                    "Select this option to change the name of the column that will contain the prediction.") //
                 .modify();
 
             group.find(PredictionColumnNameRef.class) //
                 .addAnnotation(Widget.class) //
                 .withProperty("title", "Prediction column name") //
                 .withProperty("description",
+                    "Name of the column that stores the prediction produced by the tree ensemble model.") //
+                .modify();
+
+            group.find(AppendPredictionConfidenceRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append overall prediction confidence") //
+                .withProperty("description",
                     """
-                    Name of the 1st output column. It contains the mean response of all models.
-                    A second column with the suffix "(Variance)" is appended containing the variance of all model
-                    responses.
+                    Adds the confidence of the predicted class; this is the maximum of all class confidence values,
+                    which can also be appended individually.
+                    """) //
+                .modify();
+
+            group.find(AppendClassConfidencesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Append individual class probabilities") //
+                .withProperty("description",
+                    """
+                    Adds one column per class containing its prediction confidence: the number of trees voting for that
+                    class divided by the total number of trees.
+                    """) //
+                .modify();
+
+            group.find(SuffixForClassProbabilitiesRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Suffix for probability columns") //
+                .withProperty("description",
+                    "Suffix that is appended to the class probability column names.") //
+                .modify();
+
+            group.find(UseSoftVotingRef.class) //
+                .addAnnotation(Widget.class) //
+                .withProperty("title", "Use soft voting") //
+                .withProperty("description",
+                    """
+                    Switches from hard voting (the most votes win) to soft voting, which aggregates class probabilities
+                    from all trees. Requires the random forest model to store class distributions ("Save target
+                    distribution in tree nodes" in the learner); enabling this without stored distributions triggers a
+                    warning.
                     """) //
                 .modify();
         }
