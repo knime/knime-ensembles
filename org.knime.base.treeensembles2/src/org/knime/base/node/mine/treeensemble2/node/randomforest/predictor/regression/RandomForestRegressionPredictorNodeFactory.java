@@ -47,12 +47,14 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
 
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.MINITAB_COPYRIGHT;
 import static org.knime.node.impl.description.PortDescription.fixedPort;
 
 import java.util.List;
 import java.util.Map;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.regression.TreeEnsembleRegressionPredictorNodeModel;
+import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -92,7 +94,7 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings({"java:S5738","removal"})
+    @SuppressWarnings({"java:S5738", "removal"})
     public final NodeView<TreeEnsembleRegressionPredictorNodeModel> createNodeView(final int viewIndex,
         final TreeEnsembleRegressionPredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
@@ -100,7 +102,7 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings({"java:S5738","removal"})
+    @SuppressWarnings({"java:S5738", "removal"})
     protected final boolean hasDialog() {
         return true;
     }
@@ -115,10 +117,8 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
             """;
 
     private static final String FULL_DESCRIPTION = """
-            Applies regression from a random forest* model by using the mean of the individual predictions.
-            <br/><br/>
-            (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s permission.
-            """;
+            Applies regression from a random forest model by using the mean of the individual predictions.
+            """ + MINITAB_COPYRIGHT;
 
     private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Model", """
             The random forest model as produced by the Random Forest Learner (Regression) node.
@@ -131,7 +131,7 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
             """));
 
     @Override
-    @SuppressWarnings({"java:S5738","removal"})
+    @SuppressWarnings({"java:S5738", "removal"})
     public NodeDialogPane createNodeDialogPane() {
         return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
     }
@@ -150,8 +150,7 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     @Override
     public KaiNodeInterface createKaiNodeInterface() {
-        return new DefaultKaiNodeInterface(
-            Map.of(SettingsType.MODEL, TreeEnsemblePredictorOptions.class));
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, TreeEnsemblePredictorOptions.class));
     }
 
 }

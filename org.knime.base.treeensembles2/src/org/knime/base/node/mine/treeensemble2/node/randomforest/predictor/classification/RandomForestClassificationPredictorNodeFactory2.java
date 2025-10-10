@@ -47,18 +47,40 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.classification;
 
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.MINITAB_COPYRIGHT;
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
 import org.knime.base.node.mine.treeensemble2.node.predictor.classification.TreeEnsembleClassificationPredictorNodeModel;
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
+ * Node factory for the Random Forest Predictor node that predicts classifications based on a random forest model.
+ * This factory creates the node model, dialog, and implements both NodeDialogFactory and KaiNodeInterfaceFactory
+ * to support the new dialog framework and K-AI integration.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
+@SuppressWarnings("restriction")
 public class RandomForestClassificationPredictorNodeFactory2 extends
-    NodeFactory<TreeEnsembleClassificationPredictorNodeModel> {
-
+        NodeFactory<TreeEnsembleClassificationPredictorNodeModel> implements NodeDialogFactory, KaiNodeInterfaceFactory {
     /** {@inheritDoc} */
     @Override
     public final TreeEnsembleClassificationPredictorNodeModel createNodeModel() {
@@ -73,6 +95,7 @@ public class RandomForestClassificationPredictorNodeFactory2 extends
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     public final NodeView<TreeEnsembleClassificationPredictorNodeModel> createNodeView(final int viewIndex,
         final TreeEnsembleClassificationPredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
@@ -80,14 +103,57 @@ public class RandomForestClassificationPredictorNodeFactory2 extends
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     protected final boolean hasDialog() {
         return true;
     }
 
-    /** {@inheritDoc} */
+    private static final String NODE_NAME = "Random Forest Predictor";
+
+    private static final String NODE_ICON = "treeensemble_predictor.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Predicts patterns according to an aggregation of the predictions of the individual trees in a random
+            forest model.
+            """ + MINITAB_COPYRIGHT;
+
+    private static final String FULL_DESCRIPTION = """
+            Predicts patterns according to an aggregation of the predictions of the individual trees in a random
+            forest model.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Random Forest Model", """
+            The output of the learner.
+            """), fixedPort("Input data", """
+            Data to be predicted.
+            """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(fixedPort("Prediction output", """
+            Input data along with prediction columns.
+            """));
+
     @Override
-    protected final NodeDialogPane createNodeDialogPane() {
-        return new RandomForestClassificationPredictorNodeDialogPane();
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, RandomForestClassificationPredictorNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), RandomForestClassificationPredictorNodeParameters.class,
+            null, NodeType.Predictor, List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, RandomForestClassificationPredictorNodeParameters.class));
     }
 
 }
