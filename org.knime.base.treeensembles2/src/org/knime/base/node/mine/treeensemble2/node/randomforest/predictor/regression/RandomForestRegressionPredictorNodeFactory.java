@@ -71,7 +71,9 @@ import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
 import org.knime.node.impl.description.PortDescription;
 
 /**
- * 
+ * Factory class for the Random Forest Predictor (Regression) node. Creates node model for predicting numeric values
+ * using a random forest model, and provides node dialog and KAI interface implementations.
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
  * @author AI Migration Pipeline v1.1
@@ -112,13 +114,13 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     private static final String NODE_ICON = "treeensemble_predictor_regression.png";
 
-    private static final String SHORT_DESCRIPTION = """
+    private static final String BASE_DESCRIPTION = """
             Applies regression from a random forest model by using the mean of the individual predictions.
             """;
 
-    private static final String FULL_DESCRIPTION = """
-            Applies regression from a random forest model by using the mean of the individual predictions.
-            """ + MINITAB_COPYRIGHT;
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION;
+
+    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
 
     private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Model", """
             The random forest model as produced by the Random Forest Learner (Regression) node.
