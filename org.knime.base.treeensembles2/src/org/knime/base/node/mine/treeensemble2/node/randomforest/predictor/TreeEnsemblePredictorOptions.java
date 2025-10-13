@@ -56,44 +56,46 @@ import org.knime.node.parameters.updates.ValueReference;
 import org.knime.node.parameters.updates.util.BooleanReference;
 
 /**
- * Holds the shared tree ensemble predictor options. Settings without widget annotations remain hidden in dialogs by
- * default and can be exposed selectively by subclasses adding {@link org.knime.node.parameters.Widget} annotations e.g.
- * via {@link Modification}s.
+ * Shared configuration container for random-forest predictor nodes.
+ * <p>
+ * The class declares all persistable settings and offers helper methods that configure the corresponding widgets in
+ * subclasses.
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
 public class TreeEnsemblePredictorOptions implements NodeParameters {
 
-    public final static String MINITAB_COPYRIGHT = """
+    /** Trademark disclaimer embedded into node descriptions referencing RANDOM FORESTS. */
+    public static final String MINITAB_COPYRIGHT = """
             <br/><br/>
             RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s
             permission.""";
 
-    /** Annotator reference used when exposing {@link #m_changePredictionColumnName}. */
+    /** Reference that identifies the {@code changePredictionColumnName} widget. */
     public interface ChangePredictionColumnNameRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_predictionColumnName}. */
+    /** Reference that identifies the {@code predictionColumnName} widget. */
     public interface PredictionColumnNameRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_appendPredictionConfidence}. */
+    /** Reference that identifies the {@code appendPredictionConfidence} widget. */
     public interface AppendPredictionConfidenceRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_appendClassConfidences}. */
+    /** Reference that identifies the {@code appendClassConfidences} widget. */
     public interface AppendClassConfidencesRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_appendModelCount}. */
+    /** Reference that identifies the (legacy) {@code appendModelCount} widget. */
     public interface AppendModelCountRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_suffixForClassProbabilities}. */
+    /** Reference that identifies the {@code suffixForClassProbabilities} widget. */
     public interface SuffixForClassProbabilitiesRef extends Modification.Reference {
     }
 
-    /** Annotator reference used when exposing {@link #m_useSoftVoting}. */
+    /** Reference that identifies the {@code useSoftVoting} widget. */
     public interface UseSoftVotingRef extends Modification.Reference {
     }
 
@@ -136,6 +138,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
     @Persist(configKey = "useSoftVoting")
     boolean m_useSoftVoting;
 
+    /**
+     * Adds the widget metadata for the {@code appendPredictionConfidence} toggle.
+     *
+     * @param groupModifier widget modifier accessing the target field
+     */
     public static void useAppendPredictionConfidence(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(AppendPredictionConfidenceRef.class) //
             .addAnnotation(Widget.class) //
@@ -147,6 +154,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
             .modify();
     }
 
+    /**
+     * Adds the widget metadata for the {@code appendClassConfidences} toggle.
+     *
+     * @param groupModifier widget modifier accessing the target field
+     */
     public static void useAppendClassConfidences(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(AppendClassConfidencesRef.class) //
             .addAnnotation(Widget.class) //
@@ -158,6 +170,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
             .modify();
     }
 
+    /**
+     * Adds the widget metadata for the {@code suffixForClassProbabilities} field.
+     *
+     * @param groupModifier widget modifier accessing the target field
+     */
     public static void useSuffixForClassProbabilities(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(SuffixForClassProbabilitiesRef.class) //
             .addAnnotation(Widget.class) //
@@ -166,6 +183,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
             .modify();
     }
 
+    /**
+     * Adds the widget metadata for the {@code useSoftVoting} toggle.
+     *
+     * @param groupModifier widget modifier accessing the target field
+     */
     public static void useSoftVoting(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(UseSoftVotingRef.class) //
             .addAnnotation(Widget.class) //

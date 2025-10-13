@@ -70,57 +70,23 @@ import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
 import org.knime.node.impl.description.PortDescription;
 
 /**
- * Node factory for the Random Forest Predictor node that predicts classifications based on a random forest model.
- * This factory creates the node model, dialog, and implements both NodeDialogFactory and KaiNodeInterfaceFactory
- * to support the new dialog framework and K-AI integration.
- *
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
- * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
- * @author AI Migration Pipeline v1.1
+ * Node factory for the Random Forest Predictor (classification) using the WebUI dialog stack.
  */
 @SuppressWarnings("restriction")
-public class RandomForestClassificationPredictorNodeFactory2 extends
-        NodeFactory<TreeEnsembleClassificationPredictorNodeModel> implements NodeDialogFactory, KaiNodeInterfaceFactory {
-    /** {@inheritDoc} */
-    @Override
-    public final TreeEnsembleClassificationPredictorNodeModel createNodeModel() {
-        return new TreeEnsembleClassificationPredictorNodeModel(false);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected final int getNrNodeViews() {
-        return 0;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings({"java:S5738", "removal"})
-    public final NodeView<TreeEnsembleClassificationPredictorNodeModel> createNodeView(final int viewIndex,
-        final TreeEnsembleClassificationPredictorNodeModel nodeModel) {
-        throw new IndexOutOfBoundsException();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings({"java:S5738", "removal"})
-    protected final boolean hasDialog() {
-        return true;
-    }
+public final class RandomForestClassificationPredictorNodeFactory2 extends
+    NodeFactory<TreeEnsembleClassificationPredictorNodeModel> implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
     private static final String NODE_NAME = "Random Forest Predictor";
 
     private static final String NODE_ICON = "treeensemble_predictor.png";
 
-    private static final String SHORT_DESCRIPTION = """
-            Predicts patterns according to an aggregation of the predictions of the individual trees in a random
-            forest model.
-            """ + MINITAB_COPYRIGHT;
-
-    private static final String FULL_DESCRIPTION = """
-            Predicts patterns according to an aggregation of the predictions of the individual trees in a random
-            forest model.
+    private static final String BASE_DESCRIPTION = """
+            Predicts patterns by aggregating the predictions of the individual trees in a random forest model.
             """;
+
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
+
+    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION;
 
     private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Random Forest Model", """
             The output of the learner.
@@ -131,6 +97,33 @@ public class RandomForestClassificationPredictorNodeFactory2 extends
     private static final List<PortDescription> OUTPUT_PORTS = List.of(fixedPort("Prediction output", """
             Input data along with prediction columns.
             """));
+
+    /** {@inheritDoc} */
+    @Override
+    public TreeEnsembleClassificationPredictorNodeModel createNodeModel() {
+        return new TreeEnsembleClassificationPredictorNodeModel(false);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeView<TreeEnsembleClassificationPredictorNodeModel> createNodeView(final int viewIndex,
+        final TreeEnsembleClassificationPredictorNodeModel nodeModel) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @SuppressWarnings({"java:S5738", "removal"})
+    protected boolean hasDialog() {
+        return true;
+    }
 
     @Override
     @SuppressWarnings({"java:S5738", "removal"})
