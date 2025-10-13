@@ -47,6 +47,7 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
 
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.MINITAB_COPYRIGHT;
 import static org.knime.node.impl.description.PortDescription.fixedPort;
 
 import java.util.List;
@@ -108,19 +109,16 @@ public class TreeEnsembleClassificationPredictorNodeFactory2 extends
 
     private static final String NODE_ICON = "treeensemble_predictor.png";
 
-    private static final String SHORT_DESCRIPTION = """
+    private static final String BASE_DESCRIPTION = """
             Predicts patterns according to an aggregation of the predictions of the individual trees in a random
                 forest model.
             """;
 
-    private static final String FULL_DESCRIPTION = """
-            Predicts patterns according to an aggregation of the predictions of the individual trees in a random
-                forest* model. <br/><br/>
-                (*) RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s
-                permission.
-            """;
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION;
 
-    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Tree EnsembleModel", """
+    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Tree Ensemble Model", """
             The output of the learner.
             """), fixedPort("Input data", """
             Data to be predicted.

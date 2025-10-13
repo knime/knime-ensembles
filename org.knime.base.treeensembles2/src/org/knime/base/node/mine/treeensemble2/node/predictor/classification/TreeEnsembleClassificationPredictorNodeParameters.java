@@ -43,12 +43,11 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-    
+
 package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
 
-import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorOptions;
+import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
-import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
@@ -60,64 +59,19 @@ import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
 @Modification(TreeEnsembleClassificationPredictorNodeParameters.WidgetModifier.class)
-final class TreeEnsembleClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+public final class TreeEnsembleClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
+    /**
+     * Applies classification-specific widget metadata.
+     */
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
-        @SuppressWarnings("java:S1192") // duplicate string literals "title", "description"
         public void modify(final Modification.WidgetGroupModifier group) {
-            group.find(ChangePredictionColumnNameRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Change prediction column name") //
-                .withProperty("description",
-                    "Select this option to change the name of the column containing the prediction.") //
-                .modify();
-
-            group.find(PredictionColumnNameRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Prediction column name") //
-                .withProperty("description",
-                    "Name of the column that will contain the prediction of the tree ensemble model.") //
-                .modify();
-
-            group.find(AppendPredictionConfidenceRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Append overall prediction confidence") //
-                .withProperty("description",
-                    """
-                    Appends a column with the confidence of the predicted class—equal to the maximum of all class
-                    confidence values (which can also be appended individually).
-                    """) //
-                .modify();
-
-            group.find(AppendClassConfidencesRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Append individual class probabilities") //
-                .withProperty("description",
-                    """
-                    Appends one column per class containing its prediction confidence: the number of trees voting for 
-                    the class divided by the total number of trees.
-                    """) //
-                .modify();
-
-            group.find(SuffixForClassProbabilitiesRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Suffix for probability columns") //
-                .withProperty("description",
-                    "Suffix that is appended to the class probability column names.") //
-                .modify();
-
-            group.find(UseSoftVotingRef.class) //
-                .addAnnotation(Widget.class) //
-                .withProperty("title", "Use soft voting") //
-                .withProperty("description",
-                    """
-                    Switches from hard voting (most votes win) to soft voting, which aggregates class probabilities from
-                    all trees. Requires the model to store class distributions (“Save target distribution in tree nodes”
-                    in the learner); enabling this without stored distributions triggers a warning.
-                    """) //
-                .modify();
+            useAppendPredictionConfidence(group);
+            useAppendClassConfidences(group);
+            useSuffixForClassProbabilities(group);
+            useSoftVoting(group);
         }
     }
 }
