@@ -27,65 +27,119 @@
  *  ECLIPSE and the GNU GPL Version 3 applying for KNIME, provided the
  *  license terms of ECLIPSE themselves allow for the respective use and
  *  propagation of ECLIPSE together with KNIME.
- *
- *  Additional permission relating to nodes for KNIME that extend the Node
- *  Extension (and in particular that are based on subclasses of NodeModel,
- *  NodeDialog, and NodeView) and that only interoperate with KNIME through
- *  standard APIs ("Nodes"):
- *  Nodes are deemed to be separate and independent programs and to not be
- *  covered works.  Notwithstanding anything to the contrary in the
- *  License, the License does not apply to Nodes, you are not required to
- *  license Nodes under the License, and you are granted a license to
- *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
- *  may freely choose the license terms applicable to such Node, including
- *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- *
- * History
- *   Jan 10, 2012 (wiswedel): created
  */
 package org.knime.base.node.mine.treeensemble2.node.predictor.regression;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
- * 
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * Node factory for the Tree Ensemble Predictor (Regression).
  */
-public class TreeEnsembleRegressionPredictorNodeFactory extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel> {
+@SuppressWarnings("restriction")
+// TODO manual smoke test
+// TODO review description strings
+public final class TreeEnsembleRegressionPredictorNodeFactory
+    extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-    /** {@inheritDoc} */
+    private static final String NODE_NAME = "Tree Ensemble Predictor (Regression)";
+
+    private static final String NODE_ICON = "treeensemble_predictor_regression.png";
+
+    private static final String BASE_DESCRIPTION = """
+            Applies regression from a tree ensemble model by using the mean of the individual predictions.
+            """;
+
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION;
+
+    private static final String FULL_DESCRIPTION = """
+            Applies regression from a tree ensemble model by using the mean of the individual predictions.
+            <br/><br/>
+            <strong>Change prediction column name</strong><br/>
+            Check if you want to alter the name of the column that will contain the prediction.
+            <br/><br/>
+            <strong>Prediction column name</strong><br/>
+            Name of the first output column. It contains the mean response of all models. A second column with the
+            suffix "(Variance)" is appended containing the variance of all model responses.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+        fixedPort("Tree Ensemble Model", """
+                Tree ensemble model as produced by the Tree Ensemble Learner (Regression) node.
+                """),
+        fixedPort("Input data", """
+                Data to be predicted.
+                """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+        fixedPort("Prediction output", """
+                Input data along with prediction columns.
+                """));
+
     @Override
-    public final TreeEnsembleRegressionPredictorNodeModel createNodeModel() {
+    public TreeEnsembleRegressionPredictorNodeModel createNodeModel() {
         return new TreeEnsembleRegressionPredictorNodeModel();
     }
 
-    /** {@inheritDoc} */
     @Override
-    protected final int getNrNodeViews() {
+    protected int getNrNodeViews() {
         return 0;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public final NodeView<TreeEnsembleRegressionPredictorNodeModel> createNodeView(final int viewIndex,
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeView<TreeEnsembleRegressionPredictorNodeModel> createNodeView(final int viewIndex,
         final TreeEnsembleRegressionPredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
     }
 
-    /** {@inheritDoc} */
     @Override
-    protected final boolean hasDialog() {
+    @SuppressWarnings({"java:S5738", "removal"})
+    protected boolean hasDialog() {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
-    protected final NodeDialogPane createNodeDialogPane() {
-        return new TreeEnsembleRegressionPredictorNodeDialogPane();
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
     }
 
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, TreeEnsemblePredictorOptions.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), TreeEnsemblePredictorOptions.class, null,
+            NodeType.Predictor, List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, TreeEnsemblePredictorOptions.class));
+    }
 }
