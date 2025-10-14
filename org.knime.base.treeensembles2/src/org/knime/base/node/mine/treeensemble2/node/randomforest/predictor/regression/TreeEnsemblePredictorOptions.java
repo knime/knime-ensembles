@@ -103,7 +103,7 @@ class TreeEnsemblePredictorOptions implements NodeParameters {
     boolean m_changePredictionColumnName = true;
 
     @Widget(title = "Prediction column name", description = """
-            The name of the output column containing the mean response of all models.
+            The name of the first output column, containing the mean response of all models.
             A second column with the suffix "(Variance)" will be appended, containing the variance of all model
             responses.
             """)
