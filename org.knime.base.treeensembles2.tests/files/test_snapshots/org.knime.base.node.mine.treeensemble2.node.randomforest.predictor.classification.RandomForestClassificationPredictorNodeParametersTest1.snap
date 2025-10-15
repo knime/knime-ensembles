@@ -41,7 +41,7 @@
           "predictionColumnName" : {
             "type" : "string",
             "title" : "Prediction column name",
-            "description" : "The name of the output column containing the mean response of all models.\nA second column with the suffix \"(Variance)\" will be appended, containing the variance of all model\nresponses.\n",
+            "description" : "The name of the column containing the predicted class.",
             "default" : "Prediction ()"
           },
           "suffixForClassProbabilities" : {

@@ -49,7 +49,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.knime.base.node.mine.treeensemble2.model.TreeEnsembleModelPortObjectSpec;
-import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.def.DoubleCell;
@@ -62,7 +61,7 @@ import org.knime.testing.node.dialog.DefaultNodeSettingsSnapshotTest;
 import org.knime.testing.node.dialog.SnapshotTestConfiguration;
 
 /**
- * Snapshot test for {@link TreeEnsemblePredictorOptions}.
+ * Snapshot test for {@link RandomForestRegressionPredictorNodeParameters}.
  */
 @SuppressWarnings("restriction")
 final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNodeSettingsSnapshotTest {
@@ -74,7 +73,7 @@ final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNod
     private static SnapshotTestConfiguration getConfig() {
         return SnapshotTestConfiguration.builder() //
             .withInputPortObjectSpecs(createInputPortSpecs()) //
-            .testJsonFormsForModel(TreeEnsemblePredictorOptions.class) //
+            .testJsonFormsForModel(RandomForestRegressionPredictorNodeParameters.class) //
             .testJsonFormsWithInstance(SettingsType.MODEL, () -> readSettings()) //
             .testNodeSettingsStructure(() -> readSettings()) //
             .build();
@@ -97,7 +96,7 @@ final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNod
         return new DataTableSpec(new String[]{"Feature"}, new DataType[]{DataType.getType(DoubleCell.class)});
     }
 
-    private static TreeEnsemblePredictorOptions readSettings() {
+    private static RandomForestRegressionPredictorNodeParameters readSettings() {
         try {
             var path = getSnapshotPath(RandomForestRegressionPredictorNodeParametersTest.class).getParent()
                 .resolve("node_settings")
@@ -106,7 +105,7 @@ final class RandomForestRegressionPredictorNodeParametersTest extends DefaultNod
                 var nodeSettings = NodeSettings.loadFromXML(fis);
                 return NodeParametersUtil.loadSettings(
                     nodeSettings.getNodeSettings(SettingsType.MODEL.getConfigKey()),
-                    TreeEnsemblePredictorOptions.class);
+                    RandomForestRegressionPredictorNodeParameters.class);
             }
         } catch (IOException | InvalidSettingsException e) {
             throw new IllegalStateException(e);

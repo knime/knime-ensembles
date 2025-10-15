@@ -43,7 +43,7 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.classification;
+package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
 
 import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -57,15 +57,21 @@ import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(RandomForestClassificationPredictorNodeParameters.WidgetModifier.class)
-final class RandomForestClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
+final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
     static final class WidgetModifier implements Modification.Modifier {
+
+        private static final String PREDICTION_COLUMN_NAME_DESCRIPTION = """
+                The name of the first output column, containing the mean response of all models.
+                A second column with the suffix "(Variance)" will be appended, containing the variance of all model
+                responses.
+                """.stripIndent();
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             useChangePredictionColumnName(group);
-            usePredictionColumnName(group, "The name of the column containing the predicted class.");
+            usePredictionColumnName(group, PREDICTION_COLUMN_NAME_DESCRIPTION);
             useAppendPredictionConfidence(group);
             useAppendClassConfidences(group);
             useSuffixForClassProbabilities(group);

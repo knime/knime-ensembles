@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.regression.TreeEnsembleRegressionPredictorNodeModel;
-import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
@@ -140,19 +139,20 @@ public class RandomForestRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     @Override
     public NodeDialog createNodeDialog() {
-        return new DefaultNodeDialog(SettingsType.MODEL, TreeEnsemblePredictorOptions.class);
+        return new DefaultNodeDialog(SettingsType.MODEL, RandomForestRegressionPredictorNodeParameters.class);
     }
 
     @Override
     public NodeDescription createNodeDescription() {
         return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
-            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), TreeEnsemblePredictorOptions.class, null,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), RandomForestRegressionPredictorNodeParameters.class, null,
             NodeType.Predictor, List.of(), null);
     }
 
     @Override
     public KaiNodeInterface createKaiNodeInterface() {
-        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, TreeEnsemblePredictorOptions.class));
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, RandomForestRegressionPredictorNodeParameters.class));
     }
 
 }

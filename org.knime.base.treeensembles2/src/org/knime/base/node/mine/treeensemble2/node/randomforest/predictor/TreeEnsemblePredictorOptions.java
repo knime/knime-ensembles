@@ -71,51 +71,53 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
             RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s
             permission.""";
 
+    private static final String PREDICTION_COLUMN_NAME_WIDGET_TITLE = "Prediction column name";
+
+    public static final String CHANGE_PREDICTION_COLUMN_NAME_TITLE = "Change prediction column name";
+
+    public static final String CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION =
+        "Select to customize the name of the column containing the prediction.";
+
     /** Reference that identifies the {@code changePredictionColumnName} widget. */
-    public interface ChangePredictionColumnNameRef extends Modification.Reference {
+    interface ChangePredictionColumnNameRef extends Modification.Reference {
     }
 
     /** Reference that identifies the {@code predictionColumnName} widget. */
-    public interface PredictionColumnNameRef extends Modification.Reference {
+    interface PredictionColumnNameRef extends Modification.Reference {
     }
 
     /** Reference that identifies the {@code appendPredictionConfidence} widget. */
-    public interface AppendPredictionConfidenceRef extends Modification.Reference {
+    interface AppendPredictionConfidenceRef extends Modification.Reference {
     }
 
     /** Reference that identifies the {@code appendClassConfidences} widget. */
-    public interface AppendClassConfidencesRef extends Modification.Reference {
+    interface AppendClassConfidencesRef extends Modification.Reference {
     }
 
     /** Reference that identifies the (legacy) {@code appendModelCount} widget. */
-    public interface AppendModelCountRef extends Modification.Reference {
+    interface AppendModelCountRef extends Modification.Reference {
     }
 
     /** Reference that identifies the {@code suffixForClassProbabilities} widget. */
-    public interface SuffixForClassProbabilitiesRef extends Modification.Reference {
+    interface SuffixForClassProbabilitiesRef extends Modification.Reference {
     }
 
     /** Reference that identifies the {@code useSoftVoting} widget. */
-    public interface UseSoftVotingRef extends Modification.Reference {
+    interface UseSoftVotingRef extends Modification.Reference {
     }
 
     /** Boolean reference used for effects depending on {@link #m_changePredictionColumnName}. */
     public static final class ChangePredictionColumnNameEffectRef implements BooleanReference {
     }
 
-    @Widget(title = "Change prediction column name",
-        description = "Select to customize the name of the column containing the prediction.")
     @Persist(configKey = "changePredictionColumnName")
     @ValueReference(ChangePredictionColumnNameEffectRef.class)
+    @Modification.WidgetReference(ChangePredictionColumnNameRef.class)
     boolean m_changePredictionColumnName = true;
 
-    @Widget(title = "Prediction column name", description = """
-            The name of the first output column, containing the mean response of all models.
-            A second column with the suffix "(Variance)" will be appended, containing the variance of all model
-            responses.
-            """)
     @Persist(configKey = "predictionColumnName")
     @Effect(predicate = ChangePredictionColumnNameEffectRef.class, type = Effect.EffectType.ENABLE)
+    @Modification.WidgetReference(PredictionColumnNameRef.class)
     String m_predictionColumnName = TreeEnsemblePredictorConfiguration.getDefPredictColumnName();
 
     @Modification.WidgetReference(AppendPredictionConfidenceRef.class)
@@ -137,6 +139,23 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
     @Modification.WidgetReference(UseSoftVotingRef.class)
     @Persist(configKey = "useSoftVoting")
     boolean m_useSoftVoting;
+
+    public static void useChangePredictionColumnName(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(ChangePredictionColumnNameRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", CHANGE_PREDICTION_COLUMN_NAME_TITLE) //
+            .withProperty("description", CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION) //
+            .modify();
+    }
+
+    public static void usePredictionColumnName(final Modification.WidgetGroupModifier groupModifier,
+        final String description) {
+        groupModifier.find(PredictionColumnNameRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", PREDICTION_COLUMN_NAME_WIDGET_TITLE) //
+            .withProperty("description", description) //
+            .modify();
+    }
 
     /**
      * Adds the widget metadata for the {@code appendPredictionConfidence} toggle.
