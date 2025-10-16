@@ -67,8 +67,7 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /** Trademark disclaimer embedded into node descriptions referencing RANDOM FORESTS. */
     public static final String MINITAB_COPYRIGHT = """
-            <br/><br/>
-            RANDOM FORESTS is a registered trademark of Minitab, LLC and is used with Minitab’s
+            "Random Forests" is a registered trademark of Minitab, LLC and is used with Minitab’s
             permission.""";
 
     private static final String PREDICTION_COLUMN_NAME_WIDGET_TITLE = "Prediction column name";
