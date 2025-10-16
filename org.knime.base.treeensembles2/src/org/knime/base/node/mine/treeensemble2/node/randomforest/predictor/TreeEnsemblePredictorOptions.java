@@ -158,6 +158,8 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /**
      * Adds the widget metadata for the {@code appendPredictionConfidence} toggle.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */
@@ -174,6 +176,8 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /**
      * Adds the widget metadata for the {@code appendClassConfidences} toggle.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */
@@ -190,6 +194,8 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /**
      * Adds the widget metadata for the {@code suffixForClassProbabilities} field.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */
@@ -203,6 +209,8 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /**
      * Adds the widget metadata for the {@code useSoftVoting} toggle.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */
