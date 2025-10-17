@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -41,48 +42,35 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- *
- * History
- *   Jan 10, 2012 (wiswedel): created
  */
-package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor;
+package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.regression;
 
-import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorPanel;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.port.PortObjectSpec;
+import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
+ * Node parameters for Gradient Boosted Trees Predictor (Regression).
  *
- * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
+ * <p>
+ * The configuration mirrors the legacy
+ * {@link org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorPanel} behaviour for regression,
+ * exposing only the prediction column controls.
  */
-// TODO when all nodes are migrated
-public final class GradientBoostingPredictorNodeDialogPane extends NodeDialogPane {
-
-    private final TreeEnsemblePredictorPanel m_predictorPanel;
+@SuppressWarnings("restriction")
+@LoadDefaultsForAbsentFields
+@Modification(GradientBoostingPredictorNodeParameters.WidgetModifier.class)
+final class GradientBoostingPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
     /**
-     * @param isRegression whether the dialog is for a regression or classification node
-     *  */
-    public GradientBoostingPredictorNodeDialogPane(final boolean isRegression) {
-        m_predictorPanel = new TreeEnsemblePredictorPanel(isRegression, false);
-        addTab(TreeEnsemblePredictorPanel.PANEL_NAME, m_predictorPanel);
-    }
+     * Applies regression-specific widget metadata.
+     */
+    static final class WidgetModifier implements Modification.Modifier {
 
-    /** {@inheritDoc} */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-        throws NotConfigurableException {
-        m_predictorPanel.loadSettingsFrom(settings, specs);
+        @Override
+        public void modify(final Modification.WidgetGroupModifier group) {
+            useChangePredictionColumnName(group);
+            usePredictionColumnName(group, "Name of the output column containing the prediction.");
+        }
     }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        m_predictorPanel.saveSettingsTo(settings);
-    }
-
 }
