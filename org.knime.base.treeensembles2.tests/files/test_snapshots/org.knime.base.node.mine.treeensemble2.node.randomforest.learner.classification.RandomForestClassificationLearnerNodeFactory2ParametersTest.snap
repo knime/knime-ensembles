@@ -1,0 +1,1060 @@
+{
+  "data" : {
+    "model" : {
+      "targetColumn" : "Cluster Membership",
+      "trainingAttributes" : {
+        "trainingAttributesMode" : "COLUMNS"
+      },
+      "attributeColumns" : {
+        "mode" : "MANUAL",
+        "patternFilter" : {
+          "pattern" : "",
+          "isCaseSensitive" : false,
+          "isInverted" : false
+        },
+        "manualFilter" : {
+          "manuallySelected" : [ ],
+          "manuallyDeselected" : [ ],
+          "includeUnknownColumns" : false
+        },
+        "typeFilter" : {
+          "selectedTypes" : [ ],
+          "typeDisplays" : [ ]
+        }
+      },
+      "ignoreColumnsWithoutDomain" : false,
+      "hiliteCount" : null,
+      "missingValueHandling" : "XGBOOST",
+      "saveTargetDistributionInNodes" : false,
+      "splitCriterion" : "GINI",
+      "useAverageSplitPoints" : true,
+      "useBinaryNominalSplits" : true,
+      "maxTreeDepth" : null,
+      "minNodeSizes" : {
+        "minNodeSize" : null,
+        "minChildNodeSize" : null
+      },
+      "hardCodedRootColumn" : null,
+      "numberOfModels" : 100,
+      "rowSamplingFraction" : null,
+      "rowSamplingWithReplacement" : true,
+      "rowSamplingMode" : "RANDOM",
+      "columnSamplingMode" : "SQUARE_ROOT",
+      "columnFractionLinear" : 1.0,
+      "columnAbsolute" : 10,
+      "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
+      "seed" : null
+    }
+  },
+  "schema" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "attributeColumns" : {
+            "type" : "object",
+            "properties" : {
+              "manualFilter" : {
+                "type" : "object",
+                "properties" : {
+                  "includeUnknownColumns" : {
+                    "type" : "boolean",
+                    "default" : false
+                  },
+                  "manuallyDeselected" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  },
+                  "manuallySelected" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "default" : {
+                  "manuallySelected" : [ ],
+                  "manuallyDeselected" : [ ],
+                  "includeUnknownColumns" : false
+                }
+              },
+              "mode" : {
+                "oneOf" : [ {
+                  "const" : "MANUAL",
+                  "title" : "Manual"
+                }, {
+                  "const" : "REGEX",
+                  "title" : "Regex"
+                }, {
+                  "const" : "WILDCARD",
+                  "title" : "Wildcard"
+                }, {
+                  "const" : "TYPE",
+                  "title" : "Type"
+                } ],
+                "default" : "MANUAL"
+              },
+              "patternFilter" : {
+                "type" : "object",
+                "properties" : {
+                  "isCaseSensitive" : {
+                    "type" : "boolean",
+                    "default" : false
+                  },
+                  "isInverted" : {
+                    "type" : "boolean",
+                    "default" : false
+                  },
+                  "pattern" : {
+                    "type" : "string",
+                    "default" : ""
+                  }
+                },
+                "default" : {
+                  "pattern" : "",
+                  "isCaseSensitive" : false,
+                  "isInverted" : false
+                }
+              },
+              "selected" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "string"
+                }
+              },
+              "typeFilter" : {
+                "type" : "object",
+                "properties" : {
+                  "selectedTypes" : {
+                    "default" : [ ],
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "default" : {
+                  "selectedTypes" : [ ],
+                  "typeDisplays" : [ ]
+                }
+              }
+            },
+            "title" : "Attribute selection",
+            "description" : "Select the ordinary columns that should be used as learning attributes. Use the include/exclude lists or pattern matching to manage the selection.\n",
+            "default" : {
+              "mode" : "MANUAL",
+              "patternFilter" : {
+                "pattern" : "",
+                "isCaseSensitive" : false,
+                "isInverted" : false
+              },
+              "manualFilter" : {
+                "manuallySelected" : [ ],
+                "manuallyDeselected" : [ ],
+                "includeUnknownColumns" : false
+              },
+              "typeFilter" : {
+                "selectedTypes" : [ ],
+                "typeDisplays" : [ ]
+              }
+            }
+          },
+          "attributeReuse" : {
+            "oneOf" : [ {
+              "const" : "SAME_FOR_TREE",
+              "title" : "Use same set of attributes for entire tree"
+            }, {
+              "const" : "DIFFERENT_FOR_EACH_NODE",
+              "title" : "Use different set of attributes for each tree node"
+            } ],
+            "title" : "Attribute selection",
+            "description" : "Choose whether to use the same set of sampled attributes for all nodes in a tree, or sample a new set for each node.\n",
+            "default" : "DIFFERENT_FOR_EACH_NODE"
+          },
+          "columnAbsolute" : {
+            "type" : "integer",
+            "format" : "int32",
+            "title" : "Absolute number",
+            "description" : "Number of attributes to sample for each tree.\n",
+            "default" : 10
+          },
+          "columnFractionLinear" : {
+            "type" : "number",
+            "format" : "double",
+            "title" : "Linear fraction",
+            "description" : "Fraction of attributes to sample for each tree.\n",
+            "default" : 1.0
+          },
+          "columnSamplingMode" : {
+            "oneOf" : [ {
+              "const" : "NONE",
+              "title" : "All columns"
+            }, {
+              "const" : "SQUARE_ROOT",
+              "title" : "Square root"
+            }, {
+              "const" : "LINEAR",
+              "title" : "Linear fraction"
+            }, {
+              "const" : "ABSOLUTE",
+              "title" : "Absolute number"
+            } ],
+            "title" : "Attribute sampling (columns)",
+            "description" : "Control how many attributes are available when learning individual trees.\n\n<ul>\n<li><b>All columns</b>: Disable column sampling and use all available attributes for every tree.\n</li>\n<li><b>Square root</b>: Sample the square root of the number of available attributes for each tree (default random forest behaviour).\n</li>\n<li><b>Linear fraction</b>: Sample a fraction of the available attributes for each tree.\n</li>\n<li><b>Absolute number</b>: Sample a fixed number of attributes for each tree.\n</li>\n</ul>",
+            "default" : "SQUARE_ROOT"
+          },
+          "hardCodedRootColumn" : {
+            "type" : [ "string", "null" ],
+            "title" : "Use fixed root attribute",
+            "description" : "Force the selected column to be used as the root split attribute in all trees.\n",
+            "default" : null
+          },
+          "hiliteCount" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32",
+            "title" : "Enable highlighting (number of patterns to store)",
+            "description" : "If selected, the node stores the selected number of rows and allows highlighting them in the node view.",
+            "default" : null
+          },
+          "ignoreColumnsWithoutDomain" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "maxTreeDepth" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int32",
+            "title" : "Limit number of levels (tree depth)",
+            "description" : "Limit the maximal number of tree levels. When disabled the tree depth is unbounded.\n",
+            "default" : null
+          },
+          "minNodeSizes" : {
+            "type" : "object",
+            "properties" : {
+              "minChildNodeSize" : {
+                "type" : [ "integer", "null" ],
+                "format" : "int32",
+                "title" : "Minimum child node size",
+                "description" : "Minimum number of records allowed in the child nodes after a split. Must not exceed half the minimum split node size.\n",
+                "default" : null
+              },
+              "minNodeSize" : {
+                "type" : [ "integer", "null" ],
+                "format" : "int32",
+                "title" : "Minimum split node size",
+                "description" : "Minimum number of records in a node required to attempt another split.\n",
+                "default" : null
+              }
+            },
+            "default" : {
+              "minNodeSize" : null,
+              "minChildNodeSize" : null
+            }
+          },
+          "missingValueHandling" : {
+            "oneOf" : [ {
+              "const" : "SURROGATE",
+              "title" : "Use surrogate splits"
+            }, {
+              "const" : "XGBOOST",
+              "title" : "Learn direction during training (XGBoost)"
+            } ],
+            "default" : "XGBOOST"
+          },
+          "numberOfModels" : {
+            "type" : "integer",
+            "format" : "int32",
+            "title" : "Number of models",
+            "description" : "Number of decision trees to learn. Larger ensembles generally provide more stable results but increase runtime.\n",
+            "default" : 100
+          },
+          "rowSamplingFraction" : {
+            "type" : [ "number", "null" ],
+            "format" : "double",
+            "title" : "Sample training data (rows)",
+            "description" : "Sample the training rows for each tree. Disable to use the full dataset for every model. Sampling with replacement corresponds to bootstrap sampling.\n",
+            "default" : null
+          },
+          "rowSamplingMode" : {
+            "oneOf" : [ {
+              "const" : "RANDOM",
+              "title" : "Random"
+            }, {
+              "const" : "STRATIFIED",
+              "title" : "Stratified"
+            }, {
+              "const" : "EQUAL_SIZE",
+              "title" : "Equal size"
+            } ],
+            "title" : "Data sampling mode",
+            "description" : "Choose how rows are sampled when data sampling is enabled.\n\n<ul>\n<li><b>Random</b>: Sample rows uniformly at random.\n</li>\n<li><b>Stratified</b>: Sample rows stratified by the target class distribution.\n</li>\n<li><b>Equal size</b>: Sample the same number of rows for each class. Available for classification tasks.\n</li>\n</ul>",
+            "default" : "RANDOM"
+          },
+          "rowSamplingWithReplacement" : {
+            "type" : "boolean",
+            "title" : "Sample with replacement",
+            "description" : "Draw sampled rows with replacement (bootstrap sampling). When disabled, rows are sampled without replacement.\n",
+            "default" : true
+          },
+          "saveTargetDistributionInNodes" : {
+            "type" : "boolean",
+            "default" : false
+          },
+          "seed" : {
+            "type" : [ "integer", "null" ],
+            "format" : "int64",
+            "title" : "Use static random seed",
+            "description" : "Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.",
+            "default" : null
+          },
+          "splitCriterion" : {
+            "oneOf" : [ {
+              "const" : "GINI",
+              "title" : "Gini"
+            }, {
+              "const" : "INFORMATION_GAIN",
+              "title" : "Information Gain"
+            }, {
+              "const" : "INFORMATION_GAIN_RATIO",
+              "title" : "Information Gain Ratio"
+            } ],
+            "default" : "GINI"
+          },
+          "targetColumn" : {
+            "type" : "string",
+            "title" : "Target column",
+            "description" : "Select the column containing the value to be learned. Rows with missing values in this column are ignored during the learning process.\n",
+            "default" : "Cluster Membership"
+          },
+          "trainingAttributes" : {
+            "type" : "object",
+            "properties" : {
+              "fingerprintColumn" : {
+                "type" : "string",
+                "title" : "Fingerprint attribute",
+                "description" : "Use a fingerprint (bit, byte, or double vector) column to learn the model. Each entry of the vector is treated as a separate attribute. All vectors must share the same length.\n"
+              },
+              "trainingAttributesMode" : {
+                "oneOf" : [ {
+                  "const" : "FINGERPRINT",
+                  "title" : "Use fingerprint attribute"
+                }, {
+                  "const" : "COLUMNS",
+                  "title" : "Use column attributes"
+                } ],
+                "title" : "Training attributes",
+                "description" : "Choose whether to derive attributes from a fingerprint vector column or from ordinary table columns.\n\n<ul>\n<li><b>Use fingerprint attribute</b>: Expand a fingerprint (bit, byte, or double vector) column into individual attributes during training.\n</li>\n<li><b>Use column attributes</b>: Select ordinary columns and configure include/exclude rules for training attributes.\n</li>\n</ul>",
+                "default" : "COLUMNS"
+              }
+            },
+            "default" : {
+              "trainingAttributesMode" : "COLUMNS"
+            }
+          },
+          "useAverageSplitPoints" : {
+            "type" : "boolean",
+            "title" : "Use mid-point splits",
+            "description" : "For numerical splits, use the mid-point between two class boundaries. Otherwise the split value corresponds to the lower boundary with a ≤ comparison.\n",
+            "default" : true
+          },
+          "useBinaryNominalSplits" : {
+            "type" : "boolean",
+            "title" : "Use binary splits for nominal columns",
+            "description" : "Allow binary splits for nominal attributes. Disabling keeps the original multi-way splits.\n",
+            "default" : true
+          }
+        }
+      }
+    }
+  },
+  "ui_schema" : {
+    "elements" : [ {
+      "label" : "Attribute Selection",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/targetColumn",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ],
+        "rule" : {
+          "effect" : "SHOW",
+          "condition" : {
+            "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
+            "schema" : {
+              "oneOf" : [ {
+                "const" : "FINGERPRINT"
+              } ]
+            }
+          }
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/attributeColumns",
+        "options" : {
+          "format" : "typedStringFilter",
+          "unknownValuesText" : "Any unknown column",
+          "emptyStateLabel" : "No columns in this list."
+        },
+        "providedOptions" : [ "possibleValues" ],
+        "rule" : {
+          "effect" : "SHOW",
+          "condition" : {
+            "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
+            "schema" : {
+              "oneOf" : [ {
+                "const" : "COLUMNS"
+              } ]
+            }
+          }
+        }
+      } ]
+    }, {
+      "label" : "Tree Options",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/useAverageSplitPoints",
+        "options" : {
+          "format" : "checkbox"
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/useBinaryNominalSplits",
+        "options" : {
+          "format" : "checkbox"
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/maxTreeDepth",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "validation.max", "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/hardCodedRootColumn",
+        "options" : {
+          "format" : "dropDown",
+          "hideOnNull" : true,
+          "default" : ""
+        },
+        "providedOptions" : [ "possibleValues" ]
+      } ]
+    }, {
+      "label" : "Data Sampling",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/rowSamplingFraction",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 1.0
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be greater than 0.",
+              "parameters" : {
+                "isExclusive" : true,
+                "min" : 0.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/rowSamplingWithReplacement",
+        "options" : {
+          "format" : "checkbox"
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/rowSamplingMode",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ]
+      } ]
+    }, {
+      "label" : "Ensemble Configuration",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/numberOfModels",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          }
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/columnSamplingMode",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/columnFractionLinear",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 1.0
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be greater than 0.",
+              "parameters" : {
+                "isExclusive" : true,
+                "min" : 0.0
+              }
+            }
+          }
+        },
+        "rule" : {
+          "effect" : "SHOW",
+          "condition" : {
+            "scope" : "#/properties/model/properties/columnSamplingMode",
+            "schema" : {
+              "oneOf" : [ {
+                "const" : "LINEAR"
+              } ]
+            }
+          }
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/columnAbsolute",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          }
+        },
+        "rule" : {
+          "effect" : "SHOW",
+          "condition" : {
+            "scope" : "#/properties/model/properties/columnSamplingMode",
+            "schema" : {
+              "oneOf" : [ {
+                "const" : "ABSOLUTE"
+              } ]
+            }
+          }
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/attributeReuse",
+        "options" : {
+          "format" : "radio",
+          "radioLayout" : "vertical"
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/seed",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "Value too large to process without risking precision loss (> 9007199254740991).",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 9.007199254740991E15
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      } ]
+    }, {
+      "label" : "Advanced",
+      "type" : "Section",
+      "options" : {
+        "isAdvanced" : true
+      },
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/hiliteCount",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      } ]
+    } ]
+  },
+  "persist" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "targetColumn" : {
+            "configPaths" : [ [ "targetColumn" ] ]
+          },
+          "trainingAttributes" : {
+            "configPaths" : [ [ "trainingAttributesMode" ], [ "fingerprintColumn" ] ]
+          },
+          "attributeColumns" : {
+            "configPaths" : [ [ "columnFilterConfig", "filter-type" ], [ "columnFilterConfig", "included_names" ], [ "columnFilterConfig", "excluded_names" ], [ "columnFilterConfig", "enforce_option" ], [ "columnFilterConfig", "name_pattern", "pattern" ], [ "columnFilterConfig", "name_pattern", "type" ], [ "columnFilterConfig", "name_pattern", "caseSensitive" ], [ "columnFilterConfig", "name_pattern", "excludeMatching" ] ]
+          },
+          "ignoreColumnsWithoutDomain" : {
+            "configKey" : "ignoreColumnsWithoutDomain"
+          },
+          "hiliteCount" : {
+            "configPaths" : [ [ "nrHilitePatterns" ] ]
+          },
+          "missingValueHandling" : {
+            "configPaths" : [ [ "missingValueHandling" ] ]
+          },
+          "saveTargetDistributionInNodes" : {
+            "configKey" : "saveTargetDistributionInNodes"
+          },
+          "splitCriterion" : {
+            "configPaths" : [ [ "splitCriterion" ] ]
+          },
+          "useAverageSplitPoints" : {
+            "configKey" : "useAverageSplitPoints"
+          },
+          "useBinaryNominalSplits" : {
+            "configKey" : "useBinaryNominalSplits"
+          },
+          "maxTreeDepth" : {
+            "configPaths" : [ [ "maxLevels" ] ]
+          },
+          "minNodeSizes" : {
+            "configPaths" : [ [ "minNodeSize" ], [ "minChildSize" ] ]
+          },
+          "hardCodedRootColumn" : {
+            "configPaths" : [ [ "hardCodedRootColumn" ] ]
+          },
+          "numberOfModels" : {
+            "configKey" : "nrModels"
+          },
+          "rowSamplingFraction" : {
+            "configPaths" : [ [ "dataFraction" ] ]
+          },
+          "rowSamplingWithReplacement" : {
+            "configPaths" : [ [ "isDataSelectionWithReplacement" ] ]
+          },
+          "rowSamplingMode" : {
+            "configPaths" : [ [ "rowSamplingMode" ] ]
+          },
+          "columnSamplingMode" : {
+            "configPaths" : [ [ "columnSamplingMode" ] ]
+          },
+          "columnFractionLinear" : {
+            "configPaths" : [ [ "columnFractionPerTree" ] ]
+          },
+          "columnAbsolute" : {
+            "configPaths" : [ [ "columnAbsolutePerTree" ] ]
+          },
+          "attributeReuse" : {
+            "configPaths" : [ [ "isUseDifferentAttributesAtEachNode" ] ]
+          },
+          "seed" : {
+            "configPaths" : [ [ "seed" ] ]
+          }
+        }
+      }
+    }
+  },
+  "initialUpdates" : [ {
+    "scope" : "#/properties/model/properties/attributeColumns",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "Universe_0_0",
+        "text" : "Universe_0_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_0_1",
+        "text" : "Universe_0_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_0",
+        "text" : "Universe_1_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/columnSamplingMode",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "NONE",
+        "text" : "All columns"
+      }, {
+        "id" : "SQUARE_ROOT",
+        "text" : "Square root"
+      }, {
+        "id" : "LINEAR",
+        "text" : "Linear fraction"
+      }, {
+        "id" : "ABSOLUTE",
+        "text" : "Absolute number"
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/hardCodedRootColumn",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "Cluster Membership",
+        "text" : "Cluster Membership",
+        "type" : {
+          "id" : "org.knime.core.data.StringValue",
+          "text" : "String"
+        }
+      }, {
+        "id" : "Universe_0_0",
+        "text" : "Universe_0_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_0_1",
+        "text" : "Universe_0_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_0",
+        "text" : "Universe_1_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/hardCodedRootColumn",
+    "providedOptionName" : "validatorId",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : {
+        "first" : { },
+        "second" : {
+          "actualTypeArguments" : [ "java.lang.String" ],
+          "rawType" : "java.util.Optional",
+          "ownerType" : null,
+          "typeName" : "java.util.Optional<java.lang.String>"
+        }
+      }
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/hiliteCount",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 2000
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/maxTreeDepth",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 3
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 1
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
+    "providedOptionName" : "validation.max",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : {
+        "parameters" : {
+          "max" : "Infinity",
+          "isExclusive" : false
+        },
+        "errorMessage" : ""
+      }
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 2
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/missingValueHandling",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "XGBOOST",
+        "text" : "Learn direction during training (XGBoost)"
+      }, {
+        "id" : "SURROGATE",
+        "text" : "Use surrogate splits"
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/rowSamplingFraction",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 0.7
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/rowSamplingMode",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "RANDOM",
+        "text" : "Random"
+      }, {
+        "id" : "STRATIFIED",
+        "text" : "Stratified"
+      }, {
+        "id" : "EQUAL_SIZE",
+        "text" : "Equal size"
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/seed",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 1763977024949
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/splitCriterion",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "GINI",
+        "text" : "Gini"
+      }, {
+        "id" : "INFORMATION_GAIN",
+        "text" : "Information Gain"
+      }, {
+        "id" : "INFORMATION_GAIN_RATIO",
+        "text" : "Information Gain Ratio"
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/targetColumn",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : "Cluster Membership"
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/targetColumn",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "Cluster Membership",
+        "text" : "Cluster Membership",
+        "type" : {
+          "id" : "org.knime.core.data.StringValue",
+          "text" : "String"
+        }
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "FINGERPRINT",
+        "text" : "Use fingerprint attribute"
+      }, {
+        "id" : "COLUMNS",
+        "text" : "Use column attributes"
+      } ]
+    } ]
+  } ],
+  "globalUpdates" : [ {
+    "trigger" : {
+      "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"
+    },
+    "dependencies" : [ "#/properties/model/properties/minNodeSizes/properties/minNodeSize" ]
+  }, {
+    "trigger" : {
+      "scope" : "#/properties/model/properties/targetColumn"
+    },
+    "dependencies" : [ "#/properties/model/properties/targetColumn" ]
+  } ]
+}
