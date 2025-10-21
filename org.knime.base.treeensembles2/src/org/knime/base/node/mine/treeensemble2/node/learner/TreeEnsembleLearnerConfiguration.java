@@ -97,6 +97,7 @@ import com.google.common.collect.Sets;
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
+@SuppressWarnings("javadoc")
 public class TreeEnsembleLearnerConfiguration {
 
     private static final Set<Class<? extends DataValue>> VALID_REGRESSION_TYPES =
@@ -106,57 +107,57 @@ public class TreeEnsembleLearnerConfiguration {
             Sets.newHashSet(NominalValue.class, NominalDistributionValue.class);
 
     /**  */
-    private static final String KEY_NR_HILITE_PATTERNS = "nrHilitePatterns";
+    public static final String KEY_NR_HILITE_PATTERNS = "nrHilitePatterns";
 
     /**  */
-    private static final String KEY_IGNORE_COLUMNS_WITHOUT_DOMAIN = "ignoreColumnsWithoutDomain";
+    public static final String KEY_IGNORE_COLUMNS_WITHOUT_DOMAIN = "ignoreColumnsWithoutDomain";
 
     /**  */
-    protected static final String KEY_IS_DATA_SELECTION_WITH_REPLACEMENT = "isDataSelectionWithReplacement";
+    public static final String KEY_IS_DATA_SELECTION_WITH_REPLACEMENT = "isDataSelectionWithReplacement";
 
-    protected static final String KEY_IS_USE_DIFFERENT_ATTRIBUTES_AT_EACH_NODE = "isUseDifferentAttributesAtEachNode";
+    public static final String KEY_IS_USE_DIFFERENT_ATTRIBUTES_AT_EACH_NODE = "isUseDifferentAttributesAtEachNode";
 
-    //    private static final String KEY_INCLUDE_ALL_COLUMNS = "includeAllColumns";
+    //    static final String KEY_INCLUDE_ALL_COLUMNS = "includeAllColumns";
 
-    private static final String KEY_INCLUDE_COLUMNS = "includeColumns";
+    public static final String KEY_INCLUDE_COLUMNS = "includeColumns";
 
-    private static final String KEY_FINGERPRINT_COLUMN = "fingerprintColumn";
+    public static final String KEY_FINGERPRINT_COLUMN = "fingerprintColumn";
 
-    private static final String KEY_USE_AVERAGE_SPLIT_POINTS = "useAverageSplitPoints";
+    public static final String KEY_USE_AVERAGE_SPLIT_POINTS = "useAverageSplitPoints";
 
-    private static final String KEY_USE_BINARY_NOMINAL_SPLITS = "useBinaryNominalSplits";
+    public static final String KEY_USE_BINARY_NOMINAL_SPLITS = "useBinaryNominalSplits";
 
-    private static final String KEY_SPLIT_CRITERION = "splitCriterion";
+    public static final String KEY_SPLIT_CRITERION = "splitCriterion";
 
-    private static final String KEY_MISSING_VALUE_HANDLING = "missingValueHandling";
+    public static final String KEY_MISSING_VALUE_HANDLING = "missingValueHandling";
 
-    private static final String KEY_NR_MODELS = "nrModels";
+    public static final String KEY_NR_MODELS = "nrModels";
 
-    private static final String KEY_COLUMN_FRACTION_LINEAR = "columnFractionPerTree";
+    public static final String KEY_COLUMN_FRACTION_LINEAR = "columnFractionPerTree";
 
-    private static final String KEY_COLUMN_ABSOLUTE = "columnAbsolutePerTree";
+    public static final String KEY_COLUMN_ABSOLUTE = "columnAbsolutePerTree";
 
-    private static final String KEY_ROOT_COLUMN = "hardCodedRootColumn";
+    public static final String KEY_ROOT_COLUMN = "hardCodedRootColumn";
 
-    private static final String KEY_DATA_FRACTION = "dataFraction";
+    public static final String KEY_DATA_FRACTION = "dataFraction";
 
-    protected static final String KEY_MAX_LEVELS = "maxLevels";
+    public static final String KEY_MAX_LEVELS = "maxLevels";
 
-    private static final String KEY_MIN_NODE_SIZE = "minNodeSize";
+    public static final String KEY_MIN_NODE_SIZE = "minNodeSize";
 
-    private static final String KEY_MIN_CHILD_SIZE = "minChildSize";
+    public static final String KEY_MIN_CHILD_SIZE = "minChildSize";
 
-    private static final String KEY_SEED = "seed";
+    public static final String KEY_SEED = "seed";
 
-    private static final String KEY_TARGET_COLUMN = "targetColumn";
+    public static final String KEY_TARGET_COLUMN = "targetColumn";
 
-    protected static final String KEY_COLUMN_SAMPLING_MODE = "columnSamplingMode";
+    public static final String KEY_COLUMN_SAMPLING_MODE = "columnSamplingMode";
 
-    private static final String KEY_SAVE_TARGET_DISTRIBUTION_IN_NODES = "saveTargetDistributionInNodes";
+    public static final String KEY_SAVE_TARGET_DISTRIBUTION_IN_NODES = "saveTargetDistributionInNodes";
 
     public static final String KEY_COLUMN_FILTER_CONFIG = "columnFilterConfig";
 
-    private static final String KEY_ROW_SAMPLING_MODE = "rowSamplingMode";
+    public static final String KEY_ROW_SAMPLING_MODE = "rowSamplingMode";
 
     public enum MissingValueHandling {
             /**

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.knime.org/2008/09/XMLConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.knime.org/2008/09/XMLConfig http://www.knime.org/XMLConfig_2008_09.xsd" key="test">
+    <entry key="targetColumn" type="xstring" value="Cluster Membership"/>
+    <entry key="fingerprintColumn" type="xstring" isnull="true" value=""/>
+    <config key="columnFilterConfig">
+        <entry key="filter-type" type="xstring" value="STANDARD"/>
+        <config key="included_names">
+            <entry key="array-size" type="xint" value="4"/>
+            <entry key="0" type="xstring" value="Universe_0_0"/>
+            <entry key="1" type="xstring" value="Universe_0_1"/>
+            <entry key="2" type="xstring" value="Universe_1_0"/>
+            <entry key="3" type="xstring" value="Universe_1_1"/>
+        </config>
+        <config key="excluded_names">
+            <entry key="array-size" type="xint" value="0"/>
+        </config>
+        <entry key="enforce_option" type="xstring" value="EnforceExclusion"/>
+        <config key="name_pattern">
+            <entry key="pattern" type="xstring" value=""/>
+            <entry key="caseSensitive" type="xboolean" value="true"/>
+            <entry key="excludeMatching" type="xboolean" value="false"/>
+            <entry key="type" type="xstring" value="Wildcard"/>
+        </config>
+        <config key="datatype">
+            <config key="typelist"/>
+        </config>
+    </config>
+    <entry key="ignoreColumnsWithoutDomain" type="xboolean" value="true"/>
+    <entry key="missingValueHandling" type="xstring" value="XGBoost"/>
+    <entry key="splitCriterion" type="xstring" value="InformationGainRatio"/>
+    <entry key="useAverageSplitPoints" type="xboolean" value="true"/>
+    <entry key="useBinaryNominalSplits" type="xboolean" value="true"/>
+    <entry key="maxLevels" type="xint" value="-1"/>
+    <entry key="minNodeSize" type="xint" value="-1"/>
+    <entry key="minChildSize" type="xint" value="-1"/>
+    <entry key="hardCodedRootColumn" type="xstring" isnull="true" value=""/>
+    <entry key="dataFraction" type="xdouble" value="1.0"/>
+    <entry key="isDataSelectionWithReplacement" type="xboolean" value="true"/>
+    <entry key="rowSamplingMode" type="xstring" value="Random"/>
+    <entry key="nrModels" type="xint" value="100"/>
+    <entry key="columnSamplingMode" type="xstring" value="SquareRoot"/>
+    <entry key="columnFractionPerTree" type="xdouble" value="1.0"/>
+    <entry key="columnAbsolutePerTree" type="xint" value="10"/>
+    <entry key="isUseDifferentAttributesAtEachNode" type="xboolean" value="true"/>
+    <entry key="seed" type="xstring" isnull="true" value=""/>
+    <entry key="nrHilitePatterns" type="xint" value="-1"/>
+    <entry key="saveTargetDistributionInNodes" type="xboolean" value="false"/>
+</config>

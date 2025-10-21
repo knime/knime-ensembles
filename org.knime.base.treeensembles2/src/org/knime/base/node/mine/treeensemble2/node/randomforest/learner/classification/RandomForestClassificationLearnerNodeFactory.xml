@@ -128,7 +128,7 @@
     <outPort index="2" name="Random Forest Model">The trained model.</outPort>
   </ports>
   <views>
-    <view name="Tree Views" index="0">An decision tree viewer for all the trained models. Use the spinner to iterate
+    <view name="Tree Views" index="0">A decision tree viewer for all the trained models. Use the spinner to iterate
       through the different models.
       </view>
   </views>
