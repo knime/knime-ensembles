@@ -47,15 +47,60 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.predictor.regression;
 
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.MINITAB_COPYRIGHT;
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
- * 
+ * Factory class for the Tree Ensemble Predictor (Regression) node. Creates the node model used to predict numeric
+ * targets with tree ensemble models and exposes the modern dialog and KAI interfaces.
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
-public class TreeEnsembleRegressionPredictorNodeFactory extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel> {
+@SuppressWarnings("restriction")
+public class TreeEnsembleRegressionPredictorNodeFactory extends NodeFactory<TreeEnsembleRegressionPredictorNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
+
+    private static final String NODE_NAME = "Tree Ensemble Predictor (Regression)";
+
+    private static final String NODE_ICON = "treeensemble_predictor_regression.png";
+
+    private static final String BASE_DESCRIPTION = """
+            Applies regression from a tree ensemble model by using the mean of the individual predictions.
+            """;
+
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION;
+
+    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Tree Ensemble Model", """
+            The model as produced by the Tree Ensemble Learner (Regression) node.
+            """), fixedPort("Input data", """
+            The data rows to be scored.
+            """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(fixedPort("Prediction output", """
+            The input data along with prediction columns.
+            """));
 
     /** {@inheritDoc} */
     @Override
@@ -71,6 +116,7 @@ public class TreeEnsembleRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     public final NodeView<TreeEnsembleRegressionPredictorNodeModel> createNodeView(final int viewIndex,
         final TreeEnsembleRegressionPredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
@@ -78,14 +124,33 @@ public class TreeEnsembleRegressionPredictorNodeFactory extends NodeFactory<Tree
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings({"java:S5738", "removal"})
     protected final boolean hasDialog() {
         return true;
     }
 
     /** {@inheritDoc} */
     @Override
-    protected final NodeDialogPane createNodeDialogPane() {
-        return new TreeEnsembleRegressionPredictorNodeDialogPane();
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
     }
 
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, TreeEnsembleRegressionPredictorNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, List.of(), TreeEnsembleRegressionPredictorNodeParameters.class, null,
+            NodeType.Predictor, List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, TreeEnsembleRegressionPredictorNodeParameters.class));
+    }
 }

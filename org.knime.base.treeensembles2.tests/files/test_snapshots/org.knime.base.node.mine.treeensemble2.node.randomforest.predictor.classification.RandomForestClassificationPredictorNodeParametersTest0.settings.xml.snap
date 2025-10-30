@@ -4,7 +4,7 @@
     <entry key="predictionColumnName" type="xstring" value="Prediction (Cluster Membership)"/>
     <entry key="appendPredictionConfidence" type="xboolean" value="false"/>
     <entry key="appendClassConfidences" type="xboolean" value="true"/>
-    <entry key="appendModelCount" type="xboolean" value="false"/>
     <entry key="suffixForClassProbabilities" type="xstring" value="some example string"/>
+    <entry key="appendModelCount" type="xboolean" value="false"/>
     <entry key="useSoftVoting" type="xboolean" value="true"/>
 </config>

@@ -65,10 +65,9 @@ final class RandomForestClassificationPredictorNodeParameters extends TreeEnsemb
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             useChangePredictionColumnName(group);
-            usePredictionColumnName(group, "The name of the column containing the predicted class.");
+            usePredictionColumnName(group);
             useAppendPredictionConfidence(group);
-            useAppendClassConfidences(group);
-            useSuffixForClassProbabilities(group);
+            useAppendClassConfidencesAndSuffix(group);
             useSoftVoting(group);
         }
     }

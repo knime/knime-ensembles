@@ -47,6 +47,7 @@ package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor;
 
 import org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorConfiguration;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.impl.description.ExternalResource;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
@@ -61,21 +62,37 @@ import org.knime.node.parameters.updates.util.BooleanReference;
  * The class declares all persistable settings and offers helper methods that configure the corresponding widgets in
  * subclasses.
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "java:S1192"})
 @LoadDefaultsForAbsentFields
 public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     /** Trademark disclaimer embedded into node descriptions referencing RANDOM FORESTS. */
     public static final String MINITAB_COPYRIGHT = """
-            "Random Forests" is a registered trademark of Minitab, LLC and is used with Minitab’s
+            <br/><br/><i>Random Forests</i> is a registered trademark of Minitab, LLC and is used with Minitab’s
             permission.""";
+
+    /** Citation used for gradient boosting nodes */
+    public static final String GRADIENT_BOOSTING_CITATION = """
+            <br/><br/>
+            The implementation follows the algorithms described in <i>Greedy Function Approximation: A Gradient
+            Boosting Machine</i> by Jerome H. Friedman (1999).
+            """;
+
+    /** External resource used for gradient boosting nodes */
+    public static final ExternalResource GRADIENT_BOOSTING_WIKIPEDIA =
+        new ExternalResource("https://en.wikipedia.org/wiki/Gradient_boosting", "Wikipedia: Gradient Boosting");
 
     private static final String PREDICTION_COLUMN_NAME_WIDGET_TITLE = "Prediction column name";
 
-    public static final String CHANGE_PREDICTION_COLUMN_NAME_TITLE = "Change prediction column name";
+    private static final String CHANGE_PREDICTION_COLUMN_NAME_TITLE = "Change prediction column name";
 
-    public static final String CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION =
+    private static final String CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION =
         "Select to customize the name of the column containing the prediction.";
+
+    private static final String PREDICTION_COLUMN_NAME_DESCRIPTION_REGRESSION = """
+            The name of the first output column, containing the mean response of all individual tree models.
+            A second column with the suffix "(Variance)" stores the variance across the individual model responses.
+            """;
 
     /** Reference that identifies the {@code changePredictionColumnName} widget. */
     interface ChangePredictionColumnNameRef extends Modification.Reference {
@@ -109,6 +126,10 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
     public static final class ChangePredictionColumnNameEffectRef implements BooleanReference {
     }
 
+    /** Boolean reference used for effects depending on {@link #m_appendClassConfidences}. */
+    public static final class AppendClassConfidencesEffectRef implements BooleanReference {
+    }
+
     @Persist(configKey = "changePredictionColumnName")
     @ValueReference(ChangePredictionColumnNameEffectRef.class)
     @Modification.WidgetReference(ChangePredictionColumnNameRef.class)
@@ -125,20 +146,27 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     @Modification.WidgetReference(AppendClassConfidencesRef.class)
     @Persist(configKey = "appendClassConfidences")
+    @ValueReference(AppendClassConfidencesEffectRef.class)
     boolean m_appendClassConfidences;
+
+    @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
+    @Persist(configKey = "suffixForClassProbabilities")
+    @Effect(predicate = AppendClassConfidencesEffectRef.class, type = Effect.EffectType.ENABLE)
+    String m_suffixForClassProbabilities = "";
 
     @Modification.WidgetReference(AppendModelCountRef.class)
     @Persist(configKey = "appendModelCount")
     boolean m_appendModelCount;
 
-    @Modification.WidgetReference(SuffixForClassProbabilitiesRef.class)
-    @Persist(configKey = "suffixForClassProbabilities")
-    String m_suffixForClassProbabilities = "";
-
     @Modification.WidgetReference(UseSoftVotingRef.class)
     @Persist(configKey = "useSoftVoting")
     boolean m_useSoftVoting;
 
+    /**
+     * Adds the widget metadata for the {@code changePredictionColumnName} field.
+     *
+     * @param groupModifier -
+     */
     public static void useChangePredictionColumnName(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(ChangePredictionColumnNameRef.class) //
             .addAnnotation(Widget.class) //
@@ -147,7 +175,7 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
             .modify();
     }
 
-    public static void usePredictionColumnName(final Modification.WidgetGroupModifier groupModifier,
+    private static void usePredictionColumnName(final Modification.WidgetGroupModifier groupModifier,
         final String description) {
         groupModifier.find(PredictionColumnNameRef.class) //
             .addAnnotation(Widget.class) //
@@ -157,43 +185,70 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
     }
 
     /**
+     * Adds the widget metadata for the {@code predictionColumnName} field.
+     * <p>
+     *
+     * @param groupModifier -
+     */
+    public static void usePredictionColumnName(final Modification.WidgetGroupModifier groupModifier) {
+        usePredictionColumnName(groupModifier, "Name of the output column containing the prediction.");
+    }
+
+    /**
+     * Adds the widget metadata for the {@code predictionColumnName} field.
+     * <p>
+     * Applies only to <i>some</i> regression models.
+     *
+     * @param groupModifier -
+     */
+    public static void usePredictionColumnNameForRegression(final Modification.WidgetGroupModifier groupModifier) {
+        usePredictionColumnName(groupModifier, PREDICTION_COLUMN_NAME_DESCRIPTION_REGRESSION);
+    }
+
+    /**
      * Adds the widget metadata for the {@code appendPredictionConfidence} toggle.
+     *
+     * @param groupModifier -
+     * @param description -
+     */
+    public static void useAppendPredictionConfidence(final Modification.WidgetGroupModifier groupModifier,
+        final String description) {
+        groupModifier.find(AppendPredictionConfidenceRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Append overall prediction confidence") //
+            .withProperty("description", description) //
+            .modify();
+    }
+
+    /**
+     * Adds the widget metadata for the {@code appendPredictionConfidence} toggle.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */
     public static void useAppendPredictionConfidence(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(AppendPredictionConfidenceRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Append overall prediction confidence") //
-            .withProperty("description", """
-                    Adds the confidence of the predicted class; this is the maximum of all class confidence values,
-                    which can also be appended individually.
-                    """) //
-            .modify();
+        var defaultDescription = """
+                Adds the confidence of the predicted class; this is the maximum of all class confidence values,
+                which can also be appended individually.
+                """;
+        useAppendPredictionConfidence(groupModifier, defaultDescription);
     }
 
     /**
-     * Adds the widget metadata for the {@code appendClassConfidences} toggle.
+     * Configures the widgets responsible for appending class confidences and the matching probability suffix.
      *
-     * @param groupModifier widget modifier accessing the target field
+     * @param groupModifier widget modifier accessing the target fields
+     * @param description description shown for the class confidence toggle
      */
-    public static void useAppendClassConfidences(final Modification.WidgetGroupModifier groupModifier) {
+    public static void useAppendClassConfidencesAndSuffix(final Modification.WidgetGroupModifier groupModifier,
+        final String description) {
         groupModifier.find(AppendClassConfidencesRef.class) //
             .addAnnotation(Widget.class) //
             .withProperty("title", "Append individual class probabilities") //
-            .withProperty("description", """
-                    Adds one column per class containing its prediction confidence: the number of trees voting for that
-                    class divided by the total number of trees.
-                    """) //
+            .withProperty("description", description) //
             .modify();
-    }
 
-    /**
-     * Adds the widget metadata for the {@code suffixForClassProbabilities} field.
-     *
-     * @param groupModifier widget modifier accessing the target field
-     */
-    public static void useSuffixForClassProbabilities(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(SuffixForClassProbabilitiesRef.class) //
             .addAnnotation(Widget.class) //
             .withProperty("title", "Suffix for probability columns") //
@@ -202,7 +257,25 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
     }
 
     /**
+     * Adds the widget metadata for the {@code appendClassConfidences} toggle and the related
+     * {@code suffixForClassProbabilities} field.
+     * <p>
+     * Applies only to classification models.
+     *
+     * @param groupModifier widget modifier accessing the target field
+     */
+    public static void useAppendClassConfidencesAndSuffix(final Modification.WidgetGroupModifier groupModifier) {
+        var defaultDescription = """
+                Adds one column per class containing its prediction confidence: the number of trees voting for that
+                class divided by the total number of trees.
+                """;
+        useAppendClassConfidencesAndSuffix(groupModifier, defaultDescription);
+    }
+
+    /**
      * Adds the widget metadata for the {@code useSoftVoting} toggle.
+     * <p>
+     * Applies only to classification models.
      *
      * @param groupModifier widget modifier accessing the target field
      */

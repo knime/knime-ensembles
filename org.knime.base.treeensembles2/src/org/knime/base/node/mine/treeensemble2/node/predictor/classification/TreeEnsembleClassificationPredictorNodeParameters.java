@@ -43,29 +43,36 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+
+package org.knime.base.node.mine.treeensemble2.node.predictor.classification;
 
 import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
- * Node parameters for Random Forest Predictor.
+ * Node parameters for Tree Ensemble Predictor.
  *
  * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
  * @author AI Migration Pipeline v1.1
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
-final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+@Modification(TreeEnsembleClassificationPredictorNodeParameters.WidgetModifier.class)
+public final class TreeEnsembleClassificationPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
+    /**
+     * Applies classification-specific widget metadata.
+     */
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             useChangePredictionColumnName(group);
-            usePredictionColumnNameForRegression(group);
+            usePredictionColumnName(group);
+            useAppendPredictionConfidence(group);
+            useAppendClassConfidencesAndSuffix(group);
+            useSoftVoting(group);
         }
     }
 }

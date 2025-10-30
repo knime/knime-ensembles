@@ -18,8 +18,6 @@
         "properties" : {
           "appendClassConfidences" : {
             "type" : "boolean",
-            "title" : "Append individual class probabilities",
-            "description" : "Adds one column per class containing its prediction confidence: the number of trees voting for that\nclass divided by the total number of trees.\n",
             "default" : false
           },
           "appendModelCount" : {
@@ -28,8 +26,6 @@
           },
           "appendPredictionConfidence" : {
             "type" : "boolean",
-            "title" : "Append overall prediction confidence",
-            "description" : "Adds the confidence of the predicted class; this is the maximum of all class confidence values,\nwhich can also be appended individually.\n",
             "default" : true
           },
           "changePredictionColumnName" : {
@@ -46,14 +42,10 @@
           },
           "suffixForClassProbabilities" : {
             "type" : "string",
-            "title" : "Suffix for probability columns",
-            "description" : "Suffix appended to the column names containing class probabilities.",
             "default" : ""
           },
           "useSoftVoting" : {
             "type" : "boolean",
-            "title" : "Use soft voting",
-            "description" : "Switches from hard voting (the most votes win) to soft voting, which aggregates class probabilities\nfrom all trees. Requires the random forest model to store class distributions (\"Save target\ndistribution in tree nodes\" in the learner); enabling this without stored distributions triggers a\nwarning.\n",
             "default" : false
           }
         }
@@ -78,36 +70,6 @@
             "const" : true
           }
         }
-      }
-    }, {
-      "type" : "Control",
-      "scope" : "#/properties/model/properties/appendPredictionConfidence",
-      "options" : {
-        "format" : "checkbox"
-      }
-    }, {
-      "type" : "Control",
-      "scope" : "#/properties/model/properties/appendClassConfidences",
-      "options" : {
-        "format" : "checkbox"
-      }
-    }, {
-      "type" : "Control",
-      "scope" : "#/properties/model/properties/suffixForClassProbabilities",
-      "rule" : {
-        "effect" : "ENABLE",
-        "condition" : {
-          "scope" : "#/properties/model/properties/appendClassConfidences",
-          "schema" : {
-            "const" : true
-          }
-        }
-      }
-    }, {
-      "type" : "Control",
-      "scope" : "#/properties/model/properties/useSoftVoting",
-      "options" : {
-        "format" : "checkbox"
       }
     } ]
   },

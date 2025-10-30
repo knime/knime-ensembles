@@ -48,19 +48,43 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml;
 
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.GRADIENT_BOOSTING_CITATION;
+import static org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions.GRADIENT_BOOSTING_WIKIPEDIA;
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
 import org.knime.base.node.mine.treeensemble2.model.MultiClassGradientBoostedTreesModel;
-import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.GradientBoostingPredictorNodeDialogPane;
+import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.classification.GradientBoostingClassificationPredictorNodeParameters;
 import org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.pmml.GradientBoostingPMMLPredictorNodeModel.Version;
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.ExternalResource;
+import org.knime.node.impl.description.PortDescription;
 
 /**
+ * NodeFactory for the PMML Gradient Boosted Trees predictor node.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.1
  */
+@SuppressWarnings("restriction")
 public class GradientBoostingClassificationPMMLPredictorNodeFactory3
-    extends NodeFactory<GradientBoostingPMMLPredictorNodeModel<MultiClassGradientBoostedTreesModel>> {
+    extends NodeFactory<GradientBoostingPMMLPredictorNodeModel<MultiClassGradientBoostedTreesModel>>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
     /**
      * {@inheritDoc}
@@ -82,6 +106,7 @@ public class GradientBoostingClassificationPMMLPredictorNodeFactory3
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings( {"removal", "java:S5738"})
     public NodeView<GradientBoostingPMMLPredictorNodeModel<MultiClassGradientBoostedTreesModel>> createNodeView(
         final int viewIndex,
         final GradientBoostingPMMLPredictorNodeModel<MultiClassGradientBoostedTreesModel> nodeModel) {
@@ -92,6 +117,7 @@ public class GradientBoostingClassificationPMMLPredictorNodeFactory3
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings( {"removal", "java:S5738"})
     protected boolean hasDialog() {
         return true;
     }
@@ -99,9 +125,56 @@ public class GradientBoostingClassificationPMMLPredictorNodeFactory3
     /**
      * {@inheritDoc}
      */
+    private static final String NODE_NAME = "PMML Gradient Boosted Trees Predictor";
+
+    private static final String NODE_ICON = "../classification/GradientBoostingPredictor.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Applies classification from a Gradient Boosted Trees model that is provided in PMML format.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            Applies classification from a Gradient Boosted Trees model that is provided in PMML format. Note that it
+                is currently not possible to load models that were learned on a bit-, byte- or double-vector column and
+                then written to PMML because PMML does not support vector columns.
+            """ + GRADIENT_BOOSTING_CITATION;
+
+    private static final List<ExternalResource> EXTERNAL_RESOURCES = List.of(GRADIENT_BOOSTING_WIKIPEDIA);
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Model", """
+            Gradient Boosted Trees model in PMML format.
+            """), fixedPort("Input Data", """
+            The data to predict.
+            """));
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(fixedPort("Output Data", """
+            The predicted data.
+            """));
+
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new GradientBoostingPredictorNodeDialogPane(false);
+    @SuppressWarnings({"java:S5738", "removal"})
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL,
+            GradientBoostingClassificationPredictorNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription(NODE_NAME, NODE_ICON, INPUT_PORTS, OUTPUT_PORTS,
+            SHORT_DESCRIPTION, FULL_DESCRIPTION, EXTERNAL_RESOURCES,
+            GradientBoostingClassificationPredictorNodeParameters.class, null, NodeType.Predictor,
+            List.of(), null);
+    }
+
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(
+            Map.of(SettingsType.MODEL, GradientBoostingClassificationPredictorNodeParameters.class));
     }
 
 }

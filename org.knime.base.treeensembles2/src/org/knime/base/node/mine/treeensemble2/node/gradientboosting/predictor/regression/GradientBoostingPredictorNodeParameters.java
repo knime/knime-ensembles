@@ -43,29 +43,34 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.regression;
+package org.knime.base.node.mine.treeensemble2.node.gradientboosting.predictor.regression;
 
 import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
- * Node parameters for Random Forest Predictor.
+ * Node parameters for Gradient Boosted Trees Predictor (Regression).
  *
- * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
- * @author AI Migration Pipeline v1.1
+ * <p>
+ * The configuration mirrors the legacy
+ * {@link org.knime.base.node.mine.treeensemble2.node.predictor.TreeEnsemblePredictorPanel} behaviour for regression,
+ * exposing only the prediction column controls.
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(RandomForestRegressionPredictorNodeParameters.WidgetModifier.class)
-final class RandomForestRegressionPredictorNodeParameters extends TreeEnsemblePredictorOptions {
+@Modification(GradientBoostingPredictorNodeParameters.WidgetModifier.class)
+public final class GradientBoostingPredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
+    /**
+     * Applies regression-specific widget metadata.
+     */
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             useChangePredictionColumnName(group);
-            usePredictionColumnNameForRegression(group);
+            usePredictionColumnName(group);
         }
     }
 }

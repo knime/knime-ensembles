@@ -1,8 +1,8 @@
 {
   "data" : {
     "model" : {
-      "changePredictionColumnName" : true,
-      "predictionColumnName" : "Prediction ()",
+      "changePredictionColumnName" : false,
+      "predictionColumnName" : "Prediction (Cluster Membership)",
       "appendPredictionConfidence" : true,
       "appendClassConfidences" : false,
       "suffixForClassProbabilities" : "",

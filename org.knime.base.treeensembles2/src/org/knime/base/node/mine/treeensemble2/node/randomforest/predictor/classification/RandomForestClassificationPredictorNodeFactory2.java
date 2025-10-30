@@ -84,9 +84,9 @@ public final class RandomForestClassificationPredictorNodeFactory2 extends
             Predicts patterns by aggregating the predictions of the individual trees in a random forest model.
             """;
 
-    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
+    private static final String SHORT_DESCRIPTION = BASE_DESCRIPTION;
 
-    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION;
+    private static final String FULL_DESCRIPTION = BASE_DESCRIPTION + MINITAB_COPYRIGHT;
 
     private static final List<PortDescription> INPUT_PORTS = List.of(fixedPort("Random Forest Model", """
             The output of the learner.

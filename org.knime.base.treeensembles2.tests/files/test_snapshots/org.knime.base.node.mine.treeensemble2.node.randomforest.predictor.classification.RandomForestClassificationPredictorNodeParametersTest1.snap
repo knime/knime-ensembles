@@ -5,8 +5,8 @@
       "predictionColumnName" : "Prediction (Cluster Membership)",
       "appendPredictionConfidence" : false,
       "appendClassConfidences" : true,
-      "appendModelCount" : false,
       "suffixForClassProbabilities" : "some example string",
+      "appendModelCount" : false,
       "useSoftVoting" : true
     }
   },
@@ -41,7 +41,7 @@
           "predictionColumnName" : {
             "type" : "string",
             "title" : "Prediction column name",
-            "description" : "The name of the column containing the predicted class.",
+            "description" : "Name of the output column containing the prediction.",
             "default" : "Prediction ()"
           },
           "suffixForClassProbabilities" : {
@@ -93,7 +93,16 @@
       }
     }, {
       "type" : "Control",
-      "scope" : "#/properties/model/properties/suffixForClassProbabilities"
+      "scope" : "#/properties/model/properties/suffixForClassProbabilities",
+      "rule" : {
+        "effect" : "ENABLE",
+        "condition" : {
+          "scope" : "#/properties/model/properties/appendClassConfidences",
+          "schema" : {
+            "const" : true
+          }
+        }
+      }
     }, {
       "type" : "Control",
       "scope" : "#/properties/model/properties/useSoftVoting",
@@ -120,11 +129,11 @@
           "appendClassConfidences" : {
             "configKey" : "appendClassConfidences"
           },
-          "appendModelCount" : {
-            "configKey" : "appendModelCount"
-          },
           "suffixForClassProbabilities" : {
             "configKey" : "suffixForClassProbabilities"
+          },
+          "appendModelCount" : {
+            "configKey" : "appendModelCount"
           },
           "useSoftVoting" : {
             "configKey" : "useSoftVoting"
