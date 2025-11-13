@@ -12,7 +12,7 @@ Export-Package: org.knime.base.node.mine.treeensemble2.data,
  org.knime.base.node.mine.treeensemble2.node.predictor.classification,
  org.knime.base.node.mine.treeensemble2.node.predictor.parser,
  org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor
-Require-Bundle: org.knime.core.pmml;bundle-version="[5.6.0,6.0.0)",
+Require-Bundle: org.knime.core.pmml;bundle-version="[5.9.0,6.0.0)",
   org.knime.base;bundle-version="[5.6.0,6.0.0)",
   org.knime.core.ui;bundle-version="[5.6.0,6.0.0)",
   org.apache.commons.math3;bundle-version="[3.4.1,4.0.0)",
