@@ -1,7 +1,7 @@
 {
   "data" : {
     "model" : {
-      "targetColumn" : "Sale Price",
+      "targetColumn" : "Universe_1_1",
       "trainingAttributes" : {
         "trainingAttributesMode" : "COLUMNS"
       },
@@ -13,7 +13,7 @@
           "isInverted" : false
         },
         "manualFilter" : {
-          "manuallySelected" : [ "Lot Size", "Bedrooms", "Neighborhood" ],
+          "manuallySelected" : [ "Universe_0_0", "Universe_0_1", "Universe_1_0" ],
           "manuallyDeselected" : [ ],
           "includeUnknownColumns" : true
         },
@@ -22,28 +22,28 @@
           "typeDisplays" : [ ]
         }
       },
-      "ignoreColumnsWithoutDomain" : false,
+      "ignoreColumnsWithoutDomain" : true,
       "hiliteCount" : null,
       "missingValueHandling" : "XGBOOST",
       "saveTargetDistributionInNodes" : false,
-      "splitCriterion" : "GINI",
+      "splitCriterion" : "INFORMATION_GAIN_RATIO",
       "useAverageSplitPoints" : true,
       "useBinaryNominalSplits" : true,
-      "maxTreeDepth" : 7,
+      "maxTreeDepth" : null,
       "minNodeSizes" : {
         "minNodeSize" : null,
         "minChildNodeSize" : null
       },
       "hardCodedRootColumn" : null,
-      "numberOfModels" : 125,
+      "numberOfModels" : 100,
       "rowSamplingFraction" : null,
       "rowSamplingWithReplacement" : true,
       "rowSamplingMode" : "RANDOM",
       "columnSamplingMode" : "SQUARE_ROOT",
       "columnFractionLinear" : 1.0,
-      "columnAbsolute" : 8,
+      "columnAbsolute" : 10,
       "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
-      "seed" : 1760099128440
+      "seed" : null
     }
   },
   "schema" : {
@@ -578,6 +578,13 @@
     "values" : [ {
       "indices" : [ ],
       "value" : [ {
+        "id" : "Sale Price",
+        "text" : "Sale Price",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
         "id" : "Lot Size",
         "text" : "Lot Size",
         "type" : {
@@ -706,7 +713,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1764070570324
+      "value" : 1764074296579
     } ]
   }, {
     "scope" : "#/properties/model/properties/splitCriterion",
@@ -728,7 +735,7 @@
     "scope" : "#/properties/model/properties/targetColumn",
     "values" : [ {
       "indices" : [ ],
-      "value" : "Sale Price"
+      "value" : "Bedrooms"
     } ]
   }, {
     "scope" : "#/properties/model/properties/targetColumn",

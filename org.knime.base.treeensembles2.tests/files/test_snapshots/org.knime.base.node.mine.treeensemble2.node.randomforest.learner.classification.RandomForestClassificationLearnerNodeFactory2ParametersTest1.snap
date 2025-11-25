@@ -3,7 +3,7 @@
     "model" : {
       "targetColumn" : "Cluster Membership",
       "trainingAttributes" : {
-        "trainingAttributesMode" : "COLUMNS"
+        "trainingAttributesMode" : "FINGERPRINT"
       },
       "attributeColumns" : {
         "mode" : "MANUAL",
@@ -43,7 +43,7 @@
       "columnFractionLinear" : 1.0,
       "columnAbsolute" : 10,
       "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
-      "seed" : 1760099128440
+      "seed" : null
     }
   },
   "schema" : {
@@ -972,7 +972,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1764070520290
+      "value" : 1764074296579
     } ]
   }, {
     "scope" : "#/properties/model/properties/splitCriterion",

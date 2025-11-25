@@ -153,10 +153,12 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     private interface AdvancedSection {
     }
 
+    private static final long DETERMINISTIC_SEED_DEFAULT = 1_764_074_296_579L;
+
     private static final class SeedDefaultProvider implements OptionalWidget.DefaultValueProvider<Long> {
         @Override
         public Long computeState(final NodeParametersInput context) {
-            return System.currentTimeMillis();
+            return DETERMINISTIC_SEED_DEFAULT;
         }
     }
 
