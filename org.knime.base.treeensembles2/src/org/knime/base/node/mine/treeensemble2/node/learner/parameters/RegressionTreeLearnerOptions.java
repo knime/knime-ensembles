@@ -58,7 +58,7 @@ import org.knime.node.parameters.widget.choices.EnumChoice;
 import org.knime.node.parameters.widget.choices.EnumChoicesProvider;
 
 @SuppressWarnings({"MissingJavadoc", "java:S1176"})
-public final class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
+public class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
 
     protected RegressionTreeLearnerOptions() {
         super();
