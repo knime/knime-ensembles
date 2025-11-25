@@ -43,61 +43,51 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.learner.regression;
+package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import java.util.Optional;
+
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.validation.custom.CustomValidationProvider;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.validation.custom.ValidationCallback;
 import org.knime.node.parameters.NodeParametersInput;
-import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.widget.number.NumberInputWidgetValidation;
 
-/**
- * Parameters for the Tree Ensemble Learner (regression).
- */
-@LoadDefaultsForAbsentFields
-@Modification(TreeEnsembleRegressionLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends RegressionTreeLearnerOptions {
+@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+public final class Validations {
+    private Validations() {
 
-    static final class WidgetModifier implements Modification.Modifier {
+    }
+
+    static final class HardCodedRootValidationProvider implements CustomValidationProvider<Optional<String>> {
 
         @Override
-        public void modify(final Modification.WidgetGroupModifier group) {
-            // attribute selection
-            RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
+        public ValidationCallback<Optional<String>>
+            computeValidationCallback(final NodeParametersInput parametersInput) {
+            return value -> {
+                if (value.isPresent() && value.map(String::isBlank).orElse(false)) {
+                    throw new InvalidSettingsException("Select a fixed root attribute or disable the option.");
+                }
+            };
+        }
 
-            // tree options
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            RegressionTreeLearnerOptions.minSplitNodeSize(group);
-            RegressionTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
-
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
-            WidgetGroupModifiers.rowSamplingFraction(group);
-            WidgetGroupModifiers.rowSamplingWithReplacement(group);
-            RegressionTreeLearnerOptions.rowSamplingMode(group);
-            WidgetGroupModifiers.attributeSampling(group);
-            WidgetGroupModifiers.attributeSamplingLinearFraction(group);
-            WidgetGroupModifiers.attributeSamplingAbsolute(group);
-            WidgetGroupModifiers.attributeSelectionReuse(group);
-
-            // advanced
-            WidgetGroupModifiers.hilighting(group);
-            WidgetGroupModifiers.randomSeed(group);
+        @Override
+        public void init(final StateProviderInitializer stateProviderInitializer) {
+            stateProviderInitializer.computeAfterOpenDialog();
         }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters() {
-        super();
+    static final class RowSamplingFractionMaxValidation extends NumberInputWidgetValidation.MaxValidation {
+        @Override
+        protected double getMax() {
+            return 1.0;
+        }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters(final NodeParametersInput input) {
-        super(input);
+    static final class ColumnFractionMaxValidation extends NumberInputWidgetValidation.MaxValidation {
+        @Override
+        protected double getMax() {
+            return 1.0;
+        }
     }
 }

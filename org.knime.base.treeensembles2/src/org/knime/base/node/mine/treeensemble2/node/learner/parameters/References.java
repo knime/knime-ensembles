@@ -43,61 +43,81 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.learner.regression;
+package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
-import org.knime.node.parameters.NodeParametersInput;
-import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.updates.ParameterReference;
 
-/**
- * Parameters for the Tree Ensemble Learner (regression).
- */
-@LoadDefaultsForAbsentFields
-@Modification(TreeEnsembleRegressionLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends RegressionTreeLearnerOptions {
+@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+public final class References {
 
-    static final class WidgetModifier implements Modification.Modifier {
-
-        @Override
-        public void modify(final Modification.WidgetGroupModifier group) {
-            // attribute selection
-            RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
-
-            // tree options
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            RegressionTreeLearnerOptions.minSplitNodeSize(group);
-            RegressionTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
-
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
-            WidgetGroupModifiers.rowSamplingFraction(group);
-            WidgetGroupModifiers.rowSamplingWithReplacement(group);
-            RegressionTreeLearnerOptions.rowSamplingMode(group);
-            WidgetGroupModifiers.attributeSampling(group);
-            WidgetGroupModifiers.attributeSamplingLinearFraction(group);
-            WidgetGroupModifiers.attributeSamplingAbsolute(group);
-            WidgetGroupModifiers.attributeSelectionReuse(group);
-
-            // advanced
-            WidgetGroupModifiers.hilighting(group);
-            WidgetGroupModifiers.randomSeed(group);
-        }
+    private References() {
+        // no instance
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters() {
-        super();
+    protected interface ColumnSamplingModeWidgetRef extends Modification.Reference {
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters(final NodeParametersInput input) {
-        super(input);
+    protected interface IgnoreColumnsWithoutDomainWidgetRef extends Modification.Reference {
+    }
+
+    protected interface AttributeColumnsWidgetRef extends Modification.Reference {
+    }
+
+    protected interface AttributeReuseWidgetRef extends Modification.Reference {
+    }
+
+    protected interface AverageSplitPointsWidgetRef extends Modification.Reference {
+    }
+
+    protected interface BinaryNominalSplitsWidgetRef extends Modification.Reference {
+    }
+
+    protected interface MaxTreeDepthWidgetRef extends Modification.Reference {
+    }
+
+    protected interface FixedRootAttributeWidgetRef extends Modification.Reference {
+    }
+
+    protected interface ColumnAbsoluteWidgetRef extends Modification.Reference {
+    }
+
+    protected interface ColumnFractionWidgetRef extends Modification.Reference {
+    }
+
+    interface ColumnSamplingModeRef extends ParameterReference<Options.ColumnSamplingModeOption> {
+    }
+
+    protected interface HiliteCountRef extends Modification.Reference {
+    }
+
+    protected interface MissingValueHandlingWidgetRef extends Modification.Reference {
+    }
+
+    protected interface SaveTargetDistributionRef extends Modification.Reference {
+    }
+
+    protected interface NrModelsRef extends Modification.Reference {
+    }
+
+    protected interface RowSamplingFractionWidgetRef extends Modification.Reference {
+    }
+
+    protected interface RowSamplingReplacementWidgetRef extends Modification.Reference {
+    }
+
+    protected interface RowSamplingModeWidgetRef extends Modification.Reference {
+    }
+
+    protected interface SeedRef extends Modification.Reference {
+    }
+
+    protected interface SplitCriterionWidgetRef extends Modification.Reference {
+    }
+
+    interface TargetColumnValueRef extends ParameterReference<String> {
+    }
+
+    protected interface TargetColumnWidgetRef extends Modification.Reference {
     }
 }

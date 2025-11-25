@@ -47,6 +47,7 @@
 package org.knime.base.node.mine.treeensemble2.node.randomforest.learner.regression;
 
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
@@ -74,16 +75,16 @@ final class RandomForestRegressionLearnerNodeParameters extends RegressionTreeLe
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             RegressionTreeLearnerOptions.targetColumn(group);
-            trainingAttributes(group);
-            useFingerprintAttribute(group);
-            attributeColumns(group);
-            ignoreColumnsWithoutDomainInfo(group);
+            WidgetGroupModifiers.trainingAttributes(group);
+            WidgetGroupModifiers.useFingerprintAttribute(group);
+            WidgetGroupModifiers.attributeColumns(group);
+            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
 
-            limitNumberOfLevels(group);
+            WidgetGroupModifiers.limitNumberOfLevels(group);
 
-            numberOfModels(group);
+            WidgetGroupModifiers.numberOfModels(group);
 
-            randomSeed(group);
+            WidgetGroupModifiers.randomSeed(group);
         }
     }
 }

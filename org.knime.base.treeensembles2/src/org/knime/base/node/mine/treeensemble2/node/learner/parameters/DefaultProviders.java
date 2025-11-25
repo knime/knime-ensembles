@@ -43,61 +43,43 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.learner.regression;
+package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
-import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.widget.OptionalWidget;
 
-/**
- * Parameters for the Tree Ensemble Learner (regression).
- */
-@LoadDefaultsForAbsentFields
-@Modification(TreeEnsembleRegressionLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends RegressionTreeLearnerOptions {
+@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+public final class DefaultProviders {
 
-    static final class WidgetModifier implements Modification.Modifier {
+    private DefaultProviders() {
 
+    }
+
+    static final class SeedDefaultProvider implements OptionalWidget.DefaultValueProvider<Long> {
         @Override
-        public void modify(final Modification.WidgetGroupModifier group) {
-            // attribute selection
-            RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
-
-            // tree options
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            RegressionTreeLearnerOptions.minSplitNodeSize(group);
-            RegressionTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
-
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
-            WidgetGroupModifiers.rowSamplingFraction(group);
-            WidgetGroupModifiers.rowSamplingWithReplacement(group);
-            RegressionTreeLearnerOptions.rowSamplingMode(group);
-            WidgetGroupModifiers.attributeSampling(group);
-            WidgetGroupModifiers.attributeSamplingLinearFraction(group);
-            WidgetGroupModifiers.attributeSamplingAbsolute(group);
-            WidgetGroupModifiers.attributeSelectionReuse(group);
-
-            // advanced
-            WidgetGroupModifiers.hilighting(group);
-            WidgetGroupModifiers.randomSeed(group);
+        public Long computeState(final NodeParametersInput context) {
+            return AbstractTreeLearnerOptions.DETERMINISTIC_SEED_DEFAULT;
         }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters() {
-        super();
+    static final class HiliteCountDefaultProvider implements OptionalWidget.DefaultValueProvider<Integer> {
+        @Override
+        public Integer computeState(final NodeParametersInput context) {
+            return 2000;
+        }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters(final NodeParametersInput input) {
-        super(input);
+    static final class MaxTreeDepthDefaultProvider implements OptionalWidget.DefaultValueProvider<Integer> {
+        @Override
+        public Integer computeState(final NodeParametersInput context) {
+            return 3;
+        }
+    }
+
+    static final class RowSamplingFractionDefaultProvider implements OptionalWidget.DefaultValueProvider<Double> {
+        @Override
+        public Double computeState(final NodeParametersInput context) {
+            return 0.7;
+        }
     }
 }

@@ -43,61 +43,38 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
+package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-package org.knime.base.node.mine.treeensemble2.node.randomforest.learner.classification;
+import org.knime.node.parameters.updates.EffectPredicate;
+import org.knime.node.parameters.updates.EffectPredicateProvider;
 
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.ClassificationTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
-import org.knime.node.parameters.NodeParametersInput;
-import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+public final class Predicates {
+    private Predicates() {
 
-/**
- * Parameters for Random Forest Learner.
- *
- * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
- * @author AI Migration Pipeline v1.2
- */
-@LoadDefaultsForAbsentFields
-@Modification(RandomForestClassificationLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class RandomForestClassificationLearnerNodeFactory2Parameters extends ClassificationTreeLearnerOptions {
-
-    RandomForestClassificationLearnerNodeFactory2Parameters() {
-        super();
     }
 
-    RandomForestClassificationLearnerNodeFactory2Parameters(final NodeParametersInput input) {
-        super(input);
-    }
-
-    static final class WidgetModifier implements Modification.Modifier {
+    static final class ColumnFractionEnabledPredicate implements EffectPredicateProvider {
         @Override
-        public void modify(final Modification.WidgetGroupModifier group) {
-            ClassificationTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
+        public EffectPredicate init(final PredicateInitializer initializer) {
+            return initializer.getEnum(References.ColumnSamplingModeRef.class)
+                .isOneOf(Options.ColumnSamplingModeOption.LINEAR);
+        }
+    }
 
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            ClassificationTreeLearnerOptions.minSplitNodeSize(group);
-            ClassificationTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
+    static final class ColumnAbsoluteEnabledPredicate implements EffectPredicateProvider {
+        @Override
+        public EffectPredicate init(final PredicateInitializer initializer) {
+            return initializer.getEnum(References.ColumnSamplingModeRef.class)
+                .isOneOf(Options.ColumnSamplingModeOption.ABSOLUTE);
+        }
+    }
 
-            WidgetGroupModifiers.numberOfModels(group);
-
-            WidgetGroupModifiers.rowSamplingFraction(group);
-            WidgetGroupModifiers.rowSamplingWithReplacement(group);
-            ClassificationTreeLearnerOptions.rowSamplingMode(group);
-
-            WidgetGroupModifiers.attributeSampling(group);
-            WidgetGroupModifiers.attributeSamplingLinearFraction(group);
-            WidgetGroupModifiers.attributeSamplingAbsolute(group);
-            WidgetGroupModifiers.attributeSelectionReuse(group);
-
-            WidgetGroupModifiers.hilighting(group);
-            WidgetGroupModifiers.randomSeed(group);
+    static final class ColumnAttributesSelectedPredicate implements EffectPredicateProvider {
+        @Override
+        public EffectPredicate init(final PredicateInitializer initializer) {
+            return initializer.getEnum(TrainingAttributesParameters.TrainingAttributesModeRef.class)
+                .isOneOf(TrainingAttributesParameters.TrainingAttributesModeOption.COLUMNS);
         }
     }
 }

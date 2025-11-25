@@ -43,61 +43,44 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.learner.regression;
+package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import java.util.List;
+
 import org.knime.node.parameters.NodeParametersInput;
-import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.widget.choices.EnumChoice;
+import org.knime.node.parameters.widget.choices.EnumChoicesProvider;
 
-/**
- * Parameters for the Tree Ensemble Learner (regression).
- */
-@LoadDefaultsForAbsentFields
-@Modification(TreeEnsembleRegressionLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends RegressionTreeLearnerOptions {
+@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+public final class Choices {
+    private Choices() {
 
-    static final class WidgetModifier implements Modification.Modifier {
+    }
 
+    static final class ColumnSamplingModeChoices implements EnumChoicesProvider<Options.ColumnSamplingModeOption> {
         @Override
-        public void modify(final Modification.WidgetGroupModifier group) {
-            // attribute selection
-            RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
-
-            // tree options
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            RegressionTreeLearnerOptions.minSplitNodeSize(group);
-            RegressionTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
-
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
-            WidgetGroupModifiers.rowSamplingFraction(group);
-            WidgetGroupModifiers.rowSamplingWithReplacement(group);
-            RegressionTreeLearnerOptions.rowSamplingMode(group);
-            WidgetGroupModifiers.attributeSampling(group);
-            WidgetGroupModifiers.attributeSamplingLinearFraction(group);
-            WidgetGroupModifiers.attributeSamplingAbsolute(group);
-            WidgetGroupModifiers.attributeSelectionReuse(group);
-
-            // advanced
-            WidgetGroupModifiers.hilighting(group);
-            WidgetGroupModifiers.randomSeed(group);
+        public List<EnumChoice<Options.ColumnSamplingModeOption>> computeState(final NodeParametersInput context) {
+            return List.of(EnumChoice.fromEnumConst(Options.ColumnSamplingModeOption.NONE),
+                EnumChoice.fromEnumConst(Options.ColumnSamplingModeOption.SQUARE_ROOT),
+                EnumChoice.fromEnumConst(Options.ColumnSamplingModeOption.LINEAR),
+                EnumChoice.fromEnumConst(Options.ColumnSamplingModeOption.ABSOLUTE));
         }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters() {
-        super();
+    static final class MissingValueHandlingChoices implements EnumChoicesProvider<Options.MissingValueHandlingOption> {
+        @Override
+        public List<EnumChoice<Options.MissingValueHandlingOption>> computeState(final NodeParametersInput context) {
+            return List.of(EnumChoice.fromEnumConst(Options.MissingValueHandlingOption.XGBOOST),
+                EnumChoice.fromEnumConst(Options.MissingValueHandlingOption.SURROGATE));
+        }
     }
 
-    TreeEnsembleRegressionLearnerNodeFactory2Parameters(final NodeParametersInput input) {
-        super(input);
+    static final class SplitCriterionChoices implements EnumChoicesProvider<Options.SplitCriterionOption> {
+        @Override
+        public List<EnumChoice<Options.SplitCriterionOption>> computeState(final NodeParametersInput context) {
+            return List.of(EnumChoice.fromEnumConst(Options.SplitCriterionOption.GINI),
+                EnumChoice.fromEnumConst(Options.SplitCriterionOption.INFORMATION_GAIN),
+                EnumChoice.fromEnumConst(Options.SplitCriterionOption.INFORMATION_GAIN_RATIO));
+        }
     }
 }
