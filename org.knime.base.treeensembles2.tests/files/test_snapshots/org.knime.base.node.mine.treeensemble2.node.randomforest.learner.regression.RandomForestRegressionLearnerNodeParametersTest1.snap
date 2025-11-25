@@ -655,21 +655,6 @@
       } ]
     } ]
   }, {
-    "scope" : "#/properties/model/properties/hardCodedRootColumn",
-    "providedOptionName" : "validatorId",
-    "values" : [ {
-      "indices" : [ ],
-      "value" : {
-        "first" : { },
-        "second" : {
-          "actualTypeArguments" : [ "java.lang.String" ],
-          "rawType" : "java.util.Optional",
-          "ownerType" : null,
-          "typeName" : "java.util.Optional<java.lang.String>"
-        }
-      }
-    } ]
-  }, {
     "scope" : "#/properties/model/properties/hiliteCount",
     "providedOptionName" : "default",
     "values" : [ {
@@ -721,7 +706,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1763978059687
+      "value" : 1764056027927
     } ]
   }, {
     "scope" : "#/properties/model/properties/splitCriterion",
@@ -795,6 +780,12 @@
     } ]
   } ],
   "globalUpdates" : [ {
+    "trigger" : {
+      "id" : "after-open-dialog"
+    },
+    "triggerInitially" : true,
+    "dependencies" : [ ]
+  }, {
     "trigger" : {
       "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"
     },

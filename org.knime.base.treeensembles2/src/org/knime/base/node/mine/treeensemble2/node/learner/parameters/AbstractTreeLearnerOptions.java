@@ -792,7 +792,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
 
         @Override
         public void init(final StateProviderInitializer stateProviderInitializer) {
-            stateProviderInitializer.computeBeforeOpenDialog();
+            stateProviderInitializer.computeAfterOpenDialog();
         }
     }
 
