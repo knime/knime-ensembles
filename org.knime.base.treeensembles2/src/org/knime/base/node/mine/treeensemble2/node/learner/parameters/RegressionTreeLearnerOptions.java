@@ -78,7 +78,6 @@ public class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
     }
 
     public static void targetColumn(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.targetColumn(groupModifier);
         groupModifier.find(References.TargetColumnWidgetRef.class) //
             .addAnnotation(ValueProvider.class) //
             .withProperty("value", RegressionTargetAutoSelectionProvider.class) //
@@ -89,16 +88,14 @@ public class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
             .modify();
     }
 
-    public static void minSplitNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.minSplitNodeSize(groupModifier);
+    public static void setMinSplitNodeSizeDefaultToTen(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(MinNodeSizesParameters.MinNodeSizeWidgetRef.class) //
             .addAnnotation(OptionalWidget.class) //
             .withProperty("defaultProvider", MinSplitNodeSizeDefaultProvider.class) //
             .modify();
     }
 
-    public static void minChildNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.minChildNodeSize(groupModifier);
+    public static void setMinChildNodeSizeDefaultToFive(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(MinNodeSizesParameters.MinChildNodeSizeRef.class) //
             .addAnnotation(OptionalWidget.class) //
             .withProperty("defaultProvider", MinChildNodeSizeDefaultProvider.class) //

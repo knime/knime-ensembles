@@ -55,37 +55,128 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParameters;
 import org.knime.node.parameters.NodeParametersInput;
+import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.layout.Layout;
 import org.knime.node.parameters.persistence.NodeParametersPersistor;
+import org.knime.node.parameters.persistence.Persistor;
 import org.knime.node.parameters.updates.ParameterReference;
 import org.knime.node.parameters.updates.StateProvider;
+import org.knime.node.parameters.updates.ValueProvider;
 import org.knime.node.parameters.updates.ValueReference;
 import org.knime.node.parameters.widget.number.NumberInputWidget;
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation;
 
-@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+@SuppressWarnings({"restriction"})
 public final class MinNodeSizesParameters implements NodeParameters {
 
     @Layout(AbstractTreeLearnerOptions.TreeOptionsSection.class)
     @NumberInputWidget(minValidation = NumberInputWidgetValidation.MinValidation.IsPositiveIntegerValidation.class)
-    @ValueReference(MinNodeSizeRef.class)
+    @ValueReference(MinNodeSizeWidgetRef.class)
     @Modification.WidgetReference(MinNodeSizeWidgetRef.class)
+    @Persistor(MinNodeSizePersistor.class)
     Optional<Integer> m_minNodeSize = Optional.empty();
 
     @Layout(AbstractTreeLearnerOptions.TreeOptionsSection.class)
     @Modification.WidgetReference(MinChildNodeSizeRef.class)
     @NumberInputWidget(minValidation = NumberInputWidgetValidation.MinValidation.IsPositiveIntegerValidation.class,
         maxValidationProvider = MinChildSizeMaxValidationProvider.class)
+    @Persistor(MinChildSizePersistor.class)
     Optional<Integer> m_minChildNodeSize = Optional.empty();
 
-    protected interface MinChildNodeSizeRef extends Modification.Reference {
+    private static void showMinSplitNodeSize(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(MinNodeSizesParameters.MinNodeSizeWidgetRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Minimum split node size") //
+            .withProperty("description", """
+                    Minimum number of records in a node required to attempt another split.
+                    """) //
+            .modify();
     }
 
-    public interface MinNodeSizeWidgetRef extends Modification.Reference {
+    private static void showMinChildNodeSize(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(MinNodeSizesParameters.MinChildNodeSizeRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Minimum child node size").withProperty("description", """
+                    Minimum number of records allowed in the child nodes after a split.
+                    Must not exceed half the minimum split node size.
+                    """).modify();
     }
 
-    private interface MinNodeSizeRef extends ParameterReference<Optional<Integer>> {
+    public static void showSplitNodeSizes(final Modification.WidgetGroupModifier groupModifier) {
+        showMinSplitNodeSize(groupModifier);
+        showMinChildNodeSize(groupModifier);
+    }
 
+    public static void showMinChildNodeSizeOnly(final Modification.WidgetGroupModifier groupModifier) {
+        showMinChildNodeSize(groupModifier);
+        groupModifier.find(MinNodeSizeWidgetRef.class).addAnnotation(ValueProvider.class)
+            .withValue(TwoTimesChildSizeProvider.class).modify();
+    }
+
+    interface MinChildNodeSizeRef extends Modification.Reference, ParameterReference<Optional<Integer>> {
+    }
+
+    interface MinNodeSizeWidgetRef extends Modification.Reference, ParameterReference<Optional<Integer>> {
+    }
+
+    static final class TwoTimesChildSizeProvider implements StateProvider<Optional<Integer>> {
+
+        private Supplier<Optional<Integer>> m_minChildSizeSupplier;
+
+        @Override
+        public void init(final StateProviderInitializer initializer) {
+            m_minChildSizeSupplier = initializer.computeFromValueSupplier(MinChildNodeSizeRef.class);
+            initializer.computeBeforeOpenDialog();
+        }
+
+        @Override
+        public Optional<Integer> computeState(final NodeParametersInput context) {
+            return m_minChildSizeSupplier.get().map(size -> size * 2);
+        }
+    }
+
+    abstract static class OptionalEmptyAsSpecialIntPersistor implements NodeParametersPersistor<Optional<Integer>> {
+
+        private final String m_configKey;
+
+        private final int m_specialInt;
+
+        OptionalEmptyAsSpecialIntPersistor(final String configKey, final int specialInt) {
+            m_configKey = configKey;
+            m_specialInt = specialInt;
+        }
+
+        @Override
+        public Optional<Integer> load(final NodeSettingsRO settings) throws InvalidSettingsException {
+            var value = settings.getInt(m_configKey, m_specialInt);
+            if (value == m_specialInt) {
+                return Optional.empty();
+            }
+            return Optional.of(value);
+        }
+
+        @Override
+        public void save(final Optional<Integer> value, final NodeSettingsWO settings) {
+            settings.addInt(m_configKey, value.orElse(m_specialInt));
+        }
+
+        @Override
+        public String[][] getConfigPaths() {
+            return new String[][]{{m_configKey}};
+        }
+    }
+
+    private static final class MinChildSizePersistor extends OptionalEmptyAsSpecialIntPersistor {
+        MinChildSizePersistor() {
+            super(TreeEnsembleLearnerConfiguration.KEY_MIN_CHILD_SIZE,
+                TreeEnsembleLearnerConfiguration.MIN_CHILD_SIZE_UNDEFINED);
+        }
+    }
+
+    private static final class MinNodeSizePersistor extends OptionalEmptyAsSpecialIntPersistor {
+        MinNodeSizePersistor() {
+            super(TreeEnsembleLearnerConfiguration.KEY_MIN_NODE_SIZE,
+                TreeEnsembleLearnerConfiguration.MIN_NODE_SIZE_UNDEFINED);
+        }
     }
 
     private static final class MinChildSizeMaxValidationProvider
@@ -95,7 +186,7 @@ public final class MinNodeSizesParameters implements NodeParameters {
 
         @Override
         public void init(final StateProviderInitializer initializer) {
-            m_minNodeSizeSupplier = initializer.computeFromValueSupplier(MinNodeSizeRef.class);
+            m_minNodeSizeSupplier = initializer.computeFromValueSupplier(MinNodeSizeWidgetRef.class);
             initializer.computeBeforeOpenDialog();
         }
 
@@ -103,7 +194,7 @@ public final class MinNodeSizesParameters implements NodeParameters {
         public NumberInputWidgetValidation.MaxValidation computeState(final NodeParametersInput context) {
             var minNodeSize = m_minNodeSizeSupplier.get().orElse(null);
             if (minNodeSize == null) {
-                return NoLimitMaxValidation.INSTANCE;
+                return null;
             }
             final var maxAllowed = Math.floor(minNodeSize / 2.0);
             return new NumberInputWidgetValidation.MaxValidation() {
@@ -126,58 +217,4 @@ public final class MinNodeSizesParameters implements NodeParameters {
         }
     }
 
-    static final class MinNodeSizesPersistor implements NodeParametersPersistor<MinNodeSizesParameters> {
-        @Override
-        public MinNodeSizesParameters load(final NodeSettingsRO settings) throws InvalidSettingsException {
-            var params = new MinNodeSizesParameters();
-            var minNodeSize = settings.getInt(TreeEnsembleLearnerConfiguration.KEY_MIN_NODE_SIZE,
-                TreeEnsembleLearnerConfiguration.MIN_NODE_SIZE_UNDEFINED);
-            if (minNodeSize != TreeEnsembleLearnerConfiguration.MIN_NODE_SIZE_UNDEFINED) {
-                params.m_minNodeSize = Optional.of(minNodeSize);
-            }
-            var minChildSize = settings.getInt(TreeEnsembleLearnerConfiguration.KEY_MIN_CHILD_SIZE,
-                TreeEnsembleLearnerConfiguration.MIN_CHILD_SIZE_UNDEFINED);
-            if (minChildSize != TreeEnsembleLearnerConfiguration.MIN_CHILD_SIZE_UNDEFINED) {
-                params.m_minChildNodeSize = Optional.of(minChildSize);
-            }
-            return params;
-        }
-
-        @Override
-        public void save(final MinNodeSizesParameters value, final NodeSettingsWO settings) {
-            var minNodeSize = value != null && value.m_minNodeSize.isPresent() ? value.m_minNodeSize.get()
-                : TreeEnsembleLearnerConfiguration.MIN_NODE_SIZE_UNDEFINED;
-            var minChildSize = value != null && value.m_minChildNodeSize.isPresent() ? value.m_minChildNodeSize.get()
-                : TreeEnsembleLearnerConfiguration.MIN_CHILD_SIZE_UNDEFINED;
-
-            var minNodeToPersist = minNodeSize;
-            if (minChildSize != TreeEnsembleLearnerConfiguration.MIN_CHILD_SIZE_UNDEFINED
-                && minNodeToPersist == TreeEnsembleLearnerConfiguration.MIN_NODE_SIZE_UNDEFINED) {
-                minNodeToPersist = 2 * minChildSize;
-            }
-
-            settings.addInt(TreeEnsembleLearnerConfiguration.KEY_MIN_NODE_SIZE, minNodeToPersist);
-            settings.addInt(TreeEnsembleLearnerConfiguration.KEY_MIN_CHILD_SIZE, minChildSize);
-        }
-
-        @Override
-        public String[][] getConfigPaths() {
-            return new String[][]{{TreeEnsembleLearnerConfiguration.KEY_MIN_NODE_SIZE},
-                {TreeEnsembleLearnerConfiguration.KEY_MIN_CHILD_SIZE}};
-        }
-    }
-
-    static final class NoLimitMaxValidation extends NumberInputWidgetValidation.MaxValidation {
-        private static final NoLimitMaxValidation INSTANCE = new NoLimitMaxValidation();
-
-        @Override
-        protected double getMax() {
-            return Double.POSITIVE_INFINITY;
-        }
-
-        @Override
-        public String getErrorMessage() {
-            return "";
-        }
-    }
 }

@@ -45,6 +45,8 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.learner.regression;
 
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions;
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.MinNodeSizesParameters;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -64,24 +66,24 @@ final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends Regressi
         public void modify(final Modification.WidgetGroupModifier group) {
             // attribute selection
             RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
+            AbstractTreeLearnerOptions.showIgnoreColumnsWithoutDomainInfo(group);
 
             // tree options
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            RegressionTreeLearnerOptions.minSplitNodeSize(group);
-            RegressionTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
+            AbstractTreeLearnerOptions.showUseMidpointSplits(group);
+            AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
+            AbstractTreeLearnerOptions.showLimitNumberOfLevels(group);
+            MinNodeSizesParameters.showSplitNodeSizes(group);
+            RegressionTreeLearnerOptions.setMinSplitNodeSizeDefaultToTen(group);
+            RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
+            AbstractTreeLearnerOptions.showFixedRootAttribute(group);
 
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
+            // data sampling
             WidgetGroupModifiers.rowSamplingFraction(group);
             WidgetGroupModifiers.rowSamplingWithReplacement(group);
             RegressionTreeLearnerOptions.rowSamplingMode(group);
+
+            // ensemble configuration
+            WidgetGroupModifiers.numberOfModels(group);
             WidgetGroupModifiers.attributeSampling(group);
             WidgetGroupModifiers.attributeSamplingLinearFraction(group);
             WidgetGroupModifiers.attributeSamplingAbsolute(group);

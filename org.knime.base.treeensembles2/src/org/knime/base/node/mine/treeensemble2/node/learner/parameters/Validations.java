@@ -45,36 +45,12 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
-import java.util.Optional;
-
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.validation.custom.CustomValidationProvider;
-import org.knime.core.webui.node.dialog.defaultdialog.widget.validation.custom.ValidationCallback;
-import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation;
 
-@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+@SuppressWarnings({"javadoc"})
 public final class Validations {
     private Validations() {
-
-    }
-
-    static final class HardCodedRootValidationProvider implements CustomValidationProvider<Optional<String>> {
-
-        @Override
-        public ValidationCallback<Optional<String>>
-            computeValidationCallback(final NodeParametersInput parametersInput) {
-            return value -> {
-                if (value.isPresent() && value.map(String::isBlank).orElse(false)) {
-                    throw new InvalidSettingsException("Select a fixed root attribute or disable the option.");
-                }
-            };
-        }
-
-        @Override
-        public void init(final StateProviderInitializer stateProviderInitializer) {
-            stateProviderInitializer.computeAfterOpenDialog();
-        }
+        // utility class
     }
 
     static final class RowSamplingFractionMaxValidation extends NumberInputWidgetValidation.MaxValidation {

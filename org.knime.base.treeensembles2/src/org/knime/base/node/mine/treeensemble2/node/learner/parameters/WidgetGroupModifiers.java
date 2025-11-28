@@ -48,129 +48,27 @@ package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.Widget;
 
-@SuppressWarnings({"MissingJavadoc", "java:S1176", "java:S1192"})
+/**
+ * Common modifies the widget group for all tree ensemble learners.
+ *
+ * @author Paul Bärnreuther
+ */
+@SuppressWarnings({"restriction"})
 public final class WidgetGroupModifiers {
 
     private WidgetGroupModifiers() {
-
+        // no instance
     }
 
-    public static void targetColumn(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.TargetColumnWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Target column") //
-            .withProperty("description", """
-                    Select the column containing the value to be learned. Rows with missing values in this column are \
-                    ignored during the learning process.
-                    """).modify();//
-
-    }
-
-    public static void trainingAttributes(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(TrainingAttributesParameters.TrainingAttributesModeWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Training attributes") //
-            .withProperty("description", """
-                    Choose whether to derive attributes from a fingerprint vector column or from ordinary table \
-                    columns.
-                    """) //
-            .modify();
-    }
-
-    public static void useFingerprintAttribute(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(TrainingAttributesParameters.FingerprintAttributeWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Fingerprint attribute") //
-            .withProperty("description", """
-                    Use a fingerprint (bit, byte, or double vector) column to learn the model. Each entry of the \
-                    vector is treated as a separate attribute. All vectors must share the same length.
-                    """) //
-            .modify();
-    }
-
-    public static void attributeColumns(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.AttributeColumnsWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Attribute selection") //
-            .withProperty("description", """
-                    Select the ordinary columns that should be used as learning attributes. Use the include/exclude \
-                    lists or pattern matching to manage the selection.
-                    """) //
-            .modify();
-    }
-
-    public static void ignoreColumnsWithoutDomainInfo(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.IgnoreColumnsWithoutDomainWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Ignore columns without domain information") //
-            .withProperty("description", """
-                    Ignore nominal columns that do not contain domain information, for example when the number of \
-                    nominal values is very large.
-                    """) //
-            .modify();
-    }
-
-    @SuppressWarnings("java:S1144")
+    @SuppressWarnings({"unused"})
     private static void useMissingValueHandlingWidget(final Modification.WidgetGroupModifier groupModifier) {
         // currently unused but kept for consistency since all nodes share the same configuration object
         groupModifier.find(References.MissingValueHandlingWidgetRef.class) //
             .addAnnotation(Widget.class) //
             .withProperty("title", "Missing value handling") //
-            .withProperty("description",
-                """
-                        Choose how missing attribute values are processed. XGBoost-style handling learns the best \
-                        direction for missing values during training; surrogates fall back to alternative splits.
-                        """) //
-            .modify();
-    }
-
-    public static void useMidpointSplits(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.AverageSplitPointsWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Use mid-point splits") //
             .withProperty("description", """
-                    For numerical splits, use the mid-point between two class boundaries. Otherwise the split value \
-                    corresponds to the lower boundary with a ≤ comparison.
-                    """) //
-            .modify();
-    }
-
-    public static void useBinarySplitsForNominal(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.BinaryNominalSplitsWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Use binary splits for nominal columns") //
-            .withProperty("description", """
-                    Allow binary splits for nominal attributes. Disabling keeps the original multi-way splits.
-                    """) //
-            .modify();
-    }
-
-    public static void limitNumberOfLevels(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.MaxTreeDepthWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Limit number of levels (tree depth)") //
-            .withProperty("description", """
-                    Limit the maximal number of tree levels. When disabled the tree depth is unbounded.
-                    """) //
-            .modify();
-    }
-
-    static void minSplitNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(MinNodeSizesParameters.MinNodeSizeWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Minimum split node size") //
-            .withProperty("description", """
-                    Minimum number of records in a node required to attempt another split.
-                    """) //
-            .modify();
-    }
-
-    public static void fixedRootAttribute(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.FixedRootAttributeWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Use fixed root attribute") //
-            .withProperty("description", """
-                    Force the selected column to be used as the root split attribute in all trees.
+                    Choose how missing attribute values are processed. XGBoost-style handling learns the best \
+                    direction for missing values during training; surrogates fall back to alternative splits.
                     """) //
             .modify();
     }
@@ -248,27 +146,11 @@ public final class WidgetGroupModifiers {
             .modify();
     }
 
-    public static void saveTargetDistribution(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.SaveTargetDistributionRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Save target distribution in tree nodes") //
-            .withProperty("description", """
-                            Store the distribution of the target category values in each tree node. This increases \
-                             the memory footprint but is required for some downstream views and model exports.
-                    """) //
-            .modify();
-    }
-
-    public static void splitCriterion(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(References.SplitCriterionWidgetRef.class) //
-            .addAnnotation(Widget.class) //
-            .withProperty("title", "Split criterion") //
-            .withProperty("description", """
-                    Select the impurity measure used to evaluate candidate splits. Gini is the common default.
-                    """) //
-            .modify();
-    }
-
+    /**
+     * Not shown for Random Forest Regression (for simplicity)
+     *
+     * @param groupModifier the group modifier
+     */
     public static void hilighting(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(References.HiliteCountRef.class).addAnnotation(Widget.class)
             .withProperty("title", "Enable highlighting (number of patterns to store)")
@@ -276,14 +158,6 @@ public final class WidgetGroupModifiers {
                 "If selected, the node stores the selected number of rows and allows highlighting "
                     + "them in the node view.")
             .modify();
-    }
-
-    static void minChildNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        groupModifier.find(MinNodeSizesParameters.MinChildNodeSizeRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Minimum child node size").withProperty("description", """
-                    Minimum number of records allowed in the child nodes after a split.
-                    Must not exceed half the minimum split node size.
-                    """).modify();
     }
 
     public static void numberOfModels(final Modification.WidgetGroupModifier groupModifier) {

@@ -46,6 +46,7 @@
 
 package org.knime.base.node.mine.treeensemble2.node.randomforest.learner.regression;
 
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -54,7 +55,7 @@ import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
  * Node parameters for Random Forest Learner (Regression).
- * 
+ *
  * @author Benjamin Moser, KNIME GmbH, Konstanz, Germany
  * @author AI Migration Pipeline v1.2
  */
@@ -74,16 +75,18 @@ final class RandomForestRegressionLearnerNodeParameters extends RegressionTreeLe
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
+            // attribute selection
             RegressionTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
 
-            WidgetGroupModifiers.limitNumberOfLevels(group);
+            // tree options
+            AbstractTreeLearnerOptions.showLimitNumberOfLevels(group);
 
+            // no data sampling options for random forest regression
+
+            // ensemble configuration
             WidgetGroupModifiers.numberOfModels(group);
 
+            // advanced
             WidgetGroupModifiers.randomSeed(group);
         }
     }

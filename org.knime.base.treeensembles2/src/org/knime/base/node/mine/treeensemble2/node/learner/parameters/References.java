@@ -61,13 +61,7 @@ public final class References {
     protected interface IgnoreColumnsWithoutDomainWidgetRef extends Modification.Reference {
     }
 
-    protected interface AttributeColumnsWidgetRef extends Modification.Reference {
-    }
-
     protected interface AttributeReuseWidgetRef extends Modification.Reference {
-    }
-
-    protected interface AverageSplitPointsWidgetRef extends Modification.Reference {
     }
 
     protected interface BinaryNominalSplitsWidgetRef extends Modification.Reference {

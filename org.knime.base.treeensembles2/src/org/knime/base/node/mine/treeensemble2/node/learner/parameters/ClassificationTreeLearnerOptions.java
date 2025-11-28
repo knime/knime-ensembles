@@ -52,13 +52,14 @@ import org.knime.core.data.NominalValue;
 import org.knime.core.data.probability.nominal.NominalDistributionValue;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
+import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.updates.ValueProvider;
 import org.knime.node.parameters.widget.OptionalWidget;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.EnumChoice;
 import org.knime.node.parameters.widget.choices.EnumChoicesProvider;
 
-@SuppressWarnings({"MissingJavadoc", "java:S1176"})
+@SuppressWarnings("restriction")
 public class ClassificationTreeLearnerOptions extends AbstractTreeLearnerOptions {
 
     protected ClassificationTreeLearnerOptions() {
@@ -79,8 +80,12 @@ public class ClassificationTreeLearnerOptions extends AbstractTreeLearnerOptions
         return isValidClassificationTargetColumn(col);
     }
 
+    /**
+     * Choices are nominal and nominal distribution columns.
+     *
+     * @param groupModifier the widget group modifier
+     */
     public static void targetColumn(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.targetColumn(groupModifier);
         groupModifier.find(References.TargetColumnWidgetRef.class) //
             .addAnnotation(ValueProvider.class) //
             .withProperty("value", ClassificationAutoSelectionProvider.class) //
@@ -91,16 +96,40 @@ public class ClassificationTreeLearnerOptions extends AbstractTreeLearnerOptions
             .modify();
     }
 
-    public static void minChildNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.minChildNodeSize(groupModifier);
+    public static void saveTargetDistribution(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(References.SaveTargetDistributionRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Save target distribution in tree nodes") //
+            .withProperty("description", """
+                            Store the distribution of the target category values in each tree node. This increases \
+                             the memory footprint but is required for some downstream views and model exports.
+                    """) //
+            .modify();
+    }
+
+    public static void splitCriterion(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(References.SplitCriterionWidgetRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Split criterion") //
+            .withProperty("description", """
+                    Select the impurity measure used to evaluate candidate splits. Gini is the common default.
+                    """) //
+            .modify();
+    }
+
+    public static void setMinChildNodeSizeDefaultToOne(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(MinNodeSizesParameters.MinChildNodeSizeRef.class) //
             .addAnnotation(OptionalWidget.class) //
             .withProperty("defaultProvider", MinChildNodeSizeDefaultProvider.class) //
             .modify();
     }
 
-    public static void minSplitNodeSize(final Modification.WidgetGroupModifier groupModifier) {
-        WidgetGroupModifiers.minSplitNodeSize(groupModifier);
+    /**
+     * Only used by the classification tree learner.
+     *
+     * @param groupModifier the widget group modifier
+     */
+    public static void setMinSplitNodeSizeDefaultToTwo(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(MinNodeSizesParameters.MinNodeSizeWidgetRef.class) //
             .addAnnotation(OptionalWidget.class) //
             .withProperty("defaultProvider", MinSplitNodeSizeDefaultProvider.class) //

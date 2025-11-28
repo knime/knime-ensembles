@@ -45,7 +45,9 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.learner.classification;
 
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.ClassificationTreeLearnerOptions;
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.MinNodeSizesParameters;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.WidgetGroupModifiers;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
@@ -64,32 +66,32 @@ final class TreeEnsembleClassificationLearnerNodeFactory2Parameters extends Clas
         public void modify(final Modification.WidgetGroupModifier group) {
             // attribute selection
             ClassificationTreeLearnerOptions.targetColumn(group);
-            WidgetGroupModifiers.trainingAttributes(group);
-            WidgetGroupModifiers.useFingerprintAttribute(group);
-            WidgetGroupModifiers.attributeColumns(group);
-            WidgetGroupModifiers.ignoreColumnsWithoutDomainInfo(group);
+            AbstractTreeLearnerOptions.showIgnoreColumnsWithoutDomainInfo(group);
 
             // tree options
-            WidgetGroupModifiers.splitCriterion(group);
-            WidgetGroupModifiers.useMidpointSplits(group);
-            WidgetGroupModifiers.useBinarySplitsForNominal(group);
-            WidgetGroupModifiers.limitNumberOfLevels(group);
-            ClassificationTreeLearnerOptions.minSplitNodeSize(group);
-            ClassificationTreeLearnerOptions.minChildNodeSize(group);
-            WidgetGroupModifiers.fixedRootAttribute(group);
+            ClassificationTreeLearnerOptions.splitCriterion(group);
+            AbstractTreeLearnerOptions.showUseMidpointSplits(group);
+            AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
+            AbstractTreeLearnerOptions.showLimitNumberOfLevels(group);
+            MinNodeSizesParameters.showSplitNodeSizes(group);
+            ClassificationTreeLearnerOptions.setMinSplitNodeSizeDefaultToTwo(group);
+            ClassificationTreeLearnerOptions.setMinChildNodeSizeDefaultToOne(group);
+            AbstractTreeLearnerOptions.showFixedRootAttribute(group);
 
-            // ensemble configuration
-            WidgetGroupModifiers.numberOfModels(group);
+            // data sampling
             WidgetGroupModifiers.rowSamplingFraction(group);
             WidgetGroupModifiers.rowSamplingWithReplacement(group);
             ClassificationTreeLearnerOptions.rowSamplingMode(group);
+
+            // ensemble configuration
+            WidgetGroupModifiers.numberOfModels(group);
             WidgetGroupModifiers.attributeSampling(group);
             WidgetGroupModifiers.attributeSamplingLinearFraction(group);
             WidgetGroupModifiers.attributeSamplingAbsolute(group);
             WidgetGroupModifiers.attributeSelectionReuse(group);
 
             // advanced
-            WidgetGroupModifiers.saveTargetDistribution(group);
+            ClassificationTreeLearnerOptions.saveTargetDistribution(group);
             WidgetGroupModifiers.hilighting(group);
             WidgetGroupModifiers.randomSeed(group);
         }
