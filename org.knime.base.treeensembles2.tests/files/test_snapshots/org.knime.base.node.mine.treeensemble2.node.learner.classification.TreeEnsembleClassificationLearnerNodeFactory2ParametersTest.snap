@@ -217,8 +217,8 @@
           "hiliteCount" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
-            "title" : "Enable highlighting (number of patterns to store)",
-            "description" : "If selected, the node stores the selected number of rows and\nallows highlighting them in the node view.\n",
+            "title" : "Enable highlighting",
+            "description" : "If selected, the node stores the configured number of rows and\nallows highlighting them in the node view.\n",
             "default" : null
           },
           "ignoreColumnsWithoutDomain" : {
@@ -324,7 +324,7 @@
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
-            "title" : "Save target distribution in tree nodes (memory expensive)",
+            "title" : "Save target distribution in tree nodes",
             "description" : "If selected, the model stores the distribution of the target category values in each tree node.\nStoring the class distribution may increase memory consumption considerably and we therefore\nrecommend disabling it if your use-case doesn't require it.\nClass distribution is only needed if\n<ul>\n    <li>You want to see the class distribution for each tree node in the node view.</li>\n    <li>You want to export individual decision trees to PMML.</li>\n    <li>\n        You want to use soft-voting (i.e. aggregation of probability distributions instead of\n        votes) in the predictor node.\n    </li>\n</ul>",
             "default" : false
           },

@@ -207,8 +207,8 @@
           "hiliteCount" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
-            "title" : "Enable highlighting (number of patterns to store)",
-            "description" : "If selected, the node stores the selected number of rows and\nallows highlighting them in the node view.\n",
+            "title" : "Enable highlighting",
+            "description" : "If selected, the node stores the configured number of rows and\nallows highlighting them in the node view.\n",
             "default" : null
           },
           "ignoreColumnsWithoutDomain" : {

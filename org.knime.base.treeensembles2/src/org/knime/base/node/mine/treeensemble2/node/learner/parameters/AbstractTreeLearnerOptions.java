@@ -601,8 +601,8 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @OptionalWidget(defaultProvider = DefaultProviders.HiliteCountDefaultProvider.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persistor(Persistors.HiliteCountPersistor.class)
-    @Widget(title = "Enable highlighting (number of patterns to store)", description = """
-            If selected, the node stores the selected number of rows and
+    @Widget(title = "Enable highlighting", description = """
+            If selected, the node stores the configured number of rows and
             allows highlighting them in the node view.
             """)
     Optional<Integer> m_hiliteCount = Optional.empty();
@@ -622,8 +622,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     public static void showSaveTargetDistribution(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(SaveTargetDistributionRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Save target distribution in tree nodes (memory expensive)")
-            .withProperty("description", """
+            .withProperty("title", "Save target distribution in tree nodes").withProperty("description", """
                     If selected, the model stores the distribution of the target category values in each tree node.
                     Storing the class distribution may increase memory consumption considerably and we therefore
                     recommend disabling it if your use-case doesn't require it.
