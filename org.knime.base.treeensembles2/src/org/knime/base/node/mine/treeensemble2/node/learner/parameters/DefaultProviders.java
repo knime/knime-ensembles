@@ -45,7 +45,11 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
+import java.util.Optional;
+import java.util.Random;
+
 import org.knime.node.parameters.NodeParametersInput;
+import org.knime.node.parameters.updates.StateProvider;
 import org.knime.node.parameters.widget.OptionalWidget;
 
 final class DefaultProviders {
@@ -58,6 +62,19 @@ final class DefaultProviders {
         @Override
         public String computeState(final NodeParametersInput context) {
             return Long.toString(AbstractTreeLearnerOptions.DETERMINISTIC_SEED_DEFAULT);
+        }
+    }
+
+    static final class NewSeedValueProvider implements StateProvider<Optional<String>> {
+
+        @Override
+        public void init(final StateProvider.StateProviderInitializer initializer) {
+            initializer.computeOnButtonClick(AbstractTreeLearnerOptions.NewSeedButtonRef.class);
+        }
+
+        @Override
+        public Optional<String> computeState(final NodeParametersInput parametersInput) {
+            return Optional.of(Long.toString(new Random().nextLong()));
         }
     }
 

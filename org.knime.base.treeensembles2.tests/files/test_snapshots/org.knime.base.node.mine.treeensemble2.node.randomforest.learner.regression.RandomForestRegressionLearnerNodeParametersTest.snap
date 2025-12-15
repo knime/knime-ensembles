@@ -253,6 +253,11 @@
             } ],
             "default" : "XGBOOST"
           },
+          "newSeed" : {
+            "type" : "object",
+            "title" : "Generate new seed",
+            "description" : "Generate a random seed and apply it to the field above for reproducible runs."
+          },
           "numberOfModels" : {
             "type" : "integer",
             "format" : "int32",
@@ -503,17 +508,16 @@
         "type" : "Control",
         "scope" : "#/properties/model/properties/seed",
         "options" : {
-          "validation" : {
-            "pattern" : {
-              "errorMessage" : "Please enter a valid integer number between -9223372036854775808 to 9223372036854775807.",
-              "parameters" : {
-                "pattern" : "[+-]?(0|[1-9][0-9]{0,18})"
-              }
-            }
-          },
           "hideOnNull" : true
         },
         "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/newSeed",
+        "options" : {
+          "format" : "simpleButton",
+          "triggerId" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+        }
       }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/hiliteCount",
@@ -615,6 +619,7 @@
           "seed" : {
             "configPaths" : [ [ "seed" ] ]
           },
+          "newSeed" : { },
           "hiliteCount" : {
             "configPaths" : [ [ "nrHilitePatterns" ] ]
           },
@@ -730,6 +735,11 @@
     },
     "triggerInitially" : true,
     "dependencies" : [ "#/properties/model/properties/targetColumn", "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn" ]
+  }, {
+    "trigger" : {
+      "id" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+    },
+    "dependencies" : [ ]
   }, {
     "trigger" : {
       "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"
