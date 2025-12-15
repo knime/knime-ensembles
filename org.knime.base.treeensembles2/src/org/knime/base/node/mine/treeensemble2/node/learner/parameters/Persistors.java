@@ -138,23 +138,24 @@ final class Persistors {
 
     }
 
-    static final class SeedPersistor implements NodeParametersPersistor<Optional<Long>> {
+    static final class SeedPersistor implements NodeParametersPersistor<Optional<String>> {
         @Override
-        public Optional<Long> load(final NodeSettingsRO settings) throws InvalidSettingsException {
-            var seedString = settings.getString(TreeEnsembleLearnerConfiguration.KEY_SEED, null);
-            if (seedString == null || seedString.isBlank()) {
+        public Optional<String> load(final NodeSettingsRO settings) throws InvalidSettingsException {
+            var string = settings.getString(TreeEnsembleLearnerConfiguration.KEY_SEED, null);
+            if (string == null) {
                 return Optional.empty();
             }
             try {
-                return Optional.of(Long.parseLong(seedString));
-            } catch (NumberFormatException nfe) {
-                throw new InvalidSettingsException("Unable to parse seed \"" + seedString + "\"", nfe);
+                Long.parseLong(string);
+            } catch (NumberFormatException e) {
+                throw new InvalidSettingsException(e);
             }
+            return Optional.of(string);
         }
 
         @Override
-        public void save(final Optional<Long> value, final NodeSettingsWO settings) {
-            settings.addString(TreeEnsembleLearnerConfiguration.KEY_SEED, value.map(Object::toString).orElse(null));
+        public void save(final Optional<String> value, final NodeSettingsWO settings) {
+            settings.addString(TreeEnsembleLearnerConfiguration.KEY_SEED, value.orElse(null));
         }
 
         @Override

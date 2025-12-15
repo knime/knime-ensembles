@@ -54,10 +54,10 @@ final class DefaultProviders {
         // prevent instantiation
     }
 
-    static final class SeedDefaultProvider implements OptionalWidget.DefaultValueProvider<Long> {
+    static final class SeedDefaultProvider implements OptionalWidget.DefaultValueProvider<String> {
         @Override
-        public Long computeState(final NodeParametersInput context) {
-            return AbstractTreeLearnerOptions.DETERMINISTIC_SEED_DEFAULT;
+        public String computeState(final NodeParametersInput context) {
+            return Long.toString(AbstractTreeLearnerOptions.DETERMINISTIC_SEED_DEFAULT);
         }
     }
 

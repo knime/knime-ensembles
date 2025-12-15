@@ -87,6 +87,8 @@ import org.knime.node.parameters.widget.choices.util.CompatibleColumnsProvider;
 import org.knime.node.parameters.widget.number.NumberInputWidget;
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsPositiveDoubleValidation;
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation.MinValidation.IsPositiveIntegerValidation;
+import org.knime.node.parameters.widget.text.TextInputWidget;
+import org.knime.node.parameters.persistence.legacy.LongAsStringPersistor;
 
 /**
  * Shared parameter definition for all tree-based learners.
@@ -597,12 +599,12 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
 
     @Layout(AdvancedSection.class)
     @OptionalWidget(defaultProvider = DefaultProviders.SeedDefaultProvider.class)
-    @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
+    @TextInputWidget(patternValidation = LongAsStringPersistor.IsLongInteger.class)
     @Persistor(Persistors.SeedPersistor.class)
     @Widget(title = "Use static random seed", description = """
             Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.
             """)
-    Optional<Long> m_seed = Optional.of(1764585560353L);
+    Optional<String> m_seed = Optional.of("1764585560353");
 
     @Layout(AdvancedSection.class)
     @OptionalWidget(defaultProvider = DefaultProviders.HiliteCountDefaultProvider.class)

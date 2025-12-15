@@ -44,7 +44,7 @@
       "columnFractionLinear" : 1.0,
       "columnAbsolute" : 10,
       "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
-      "seed" : 1760690706516,
+      "seed" : "1760690706516",
       "hiliteCount" : null,
       "saveTargetDistributionInNodes" : false
     }
@@ -324,11 +324,10 @@
             "default" : false
           },
           "seed" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int64",
+            "type" : [ "string", "null" ],
             "title" : "Use static random seed",
             "description" : "Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.\n",
-            "default" : 1764585560353
+            "default" : "1764585560353"
           },
           "splitCriterion" : {
             "oneOf" : [ {
@@ -739,18 +738,10 @@
         "scope" : "#/properties/model/properties/seed",
         "options" : {
           "validation" : {
-            "max" : {
-              "errorMessage" : "Value too large to process without risking precision loss (> 9007199254740991).",
+            "pattern" : {
+              "errorMessage" : "Please enter a valid integer number between -9223372036854775808 to 9223372036854775807.",
               "parameters" : {
-                "isExclusive" : false,
-                "max" : 9.007199254740991E15
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
+                "pattern" : "[+-]?(0|[1-9][0-9]{0,18})"
               }
             }
           },
@@ -970,7 +961,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1764074296579
+      "value" : "1764074296579"
     } ]
   }, {
     "scope" : "#/properties/model/properties/targetColumn",
