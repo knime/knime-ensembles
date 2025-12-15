@@ -47,6 +47,7 @@ package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
 import org.knime.core.data.DataColumnSpec;
@@ -69,6 +70,8 @@ import org.knime.node.parameters.updates.ParameterReference;
 import org.knime.node.parameters.updates.ValueProvider;
 import org.knime.node.parameters.updates.ValueReference;
 import org.knime.node.parameters.updates.legacy.ColumnNameAutoGuessValueProvider;
+import org.knime.node.parameters.updates.StateProvider;
+import org.knime.node.parameters.updates.StateProvider.StateProviderInitializer;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.Label;
 import org.knime.node.parameters.widget.choices.ValueSwitchWidget;
@@ -80,6 +83,7 @@ final class TrainingAttributesParameters implements NodeParameters {
     @Layout(AbstractTreeLearnerOptions.AttributeSelectionSection.class)
     @ValueSwitchWidget
     @ValueReference(TrainingAttributesModeRef.class)
+    @ValueProvider(TrainingModeAutoSelectionProvider.class)
     @Widget(title = "Training attributes", description = """
             Choose whether to derive attributes from a fingerprint vector column or from ordinary table \
             columns.
@@ -173,6 +177,23 @@ final class TrainingAttributesParameters implements NodeParameters {
                 parametersInput, //
                 getValidFingerprintColumns().toArray(new Class[0]) //
             );
+        }
+    }
+
+    static final class TrainingModeAutoSelectionProvider implements StateProvider<TrainingAttributesModeOption> {
+
+        private Supplier<String> m_fingerprintSelection;
+
+        @Override
+        public void init(final StateProviderInitializer initializer) {
+            m_fingerprintSelection = initializer.computeFromProvidedState(FingerprintColumnAutoSelectionProvider.class);
+        }
+
+        @Override
+        public TrainingAttributesModeOption computeState(final NodeParametersInput parametersInput) {
+            var fp = m_fingerprintSelection.get();
+            return fp == null || fp.isBlank() ? TrainingAttributesModeOption.COLUMNS
+                : TrainingAttributesModeOption.FINGERPRINT;
         }
     }
 
