@@ -1013,7 +1013,7 @@
       "id" : "after-open-dialog"
     },
     "triggerInitially" : true,
-    "dependencies" : [ "#/properties/model/properties/targetColumn" ]
+    "dependencies" : [ "#/properties/model/properties/targetColumn", "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn" ]
   }, {
     "trigger" : {
       "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"

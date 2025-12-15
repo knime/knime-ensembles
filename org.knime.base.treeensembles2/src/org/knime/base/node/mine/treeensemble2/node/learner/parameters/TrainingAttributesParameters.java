@@ -46,8 +46,11 @@
 package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataValue;
 import org.knime.core.data.vector.bitvector.BitVectorValue;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
 import org.knime.core.data.vector.doublevector.DoubleVectorValue;
@@ -55,6 +58,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.node.parameters.NodeParameters;
+import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.layout.Layout;
 import org.knime.node.parameters.persistence.NodeParametersPersistor;
@@ -62,10 +66,13 @@ import org.knime.node.parameters.updates.Effect;
 import org.knime.node.parameters.updates.EffectPredicate;
 import org.knime.node.parameters.updates.EffectPredicateProvider;
 import org.knime.node.parameters.updates.ParameterReference;
+import org.knime.node.parameters.updates.ValueProvider;
 import org.knime.node.parameters.updates.ValueReference;
+import org.knime.node.parameters.updates.legacy.ColumnNameAutoGuessValueProvider;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.Label;
 import org.knime.node.parameters.widget.choices.ValueSwitchWidget;
+import org.knime.node.parameters.widget.choices.util.ColumnSelectionUtil;
 import org.knime.node.parameters.widget.choices.util.CompatibleColumnsProvider;
 
 final class TrainingAttributesParameters implements NodeParameters {
@@ -79,8 +86,13 @@ final class TrainingAttributesParameters implements NodeParameters {
             """)
     TrainingAttributesModeOption m_trainingAttributesMode = TrainingAttributesModeOption.COLUMNS;
 
+    interface FingerprintColumnRef extends ParameterReference<String> {
+    }
+
     @Layout(AbstractTreeLearnerOptions.AttributeSelectionSection.class)
     @ChoicesProvider(FingerprintColumnsProvider.class)
+    @ValueProvider(FingerprintColumnAutoSelectionProvider.class)
+    @ValueReference(FingerprintColumnRef.class)
     @Effect(predicate = FingerprintAttributesSelectedPredicate.class, type = Effect.EffectType.SHOW)
     @Widget(title = "Fingerprint attribute", description = """
             Use a fingerprint (bit, byte, or double vector) column to learn the model. Each entry of the \
@@ -139,9 +151,29 @@ final class TrainingAttributesParameters implements NodeParameters {
         }
     }
 
+    private static List<Class<? extends DataValue>> getValidFingerprintColumns() {
+        return List.of(BitVectorValue.class, ByteVectorValue.class, DoubleVectorValue.class);
+    }
+
     static final class FingerprintColumnsProvider extends CompatibleColumnsProvider {
         FingerprintColumnsProvider() {
-            super(List.of(BitVectorValue.class, ByteVectorValue.class, DoubleVectorValue.class));
+            super(getValidFingerprintColumns());
         }
     }
+
+    private static final class FingerprintColumnAutoSelectionProvider extends ColumnNameAutoGuessValueProvider {
+
+        FingerprintColumnAutoSelectionProvider() {
+            super(FingerprintColumnRef.class);
+        }
+
+        @Override
+        protected Optional<DataColumnSpec> autoGuessColumn(final NodeParametersInput parametersInput) {
+            return ColumnSelectionUtil.getFirstCompatibleColumnOfFirstPort( //
+                parametersInput, //
+                getValidFingerprintColumns().toArray(new Class[0]) //
+            );
+        }
+    }
+
 }
