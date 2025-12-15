@@ -214,7 +214,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @Persistor(Persistors.ColumnFilterPersistor.class)
     @Widget(title = "Attribute selection", description = """
             """)
-    ColumnFilter m_attributeColumns = new ColumnFilter().withExcludeUnknownColumns();
+    ColumnFilter m_attributeColumns = new ColumnFilter().withIncludeUnknownColumns();
 
     @Layout(AttributeSelectionSection.class)
     @Effect(predicate = Predicates.ColumnAttributesSelectedPredicate.class, type = EffectType.SHOW)
