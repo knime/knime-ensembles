@@ -37,7 +37,7 @@
         "enabled" : false,
         "fraction" : 1.0
       },
-      "rowSamplingWithReplacement" : true,
+      "rowSamplingWithReplacement" : false,
       "rowSamplingMode" : "RANDOM",
       "numberOfModels" : 100,
       "columnSamplingMode" : "SQUARE_ROOT",
@@ -315,7 +315,7 @@
             "type" : "boolean",
             "title" : "Sample with replacement",
             "description" : "Draw sampled rows with replacement (bootstrap sampling). When disabled, rows are sampled without replacement.\n",
-            "default" : true
+            "default" : false
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",

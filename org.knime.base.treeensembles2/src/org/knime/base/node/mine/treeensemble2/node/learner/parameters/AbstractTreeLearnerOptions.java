@@ -397,7 +397,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_IS_DATA_SELECTION_WITH_REPLACEMENT)
     @Modification.WidgetReference(RowSamplingReplacementWidgetRef.class)
     @Effect(predicate = EnableRowSamplingWidgetRef.class, type = EffectType.SHOW)
-    boolean m_rowSamplingWithReplacement = true;
+    boolean m_rowSamplingWithReplacement = false;
 
     private interface RowSamplingReplacementWidgetRef extends Modification.Reference {
     }

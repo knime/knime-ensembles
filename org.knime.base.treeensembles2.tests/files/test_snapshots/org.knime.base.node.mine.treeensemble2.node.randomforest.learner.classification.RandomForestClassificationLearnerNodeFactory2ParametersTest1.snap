@@ -293,7 +293,7 @@
           },
           "rowSamplingWithReplacement" : {
             "type" : "boolean",
-            "default" : true
+            "default" : false
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",

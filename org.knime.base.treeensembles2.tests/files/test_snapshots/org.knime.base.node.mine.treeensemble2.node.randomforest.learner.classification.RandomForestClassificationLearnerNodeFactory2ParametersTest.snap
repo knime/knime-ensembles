@@ -37,7 +37,7 @@
         "enabled" : false,
         "fraction" : 1.0
       },
-      "rowSamplingWithReplacement" : true,
+      "rowSamplingWithReplacement" : false,
       "rowSamplingMode" : "RANDOM",
       "numberOfModels" : 100,
       "columnSamplingMode" : "SQUARE_ROOT",
@@ -293,7 +293,7 @@
           },
           "rowSamplingWithReplacement" : {
             "type" : "boolean",
-            "default" : true
+            "default" : false
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
