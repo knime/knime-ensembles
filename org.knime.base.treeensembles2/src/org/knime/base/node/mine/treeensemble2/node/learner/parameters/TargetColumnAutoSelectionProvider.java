@@ -48,7 +48,6 @@ package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 import java.util.Optional;
 
 import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataTableSpec;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.updates.legacy.ColumnNameAutoGuessValueProvider;
 
@@ -61,11 +60,11 @@ abstract class TargetColumnAutoSelectionProvider extends ColumnNameAutoGuessValu
 
     @Override
     protected final Optional<DataColumnSpec> autoGuessColumn(final NodeParametersInput parametersInput) {
-        return parametersInput.getInTableSpec(0).flatMap(this::findFallback);
-    }
-
-    private Optional<DataColumnSpec> findFallback(final DataTableSpec spec) {
-        return spec.stream().filter(this::isValidTargetColumn).findFirst();
+        return parametersInput.getInTableSpec(0) //
+            .flatMap(spec -> spec.stream() //
+                .filter(this::isValidTargetColumn) //
+                .findFirst() //
+            );
     }
 
     abstract boolean isValidTargetColumn(final DataColumnSpec col);

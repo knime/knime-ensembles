@@ -15,7 +15,7 @@
         "manualFilter" : {
           "manuallySelected" : [ ],
           "manuallyDeselected" : [ ],
-          "includeUnknownColumns" : false
+          "includeUnknownColumns" : true
         },
         "typeFilter" : {
           "selectedTypes" : [ ],
@@ -37,14 +37,14 @@
         "enabled" : false,
         "fraction" : 1.0
       },
-      "rowSamplingWithReplacement" : true,
+      "rowSamplingWithReplacement" : false,
       "rowSamplingMode" : "RANDOM",
       "numberOfModels" : 100,
       "columnSamplingMode" : "SQUARE_ROOT",
       "columnFractionLinear" : 1.0,
       "columnAbsolute" : 10,
       "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
-      "seed" : 1764585560353,
+      "seed" : "1764585560353",
       "hiliteCount" : null,
       "saveTargetDistributionInNodes" : false
     }
@@ -156,7 +156,7 @@
               "manualFilter" : {
                 "manuallySelected" : [ ],
                 "manuallyDeselected" : [ ],
-                "includeUnknownColumns" : false
+                "includeUnknownColumns" : true
               },
               "typeFilter" : {
                 "selectedTypes" : [ ],
@@ -217,8 +217,8 @@
           "hiliteCount" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
-            "title" : "Enable highlighting (number of patterns to store)",
-            "description" : "If selected, the node stores the selected number of rows and\nallows highlighting them in the node view.\n",
+            "title" : "Enable highlighting",
+            "description" : "If selected, the node stores the configured number of rows and\nallows highlighting them in the node view.\n",
             "default" : null
           },
           "ignoreColumnsWithoutDomain" : {
@@ -266,6 +266,11 @@
               "title" : "Learn direction during training (XGBoost)"
             } ],
             "default" : "XGBOOST"
+          },
+          "newSeed" : {
+            "type" : "object",
+            "title" : "Generate new seed",
+            "description" : "Generate a random seed and apply it to the field above for reproducible runs."
           },
           "numberOfModels" : {
             "type" : "integer",
@@ -315,20 +320,19 @@
             "type" : "boolean",
             "title" : "Sample with replacement",
             "description" : "Draw sampled rows with replacement (bootstrap sampling). When disabled, rows are sampled without replacement.\n",
-            "default" : true
+            "default" : false
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
-            "title" : "Save target distribution in tree nodes (memory expensive)",
+            "title" : "Save target distribution in tree nodes",
             "description" : "If selected, the model stores the distribution of the target category values in each tree node.\nStoring the class distribution may increase memory consumption considerably and we therefore\nrecommend disabling it if your use-case doesn't require it.\nClass distribution is only needed if\n<ul>\n    <li>You want to see the class distribution for each tree node in the node view.</li>\n    <li>You want to export individual decision trees to PMML.</li>\n    <li>\n        You want to use soft-voting (i.e. aggregation of probability distributions instead of\n        votes) in the predictor node.\n    </li>\n</ul>",
             "default" : false
           },
           "seed" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int64",
+            "type" : [ "string", "null" ],
             "title" : "Use static random seed",
             "description" : "Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.\n",
-            "default" : 1764585560353
+            "default" : "1764585560353"
           },
           "splitCriterion" : {
             "oneOf" : [ {
@@ -738,25 +742,16 @@
         "type" : "Control",
         "scope" : "#/properties/model/properties/seed",
         "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "Value too large to process without risking precision loss (> 9007199254740991).",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 9.007199254740991E15
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          },
           "hideOnNull" : true
         },
         "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/newSeed",
+        "options" : {
+          "format" : "simpleButton",
+          "triggerId" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+        }
       }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/hiliteCount",
@@ -864,6 +859,7 @@
           "seed" : {
             "configPaths" : [ [ "seed" ] ]
           },
+          "newSeed" : { },
           "hiliteCount" : {
             "configPaths" : [ [ "nrHilitePatterns" ] ]
           },
@@ -963,7 +959,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1764074296579
+      "value" : "1764074296579"
     } ]
   }, {
     "scope" : "#/properties/model/properties/targetColumn",
@@ -1006,7 +1002,12 @@
       "id" : "after-open-dialog"
     },
     "triggerInitially" : true,
-    "dependencies" : [ "#/properties/model/properties/targetColumn" ]
+    "dependencies" : [ "#/properties/model/properties/targetColumn", "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn" ]
+  }, {
+    "trigger" : {
+      "id" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+    },
+    "dependencies" : [ ]
   }, {
     "trigger" : {
       "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"

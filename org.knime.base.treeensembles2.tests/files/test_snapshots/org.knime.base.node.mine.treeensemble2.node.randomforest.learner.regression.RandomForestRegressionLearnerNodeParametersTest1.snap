@@ -156,7 +156,7 @@
               "manualFilter" : {
                 "manuallySelected" : [ ],
                 "manuallyDeselected" : [ ],
-                "includeUnknownColumns" : false
+                "includeUnknownColumns" : true
               },
               "typeFilter" : {
                 "selectedTypes" : [ ],
@@ -207,8 +207,8 @@
           "hiliteCount" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
-            "title" : "Enable highlighting (number of patterns to store)",
-            "description" : "If selected, the node stores the selected number of rows and\nallows highlighting them in the node view.\n",
+            "title" : "Enable highlighting",
+            "description" : "If selected, the node stores the configured number of rows and\nallows highlighting them in the node view.\n",
             "default" : null
           },
           "ignoreColumnsWithoutDomain" : {
@@ -253,6 +253,11 @@
             } ],
             "default" : "XGBOOST"
           },
+          "newSeed" : {
+            "type" : "object",
+            "title" : "Generate new seed",
+            "description" : "Generate a random seed and apply it to the field above for reproducible runs."
+          },
           "numberOfModels" : {
             "type" : "integer",
             "format" : "int32",
@@ -293,18 +298,17 @@
           },
           "rowSamplingWithReplacement" : {
             "type" : "boolean",
-            "default" : true
+            "default" : false
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
             "default" : false
           },
           "seed" : {
-            "type" : [ "integer", "null" ],
-            "format" : "int64",
+            "type" : [ "string", "null" ],
             "title" : "Use static random seed",
             "description" : "Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.\n",
-            "default" : 1764585560353
+            "default" : "1764585560353"
           },
           "splitCriterion" : {
             "oneOf" : [ {
@@ -504,25 +508,16 @@
         "type" : "Control",
         "scope" : "#/properties/model/properties/seed",
         "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "Value too large to process without risking precision loss (> 9007199254740991).",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 9.007199254740991E15
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          },
           "hideOnNull" : true
         },
         "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/newSeed",
+        "options" : {
+          "format" : "simpleButton",
+          "triggerId" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+        }
       }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/hiliteCount",
@@ -624,6 +619,7 @@
           "seed" : {
             "configPaths" : [ [ "seed" ] ]
           },
+          "newSeed" : { },
           "hiliteCount" : {
             "configPaths" : [ [ "nrHilitePatterns" ] ]
           },
@@ -702,7 +698,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1764074296579
+      "value" : "1764074296579"
     } ]
   }, {
     "scope" : "#/properties/model/properties/targetColumn",
@@ -745,7 +741,12 @@
       "id" : "after-open-dialog"
     },
     "triggerInitially" : true,
-    "dependencies" : [ "#/properties/model/properties/targetColumn" ]
+    "dependencies" : [ "#/properties/model/properties/targetColumn", "#/properties/model/properties/trainingAttributes/properties/fingerprintColumn" ]
+  }, {
+    "trigger" : {
+      "id" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
+    },
+    "dependencies" : [ ]
   }, {
     "trigger" : {
       "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize"

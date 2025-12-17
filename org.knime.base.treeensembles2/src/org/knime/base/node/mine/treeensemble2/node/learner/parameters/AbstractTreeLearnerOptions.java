@@ -55,6 +55,7 @@ import org.knime.base.node.mine.treeensemble2.node.learner.parameters.Validation
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
+import org.knime.core.webui.node.dialog.defaultdialog.internal.button.SimpleButtonWidget;
 import org.knime.core.webui.node.dialog.defaultdialog.internal.widget.PersistWithin.PersistEmbedded;
 import org.knime.core.webui.node.dialog.defaultdialog.internal.widget.TypedStringFilterWidgetInternal;
 import org.knime.core.webui.node.dialog.defaultdialog.util.updates.StateComputationFailureException;
@@ -69,6 +70,7 @@ import org.knime.node.parameters.layout.Section;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 import org.knime.node.parameters.persistence.Persist;
 import org.knime.node.parameters.persistence.Persistor;
+import org.knime.node.parameters.updates.ButtonReference;
 import org.knime.node.parameters.updates.Effect;
 import org.knime.node.parameters.updates.Effect.EffectType;
 import org.knime.node.parameters.updates.ParameterReference;
@@ -210,10 +212,9 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @TypedStringFilterWidgetInternal(hideTypeFilter = true)
     @Effect(predicate = Predicates.ColumnAttributesSelectedPredicate.class, type = EffectType.SHOW)
     @Persistor(Persistors.ColumnFilterPersistor.class)
-    @Widget(title = "Attribute selection",
-        description = """
-                """)
-    ColumnFilter m_attributeColumns = new ColumnFilter().withExcludeUnknownColumns();
+    @Widget(title = "Attribute selection", description = """
+            """)
+    ColumnFilter m_attributeColumns = new ColumnFilter().withIncludeUnknownColumns();
 
     @Layout(AttributeSelectionSection.class)
     @Effect(predicate = Predicates.ColumnAttributesSelectedPredicate.class, type = EffectType.SHOW)
@@ -233,11 +234,10 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
         groupModifier.find(IgnoreColumnsWithoutDomainWidgetRef.class) //
             .addAnnotation(Widget.class) //
             .withProperty("title", "Ignore columns without domain information") //
-            .withProperty("description",
-                """
-                        If selected, nominal columns with no domain information are ignored
-                        (as they likely have too many possible values anyway).
-                        """) //
+            .withProperty("description", """
+                    If selected, nominal columns with no domain information are ignored
+                    (as they likely have too many possible values anyway).
+                    """) //
             .modify();
     }
 
@@ -264,19 +264,16 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     public static void showSplitCriterion(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(SplitCriterionWidgetRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Split criterion")
-            .withProperty("description",
-                """
-                        Choose the
-                        <a href="http://en.wikipedia.org/wiki/Decision_tree_learning#Formulae">split criterion</a>
-                        here. Gini is usually a good choice and is used in "Classification and Regression Trees"
-                        (Breiman et al, 1984) and the original random forest algorithm
-                        (as described by Breiman et al, 2001);
-                        information gain is used in C4.5; the information gain ratio normalizes the standard
-                        information gain by the split entropy to overcome any unfair preference for nominal splits with
-                        many child nodes.
-                            """)
-            .modify();
+            .withProperty("title", "Split criterion").withProperty("description", """
+                    Choose the
+                    <a href="http://en.wikipedia.org/wiki/Decision_tree_learning#Formulae">split criterion</a>
+                    here. Gini is usually a good choice and is used in "Classification and Regression Trees"
+                    (Breiman et al, 1984) and the original random forest algorithm
+                    (as described by Breiman et al, 2001);
+                    information gain is used in C4.5; the information gain ratio normalizes the standard
+                    information gain by the split entropy to overcome any unfair preference for nominal splits with
+                    many child nodes.
+                        """).modify();
     }
 
     @Layout(TreeOptionsSection.class)
@@ -320,11 +317,10 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
         groupModifier.find(BinaryNominalSplitsWidgetRef.class) //
             .addAnnotation(Widget.class) //
             .withProperty("title", "Use binary splits for nominal columns") //
-            .withProperty("description",
-                """
-                        If selected, nominal columns also produce binary splits instead of multiway splits in which each
-                        nominal value corresponds to one child node.
-                        """) //
+            .withProperty("description", """
+                    If selected, nominal columns also produce binary splits instead of multiway splits in which each
+                    nominal value corresponds to one child node.
+                    """) //
             .modify();
     }
 
@@ -354,15 +350,12 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
         final Class<? extends RootColumnDefaultProvider> defaultProviderClass) {
         final var field = groupModifier.find(FixedRootAttributeWidgetRef.class);
         field.addAnnotation(Widget.class).withProperty("title", "Use fixed root attribute")
-            .withProperty("description",
-                """
-                          Force the selected column to be used as the root split attribute in all trees -- even if the
-                        column is not in the attribute sample.
-                          """)
-            .modify();
+            .withProperty("description", """
+                      Force the selected column to be used as the root split attribute in all trees -- even if the
+                    column is not in the attribute sample.
+                      """).modify();
         field.addAnnotation(ChoicesProvider.class).withProperty("value", choicesProviderClass).modify();
-        field.addAnnotation(OptionalWidget.class)
-                .withProperty("defaultProvider", defaultProviderClass).modify();
+        field.addAnnotation(OptionalWidget.class).withProperty("defaultProvider", defaultProviderClass).modify();
 
     }
 
@@ -397,7 +390,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_IS_DATA_SELECTION_WITH_REPLACEMENT)
     @Modification.WidgetReference(RowSamplingReplacementWidgetRef.class)
     @Effect(predicate = EnableRowSamplingWidgetRef.class, type = EffectType.SHOW)
-    boolean m_rowSamplingWithReplacement = true;
+    boolean m_rowSamplingWithReplacement = false;
 
     private interface RowSamplingReplacementWidgetRef extends Modification.Reference {
     }
@@ -432,19 +425,16 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     private static void showRowSamplingMode(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(RowSamplingModeWidgetRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Data sampling mode")
-            .withProperty("description",
-                """
-                        The sampling mode decides how the rows are sampled.
-                        In the random mode, the rows are sampled from the whole dataset, i.e. each row has exactly the
-                        same probability as in the sample.
-                        In case of equal size sampling, first a sample from the minority class is drawn and then the
-                        same number of rows as in the minority sample are drawn from all other classes so that each
-                        class is represented with the same number of rows in the sample.
-                        If stratified sampling is selected, the same fraction of rows is drawn from each class so the
-                        class distribution in the sample is approximately the same as in the full dataset.
-                        """)
-            .modify();
+            .withProperty("title", "Data sampling mode").withProperty("description", """
+                    The sampling mode decides how the rows are sampled.
+                    In the random mode, the rows are sampled from the whole dataset, i.e. each row has exactly the
+                    same probability as in the sample.
+                    In case of equal size sampling, first a sample from the minority class is drawn and then the
+                    same number of rows as in the minority sample are drawn from all other classes so that each
+                    class is represented with the same number of rows in the sample.
+                    If stratified sampling is selected, the same fraction of rows is drawn from each class so the
+                    class distribution in the sample is approximately the same as in the full dataset.
+                    """).modify();
     }
 
     /**
@@ -475,13 +465,12 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @Layout(EnsembleConfigurationSection.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_NR_MODELS)
-    @Widget(title = "Number of models",
-        description = """
-                Number of decision trees to learn.
-                Larger ensembles generally provide more stable results but increase runtime.
-                For most datasets, a value between 100 and 500 yields good results; however, the optimal number is data
-                dependent and should thus be subject to hyperparameter tuning.
-                """)
+    @Widget(title = "Number of models", description = """
+            Number of decision trees to learn.
+            Larger ensembles generally provide more stable results but increase runtime.
+            For most datasets, a value between 100 and 500 yields good results; however, the optimal number is data
+            dependent and should thus be subject to hyperparameter tuning.
+            """)
     int m_numberOfModels = TreeEnsembleLearnerConfiguration.DEF_NR_MODELS;
 
     @Layout(EnsembleConfigurationSection.class)
@@ -503,18 +492,15 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     public static void showAttributeSampling(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(ColumnSamplingModeWidgetRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Attribute sampling (columns)")
-            .withProperty("description",
-                """
-                             Defines the sampling of attributes to learn an individual tree.
-                             This can either be a function based on the number of attributes
-                             (linear fraction or square root) or some absolute value.
-                             The latter can be used in conjunction with flow variables
-                             to inject some other value derived from the number of attributes (e.g. Breiman suggests
-                             starting with the square root of the
-                             number of attributes but also to try to double or half that number).
-                        """)
-            .modify();
+            .withProperty("title", "Attribute sampling (columns)").withProperty("description", """
+                         Defines the sampling of attributes to learn an individual tree.
+                         This can either be a function based on the number of attributes
+                         (linear fraction or square root) or some absolute value.
+                         The latter can be used in conjunction with flow variables
+                         to inject some other value derived from the number of attributes (e.g. Breiman suggests
+                         starting with the square root of the
+                         number of attributes but also to try to double or half that number).
+                    """).modify();
     }
 
     @Layout(EnsembleConfigurationSection.class)
@@ -577,39 +563,46 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     public static void showAttributeSelectionReuse(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(AttributeReuseWidgetRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Attribute selection")
-            .withProperty("description",
-                """
-                            <p>
-                          <i>Use the same set of attributes for each tree</i>
-                          means that the attributes are sampled once for each tree
-                          and this sample is then used to construct the tree.
-                        </p>
+            .withProperty("title", "Attribute selection").withProperty("description", """
                         <p>
-                          <i>Use a different set of attributes for each tree node</i>
-                          samples a different set of candidate attributes in each of the tree nodes
-                          from which the optimal one is chosen to perform the split.
-                          This is the option used in random forests.
-                        </p>
-                        """)
-            .modify();
+                      <i>Use the same set of attributes for each tree</i>
+                      means that the attributes are sampled once for each tree
+                      and this sample is then used to construct the tree.
+                    </p>
+                    <p>
+                      <i>Use a different set of attributes for each tree node</i>
+                      samples a different set of candidate attributes in each of the tree nodes
+                      from which the optimal one is chosen to perform the split.
+                      This is the option used in random forests.
+                    </p>
+                    """).modify();
     }
 
     @Layout(AdvancedSection.class)
     @OptionalWidget(defaultProvider = DefaultProviders.SeedDefaultProvider.class)
-    @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
+    @NumberInputWidget
+    @ValueProvider(DefaultProviders.NewSeedValueProvider.class)
     @Persistor(Persistors.SeedPersistor.class)
     @Widget(title = "Use static random seed", description = """
             Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.
             """)
-    Optional<Long> m_seed = Optional.of(1764585560353L);
+    Optional<String> m_seed = Optional.of("1764585560353");
+
+    interface NewSeedButtonRef extends ButtonReference {
+    }
+
+    @Layout(AdvancedSection.class)
+    @Widget(title = "Generate new seed",
+        description = "Generate a random seed and apply it to the field above for reproducible runs.")
+    @SimpleButtonWidget(ref = NewSeedButtonRef.class)
+    Void m_newSeed;
 
     @Layout(AdvancedSection.class)
     @OptionalWidget(defaultProvider = DefaultProviders.HiliteCountDefaultProvider.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persistor(Persistors.HiliteCountPersistor.class)
-    @Widget(title = "Enable highlighting (number of patterns to store)", description = """
-            If selected, the node stores the selected number of rows and
+    @Widget(title = "Enable highlighting", description = """
+            If selected, the node stores the configured number of rows and
             allows highlighting them in the node view.
             """)
     Optional<Integer> m_hiliteCount = Optional.empty();
@@ -629,22 +622,19 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
      */
     public static void showSaveTargetDistribution(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(SaveTargetDistributionRef.class).addAnnotation(Widget.class)
-            .withProperty("title", "Save target distribution in tree nodes (memory expensive)")
-            .withProperty("description",
-                """
-                        If selected, the model stores the distribution of the target category values in each tree node.
-                        Storing the class distribution may increase memory consumption considerably and we therefore
-                        recommend disabling it if your use-case doesn't require it.
-                        Class distribution is only needed if
-                        <ul>
-                            <li>You want to see the class distribution for each tree node in the node view.</li>
-                            <li>You want to export individual decision trees to PMML.</li>
-                            <li>
-                                You want to use soft-voting (i.e. aggregation of probability distributions instead of
-                                votes) in the predictor node.
-                            </li>
-                        </ul>""")
-            .modify();
+            .withProperty("title", "Save target distribution in tree nodes").withProperty("description", """
+                    If selected, the model stores the distribution of the target category values in each tree node.
+                    Storing the class distribution may increase memory consumption considerably and we therefore
+                    recommend disabling it if your use-case doesn't require it.
+                    Class distribution is only needed if
+                    <ul>
+                        <li>You want to see the class distribution for each tree node in the node view.</li>
+                        <li>You want to export individual decision trees to PMML.</li>
+                        <li>
+                            You want to use soft-voting (i.e. aggregation of probability distributions instead of
+                            votes) in the predictor node.
+                        </li>
+                    </ul>""").modify();
     }
 
 }
