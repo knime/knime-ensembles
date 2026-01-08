@@ -85,8 +85,10 @@ final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends Regressi
             AbstractTreeLearnerOptions.showAttributeSamplingLinearFraction(group);
             AbstractTreeLearnerOptions.showAttributeSamplingAbsolute(group);
             AbstractTreeLearnerOptions.showAttributeSelectionReuse(group);
+            AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
-            // no advanced options customization needed
+            // advanced options
+            AbstractTreeLearnerOptions.showRandomSeedOptions(group);
         }
     }
 

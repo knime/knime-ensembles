@@ -1,7 +1,7 @@
 {
   "data" : {
     "model" : {
-      "targetColumn" : "Cluster Membership",
+      "targetColumn" : "Universe_1_0",
       "trainingAttributes" : {
         "trainingAttributesMode" : "COLUMNS"
       },
@@ -213,6 +213,8 @@
           },
           "ignoreColumnsWithoutDomain" : {
             "type" : "boolean",
+            "title" : "Ignore columns without domain information",
+            "description" : "If selected, nominal columns with no domain information are ignored\n(as they likely have too many possible values anyway).\n",
             "default" : true
           },
           "maxTreeDepth" : {
@@ -235,6 +237,8 @@
               "minNodeSize" : {
                 "type" : [ "integer", "null" ],
                 "format" : "int32",
+                "title" : "Minimum split node size",
+                "description" : "Minimum number of records in a decision tree node so that another split\nis attempted.\nNote, this option does not make any implications on the minimum number of records in a\nterminal node.\nIf enabled, this number needs to be at least twice as large as the minimum child node size\n(as otherwise for binary splits one of the two children would have less records than specified).\n",
                 "default" : null
               }
             },
@@ -251,18 +255,16 @@
               "const" : "SURROGATE",
               "title" : "Surrogate"
             } ],
+            "title" : "Missing value handling",
+            "description" : "Specify how missing values should be handled during training.\n\n<ul>\n<li><b>XGBoost</b>: If this is selected (it is also the default), the learner will calculate which direction is best suited for missing values, by sending the missing values in each direction of a split. The direction that yields the best result (i.e. largest gain) is then used as default direction for missing values. This method works with both, binary and multiway splits.</li>\n<li><b>Surrogate</b>: This approach calculates for each split alternative splits that best approximate the best split. The method was first described in the book \"Classification and Regression Trees\" by Breiman et al. (1984). NOTE: This method can only be used with binary nominal splits.</li>\n</ul>",
             "default" : "XGBOOST"
           },
           "newSeed" : {
-            "type" : "object",
-            "title" : "Generate new seed",
-            "description" : "Generate a random seed and apply it to the field above for reproducible runs."
+            "type" : "object"
           },
           "numberOfModels" : {
             "type" : "integer",
             "format" : "int32",
-            "title" : "Number of models",
-            "description" : "Number of decision trees to learn.\nLarger ensembles generally provide more stable results but increase runtime.\nFor most datasets, a value between 100 and 500 yields good results; however, the optimal number is data\ndependent and should thus be subject to hyperparameter tuning.\n",
             "default" : 100
           },
           "rowSamplingFraction" : {
@@ -302,14 +304,10 @@
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
-            "title" : "Save target distribution in tree nodes",
-            "description" : "If selected, the model stores the distribution of the target category values in each tree node.\nStoring the class distribution may increase memory consumption considerably and we therefore\nrecommend disabling it if your use-case doesn't require it.\nClass distribution is only needed if\n<ul>\n    <li>You want to see the class distribution for each tree node in the node view.</li>\n    <li>You want to export individual decision trees to PMML.</li>\n    <li>\n        You want to use soft-voting (i.e. aggregation of probability distributions instead of\n        votes) in the predictor node.\n    </li>\n</ul>",
             "default" : false
           },
           "seed" : {
             "type" : [ "string", "null" ],
-            "title" : "Use static random seed",
-            "description" : "Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.\n",
             "default" : "1764585560353"
           },
           "splitCriterion" : {
@@ -323,15 +321,13 @@
               "const" : "GINI",
               "title" : "Gini"
             } ],
-            "title" : "Split criterion",
-            "description" : "Choose the\n<a href=\"http://en.wikipedia.org/wiki/Decision_tree_learning#Formulae\">split criterion</a>\nhere. Gini is usually a good choice and is used in \"Classification and Regression Trees\"\n(Breiman et al, 1984) and the original random forest algorithm\n(as described by Breiman et al, 2001);\ninformation gain is used in C4.5; the information gain ratio normalizes the standard\ninformation gain by the split entropy to overcome any unfair preference for nominal splits with\nmany child nodes.\n\n<ul>\n<li><b>Information Gain</b>: Maximizes the information gain when creating splits. Equivalent to entropy reduction.\n</li>\n<li><b>Information Gain Ratio</b>: Uses the information gain ratio to compensate for the bias towards attributes with many distinct values.\n</li>\n<li><b>Gini</b>: Measures the impurity of a split based on the Gini index. Common default for classification tasks.\n</li>\n</ul>",
             "default" : "INFORMATION_GAIN_RATIO"
           },
           "targetColumn" : {
             "type" : "string",
             "title" : "Target column",
             "description" : "Select the column containing the value to be learned. Rows with missing values in this column are ignored during the learning process.\n",
-            "default" : "Cluster Membership"
+            "default" : "Universe_1_0"
           },
           "trainingAttributes" : {
             "type" : "object",
@@ -364,6 +360,8 @@
           },
           "useBinaryNominalSplits" : {
             "type" : "boolean",
+            "title" : "Use binary splits for nominal columns",
+            "description" : "If selected, nominal columns also produce binary splits instead of multiway splits in which each\nnominal value corresponds to one child node.\n",
             "default" : true
           }
         }
@@ -426,16 +424,62 @@
             }
           }
         }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/ignoreColumnsWithoutDomain",
+        "options" : {
+          "format" : "checkbox"
+        },
+        "rule" : {
+          "effect" : "SHOW",
+          "condition" : {
+            "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
+            "schema" : {
+              "oneOf" : [ {
+                "const" : "COLUMNS"
+              } ]
+            }
+          }
+        }
       } ]
     }, {
       "label" : "Tree Options",
       "type" : "Section",
       "elements" : [ {
         "type" : "Control",
-        "scope" : "#/properties/model/properties/splitCriterion"
+        "scope" : "#/properties/model/properties/missingValueHandling"
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/useBinaryNominalSplits",
+        "options" : {
+          "format" : "checkbox"
+        }
       }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/maxTreeDepth",
+        "options" : {
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 2147483647.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 2.147483647E9
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 1.0
+              }
+            }
+          },
+          "hideOnNull" : true
+        },
+        "providedOptions" : [ "default" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
         "options" : {
           "validation" : {
             "max" : {
@@ -481,51 +525,12 @@
         "providedOptions" : [ "validation.max", "default" ]
       } ]
     }, {
-      "label" : "Ensemble Configuration",
-      "type" : "Section",
-      "elements" : [ {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/numberOfModels",
-        "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "The value must not exceed 2147483647.",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 2.147483647E9
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          }
-        }
-      } ]
-    }, {
       "label" : "Advanced",
       "type" : "Section",
       "options" : {
         "isAdvanced" : true
       },
       "elements" : [ {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/seed",
-        "options" : {
-          "hideOnNull" : true
-        },
-        "providedOptions" : [ "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/newSeed",
-        "options" : {
-          "format" : "simpleButton",
-          "triggerId" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
-        }
-      }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/hiliteCount",
         "options" : {
@@ -548,12 +553,6 @@
           "hideOnNull" : true
         },
         "providedOptions" : [ "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/saveTargetDistributionInNodes",
-        "options" : {
-          "format" : "checkbox"
-        }
       } ]
     } ]
   },
@@ -649,6 +648,13 @@
     "values" : [ {
       "indices" : [ ],
       "value" : [ {
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
         "id" : "Universe_0_0",
         "text" : "Universe_0_0",
         "type" : {
@@ -663,18 +669,11 @@
           "text" : "Number (Float)"
         }
       }, {
-        "id" : "Universe_1_0",
-        "text" : "Universe_1_0",
+        "id" : "Cluster Membership",
+        "text" : "Cluster Membership",
         "type" : {
-          "id" : "org.knime.core.data.DoubleValue",
-          "text" : "Number (Float)"
-        }
-      }, {
-        "id" : "Universe_1_1",
-        "text" : "Universe_1_1",
-        "type" : {
-          "id" : "org.knime.core.data.DoubleValue",
-          "text" : "Number (Float)"
+          "id" : "org.knime.core.data.StringValue",
+          "text" : "String"
         }
       } ]
     } ]
@@ -697,7 +696,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 1
+      "value" : 5
     } ]
   }, {
     "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
@@ -705,6 +704,13 @@
     "values" : [ {
       "indices" : [ ],
       "value" : null
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
+    "providedOptionName" : "default",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : 10
     } ]
   }, {
     "scope" : "#/properties/model/properties/seed",
@@ -719,11 +725,32 @@
     "values" : [ {
       "indices" : [ ],
       "value" : [ {
-        "id" : "Cluster Membership",
-        "text" : "Cluster Membership",
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
         "type" : {
-          "id" : "org.knime.core.data.StringValue",
-          "text" : "String"
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_0_0",
+        "text" : "Universe_0_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_0_1",
+        "text" : "Universe_0_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_0",
+        "text" : "Universe_1_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
         }
       } ]
     } ]

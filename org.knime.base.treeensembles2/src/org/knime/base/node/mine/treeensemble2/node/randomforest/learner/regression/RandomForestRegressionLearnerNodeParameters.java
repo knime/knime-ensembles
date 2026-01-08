@@ -46,6 +46,7 @@
 
 package org.knime.base.node.mine.treeensemble2.node.randomforest.learner.regression;
 
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.MinNodeSizesParameters;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
@@ -84,9 +85,11 @@ final class RandomForestRegressionLearnerNodeParameters extends RegressionTreeLe
 
             // no data sampling options for random forest
 
-            // no ensemble configuration customization needed
+            // ensemble options
+            AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
-            // no advanced options customization needed
+            // advanced options
+            AbstractTreeLearnerOptions.showRandomSeedOptions(group);
 
         }
     }

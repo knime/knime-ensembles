@@ -249,6 +249,21 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     private interface MissingValueHandlingWidgetRef extends Modification.Reference {
     }
 
+    /**
+     * Only used by Simple Regression Tree Learner node.
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showMissingValueHandling(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(MissingValueHandlingWidgetRef.class) //
+            .addAnnotation(Widget.class) //
+            .withProperty("title", "Missing value handling") //
+            .withProperty("description", """
+                    Specify how missing values should be handled during training.
+                    """) //
+            .modify();
+    }
+
     @Layout(TreeOptionsSection.class)
     @Persistor(Persistors.SplitCriterionPersistor.class)
     @Modification.WidgetReference(SplitCriterionWidgetRef.class)
@@ -465,13 +480,26 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @Layout(EnsembleConfigurationSection.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_NR_MODELS)
-    @Widget(title = "Number of models", description = """
-            Number of decision trees to learn.
-            Larger ensembles generally provide more stable results but increase runtime.
-            For most datasets, a value between 100 and 500 yields good results; however, the optimal number is data
-            dependent and should thus be subject to hyperparameter tuning.
-            """)
+    @Modification.WidgetReference(NumberOfModelsWidgetRef.class)
     int m_numberOfModels = TreeEnsembleLearnerConfiguration.DEF_NR_MODELS;
+
+    private interface NumberOfModelsWidgetRef extends Modification.Reference {
+    }
+
+    /**
+     * Number of models option is not required for the simple regression tree learner.
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showNumberOfModelsOption(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(NumberOfModelsWidgetRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Number of models").withProperty("description", """
+                    Number of decision trees to learn.
+                    Larger ensembles generally provide more stable results but increase runtime.
+                    For most datasets, a value between 100 and 500 yields good results; however, the optimal number is data
+                    dependent and should thus be subject to hyperparameter tuning.
+                    """).modify();
+    }
 
     @Layout(EnsembleConfigurationSection.class)
     @Persistor(Persistors.ColumnSamplingModePersistor.class)
@@ -583,19 +611,39 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @NumberInputWidget
     @ValueProvider(DefaultProviders.NewSeedValueProvider.class)
     @Persistor(Persistors.SeedPersistor.class)
-    @Widget(title = "Use static random seed", description = """
-            Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.
-            """)
+    @Modification.WidgetReference(SeedWidgetRef.class)
     Optional<String> m_seed = Optional.of("1764585560353");
+
+    private interface SeedWidgetRef extends Modification.Reference {
+    }
 
     interface NewSeedButtonRef extends ButtonReference {
     }
 
     @Layout(AdvancedSection.class)
-    @Widget(title = "Generate new seed",
-        description = "Generate a random seed and apply it to the field above for reproducible runs.")
     @SimpleButtonWidget(ref = NewSeedButtonRef.class)
+    @Modification.WidgetReference(NewSeedButtonWidgetRef.class)
     Void m_newSeed;
+
+    private interface NewSeedButtonWidgetRef extends Modification.Reference {
+    }
+
+    /**
+     * Random seed options are not required for the simple regression tree learner.
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showRandomSeedOptions(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(SeedWidgetRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Use static random seed")
+            .withProperty("description", """
+                    Provide a seed to obtain deterministic results. Leave disabled to use a time-dependent seed.
+                    """).modify();
+        groupModifier.find(NewSeedButtonWidgetRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Generate new seed")
+            .withProperty("description", "Generate a random seed and apply it to the field above for reproducible runs.")
+            .modify();
+    }
 
     @Layout(AdvancedSection.class)
     @OptionalWidget(defaultProvider = DefaultProviders.HiliteCountDefaultProvider.class)
