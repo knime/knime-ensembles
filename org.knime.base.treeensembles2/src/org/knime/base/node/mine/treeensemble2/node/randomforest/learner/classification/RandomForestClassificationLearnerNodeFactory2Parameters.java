@@ -85,10 +85,12 @@ final class RandomForestClassificationLearnerNodeFactory2Parameters extends Clas
 
             // no data sampling options for random forest
 
-            // no ensemble configuration customization needed
+            // ensemble options
+            AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
             // advanced
             AbstractTreeLearnerOptions.showSaveTargetDistribution(group);
+            AbstractTreeLearnerOptions.showRandomSeedOptions(group);
         }
     }
 }

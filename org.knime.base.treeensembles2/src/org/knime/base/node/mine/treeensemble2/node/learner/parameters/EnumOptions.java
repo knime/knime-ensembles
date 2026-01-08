@@ -63,16 +63,19 @@ final class EnumOptions {
     }
 
     enum MissingValueHandlingOption {
-            @Label(value = "Use surrogate splits", description = """
-                    Learn surrogate splits to route rows with missing values. Comparable to the strategy used by \
-                    single decision-tree learners.
+            @Label(value = "XGBoost", description = """
+                    If this is selected (it is also the default), the learner will calculate which direction \
+                    is best suited for missing values, by sending the missing values in each direction of a split. \
+                    The direction that yields the best result (i.e. largest gain) is then used as default direction \
+                    for missing values. This method works with both, binary and multiway splits.\
                     """)
-            SURROGATE(TreeEnsembleLearnerConfiguration.MissingValueHandling.Surrogate),
-            @Label(value = "Learn direction during training (XGBoost)", description = """
-                    Evaluate both branches during training and store the best direction for missing values. \
-                    Matches the XGBoost-style behaviour used by recent tree ensemble nodes.
+            XGBOOST(TreeEnsembleLearnerConfiguration.MissingValueHandling.XGBoost),
+            @Label(value = "Surrogate", description = """
+                    This approach calculates for each split alternative splits that best approximate the best split. \
+                    The method was first described in the book "Classification and Regression Trees" by \
+                    Breiman et al. (1984). NOTE: This method can only be used with binary nominal splits.\
                     """)
-            XGBOOST(TreeEnsembleLearnerConfiguration.MissingValueHandling.XGBoost);
+            SURROGATE(TreeEnsembleLearnerConfiguration.MissingValueHandling.Surrogate);
 
         MissingValueHandlingOption(final TreeEnsembleLearnerConfiguration.MissingValueHandling delegate) {
             m_delegate = delegate;

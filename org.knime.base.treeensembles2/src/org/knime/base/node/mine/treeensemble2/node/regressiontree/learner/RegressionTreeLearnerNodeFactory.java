@@ -47,29 +47,47 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.regressiontree.learner;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
+import org.knime.node.impl.description.ViewDescription;
 
 /**
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
-public final class RegressionTreeLearnerNodeFactory extends NodeFactory<RegressionTreeLearnerNodeModel> {
+@SuppressWarnings("restriction")
+public final class RegressionTreeLearnerNodeFactory extends NodeFactory<RegressionTreeLearnerNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-    /** {@inheritDoc} */
     @Override
     public RegressionTreeLearnerNodeModel createNodeModel() {
         return new RegressionTreeLearnerNodeModel();
     }
 
-    /** {@inheritDoc} */
     @Override
     protected int getNrNodeViews() {
         return 1;
     }
 
-    /** {@inheritDoc} */
     @Override
     public NodeView<RegressionTreeLearnerNodeModel> createNodeView(final int viewIndex,
         final RegressionTreeLearnerNodeModel nodeModel) {
@@ -79,16 +97,91 @@ public final class RegressionTreeLearnerNodeFactory extends NodeFactory<Regressi
         return new RegressionTreeLearnerNodeView(nodeModel);
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean hasDialog() {
         return true;
     }
 
-    /** {@inheritDoc} */
+    private static final String NODE_NAME = "Simple Regression Tree Learner";
+
+    private static final String NODE_ICON = "Simple_Regression_Tree_Learner.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Learns a single regression tree.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            <p> Learns a single regression tree. The procedure follows the algorithm described by "Classification
+                and Regression Trees" (Breiman et al, 1984), whereby the current implementation applies a couple of
+                simplifications, e.g. no pruning, not necessarily binary trees, etc. </p> <p> In a regression tree the
+                predicted value for a leaf node is the mean target value of the records within the leaf. Hence the
+                predictions are best (with respect to the training data) if the variance of target values within a leaf
+                is minimal. This is achieved by splits that minimize the sum of squared errors in their respective
+                children. </p> <p> The currently used missing value handling also differs from the one used by Breiman
+                et al, 1984. In each split the algorithm tries to find the best direction for missing values by sending
+                them in each direction and selecting the one that yields the best result (i.e. largest gain). The
+                procedure is adapted from the well known XGBoost algorithm and is described <a
+                href="https://github.com/dmlc/xgboost/issues/21">here</a> . </p>
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+            fixedPort("Input Data", """
+                The data to learn from. It must contain at least one numeric target column and either a fingerprint
+                (bit/byte/double-vector) column or another numeric or nominal column.
+                """)
+    );
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+            fixedPort("Regression Tree Model", """
+                The trained model.
+                """)
+    );
+
+    private static final List<ViewDescription> VIEWS = List.of(
+            new ViewDescription("Regression Tree View", """
+                Regression Tree View
+                """)
+    );
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new RegressionTreeLearnerNodeDialogPane();
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, RegressionTreeLearnerNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription( //
+            NODE_NAME, //
+            NODE_ICON, //
+            INPUT_PORTS, //
+            OUTPUT_PORTS, //
+            SHORT_DESCRIPTION, //
+            FULL_DESCRIPTION, //
+            List.of(), //
+            RegressionTreeLearnerNodeParameters.class, //
+            VIEWS, //
+            NodeType.Learner, //
+            List.of(), //
+            null //
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, RegressionTreeLearnerNodeParameters.class));
     }
 
 }

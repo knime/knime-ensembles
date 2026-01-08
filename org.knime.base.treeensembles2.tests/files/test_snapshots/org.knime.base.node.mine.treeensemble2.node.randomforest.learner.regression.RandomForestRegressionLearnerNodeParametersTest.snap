@@ -245,11 +245,11 @@
           },
           "missingValueHandling" : {
             "oneOf" : [ {
-              "const" : "SURROGATE",
-              "title" : "Use surrogate splits"
-            }, {
               "const" : "XGBOOST",
-              "title" : "Learn direction during training (XGBoost)"
+              "title" : "XGBoost"
+            }, {
+              "const" : "SURROGATE",
+              "title" : "Surrogate"
             } ],
             "default" : "XGBOOST"
           },

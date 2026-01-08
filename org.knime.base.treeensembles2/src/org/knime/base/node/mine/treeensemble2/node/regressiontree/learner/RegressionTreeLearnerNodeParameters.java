@@ -43,61 +43,53 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
  */
-package org.knime.base.node.mine.treeensemble2.node.learner.classification;
+
+package org.knime.base.node.mine.treeensemble2.node.regressiontree.learner;
 
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions;
-import org.knime.base.node.mine.treeensemble2.node.learner.parameters.ClassificationTreeLearnerOptions;
 import org.knime.base.node.mine.treeensemble2.node.learner.parameters.MinNodeSizesParameters;
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.RegressionTreeLearnerOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 
 /**
- * Parameters for the Tree Ensemble Learner (classification).
+ * Node parameters for Simple Regression Tree Learner.
+ *
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
 @SuppressWarnings("restriction")
 @LoadDefaultsForAbsentFields
-@Modification(TreeEnsembleClassificationLearnerNodeFactory2Parameters.WidgetModifier.class)
-final class TreeEnsembleClassificationLearnerNodeFactory2Parameters extends ClassificationTreeLearnerOptions {
+@Modification(RegressionTreeLearnerNodeParameters.WidgetModifier.class)
+final class RegressionTreeLearnerNodeParameters extends RegressionTreeLearnerOptions {
 
     static final class WidgetModifier implements Modification.Modifier {
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
             // attribute selection
-            ClassificationTreeLearnerOptions.setTargetColumnChoices(group);
+            RegressionTreeLearnerOptions.setTargetColumnChoices(group);
             AbstractTreeLearnerOptions.showIgnoreColumnsWithoutDomainInfo(group);
 
             // tree options
-            AbstractTreeLearnerOptions.showSplitCriterion(group);
-            AbstractTreeLearnerOptions.showUseMidpointSplits(group);
             AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
+            AbstractTreeLearnerOptions.showMissingValueHandling(group);
             MinNodeSizesParameters.showSplitNodeSizes(group);
-            ClassificationTreeLearnerOptions.setMinSplitNodeSizeDefaultToTwo(group);
-            ClassificationTreeLearnerOptions.setMinChildNodeSizeDefaultToOne(group);
-            ClassificationTreeLearnerOptions.showFixedRootAttribute(group);
+            RegressionTreeLearnerOptions.setMinSplitNodeSizeDefaultToTen(group);
+            RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
 
-            // data sampling
-            AbstractTreeLearnerOptions.showDataSamplingSection(group);
+            // no ensemble options
 
-            // ensemble configuration
-            AbstractTreeLearnerOptions.showAttributeSampling(group);
-            AbstractTreeLearnerOptions.showAttributeSamplingLinearFraction(group);
-            AbstractTreeLearnerOptions.showAttributeSamplingAbsolute(group);
-            AbstractTreeLearnerOptions.showAttributeSelectionReuse(group);
-            AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
-
-            // advanced
-            AbstractTreeLearnerOptions.showSaveTargetDistribution(group);
-            AbstractTreeLearnerOptions.showRandomSeedOptions(group);
+            // no advanced options
         }
     }
 
-    TreeEnsembleClassificationLearnerNodeFactory2Parameters() {
+    RegressionTreeLearnerNodeParameters() {
         super();
     }
 
-    TreeEnsembleClassificationLearnerNodeFactory2Parameters(final NodeParametersInput input) {
+    RegressionTreeLearnerNodeParameters(final NodeParametersInput input) {
         super(input);
     }
 }
