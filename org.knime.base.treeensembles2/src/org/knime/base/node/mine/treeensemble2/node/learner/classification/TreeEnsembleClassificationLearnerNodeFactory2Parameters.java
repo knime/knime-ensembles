@@ -72,6 +72,7 @@ final class TreeEnsembleClassificationLearnerNodeFactory2Parameters extends Clas
             AbstractTreeLearnerOptions.showSplitCriterion(group);
             AbstractTreeLearnerOptions.showUseMidpointSplits(group);
             AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
+            AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showSplitNodeSizes(group);
             ClassificationTreeLearnerOptions.setMinSplitNodeSizeDefaultToTwo(group);
             ClassificationTreeLearnerOptions.setMinChildNodeSizeDefaultToOne(group);
@@ -88,6 +89,7 @@ final class TreeEnsembleClassificationLearnerNodeFactory2Parameters extends Clas
             AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
             // advanced
+            AbstractTreeLearnerOptions.showHiliteCountOption(group);
             AbstractTreeLearnerOptions.showSaveTargetDistribution(group);
             AbstractTreeLearnerOptions.showRandomSeedOptions(group);
         }

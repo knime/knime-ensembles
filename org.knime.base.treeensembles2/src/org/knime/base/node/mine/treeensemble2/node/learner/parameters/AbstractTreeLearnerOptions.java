@@ -124,9 +124,14 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     interface AttributeSelectionSection {
     }
 
+    /**
+     * Tree options configuration section.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
     @Section(title = "Tree Options")
     @After(AttributeSelectionSection.class)
-    interface TreeOptionsSection {
+    public interface TreeOptionsSection {
     }
 
     @Section(title = "Data Sampling")
@@ -134,9 +139,31 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     private interface DataSamplingSection {
     }
 
+    /**
+     * Ensemble configuration section. Needed for parameter implementation with different default values.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
     @Section(title = "Ensemble Configuration")
     @After(DataSamplingSection.class)
-    private interface EnsembleConfigurationSection {
+    public interface EnsembleConfigurationSection {
+
+        @SuppressWarnings("javadoc")
+        interface NumberOfModels {
+
+        }
+
+        @SuppressWarnings("javadoc")
+        @After(NumberOfModels.class)
+        interface ColumnSamplingMode {
+
+        }
+
+        @SuppressWarnings("javadoc")
+        @After(ColumnSamplingMode.class)
+        interface Other {
+
+        }
     }
 
     @Section(title = "Advanced")
@@ -343,11 +370,25 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @OptionalWidget(defaultProvider = DefaultProviders.MaxTreeDepthDefaultProvider.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persistor(Persistors.MaxDepthPersistor.class)
-    @Widget(title = "Limit number of levels (tree depth)", description = """
-            Limit the maximal number of tree levels. When disabled the tree depth is unbounded.
-            For instance, a value of 1 would only split the (single) root node resulting in a decision stump
-            """)
+    @Modification.WidgetReference(MaxTreeDepthWidgetRef.class)
     Optional<Integer> m_maxTreeDepth = Optional.empty();
+
+    private interface MaxTreeDepthWidgetRef extends Modification.Reference {
+    }
+
+    /**
+     * Shows the max tree depth option. This method is only needed when the default widget annotation needs to be
+     * explicitly shown (e.g., to override a hide in a parent class).
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showMaxTreeDepthOption(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(MaxTreeDepthWidgetRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Limit number of levels (tree depth)").withProperty("description", """
+                    Limit the maximal number of tree levels. When disabled the tree depth is unbounded.
+                    For instance, a value of 1 would only split the (single) root node resulting in a decision stump
+                    """).modify();
+    }
 
     @PersistEmbedded
     final MinNodeSizesParameters m_minNodeSizes = new MinNodeSizesParameters();
@@ -453,14 +494,24 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     }
 
     /**
+     * Shows the data sampling section without the row sampling mode.
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showDataSamplingSectionWithoutRowSamplingMode(
+        final Modification.WidgetGroupModifier groupModifier) {
+        RowSamplingFraction.showEnableRowSampling(groupModifier);
+        RowSamplingFraction.showRowSamplingFraction(groupModifier);
+        showRowSamplingWithReplacement(groupModifier);
+    }
+
+    /**
      * Only used by Tree Ensemble nodes.
      *
      * @param groupModifier the group modifier
      */
     public static void showDataSamplingSection(final Modification.WidgetGroupModifier groupModifier) {
-        RowSamplingFraction.showEnableRowSampling(groupModifier);
-        RowSamplingFraction.showRowSamplingFraction(groupModifier);
-        showRowSamplingWithReplacement(groupModifier);
+        showDataSamplingSectionWithoutRowSamplingMode(groupModifier);
         showRowSamplingMode(groupModifier);
     }
 
@@ -477,7 +528,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
             .withProperty("value", choicesProviderClass).modify();
     }
 
-    @Layout(EnsembleConfigurationSection.class)
+    @Layout(EnsembleConfigurationSection.NumberOfModels.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_NR_MODELS)
     @Modification.WidgetReference(NumberOfModelsWidgetRef.class)
@@ -501,13 +552,16 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
                     """).modify();
     }
 
-    @Layout(EnsembleConfigurationSection.class)
+    @Layout(EnsembleConfigurationSection.ColumnSamplingMode.class)
     @Persistor(Persistors.ColumnSamplingModePersistor.class)
     @ValueReference(ColumnSamplingModeRef.class)
     @Modification.WidgetReference(ColumnSamplingModeWidgetRef.class)
     EnumOptions.ColumnSamplingModeOption m_columnSamplingMode = EnumOptions.ColumnSamplingModeOption.SQUARE_ROOT;
 
-    interface ColumnSamplingModeRef extends ParameterReference<EnumOptions.ColumnSamplingModeOption> {
+    /**
+     * public to be attached to overshadowing field in subclass.
+     */
+    public interface ColumnSamplingModeRef extends ParameterReference<EnumOptions.ColumnSamplingModeOption> {
     }
 
     private interface ColumnSamplingModeWidgetRef extends Modification.Reference {
@@ -531,7 +585,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
                     """).modify();
     }
 
-    @Layout(EnsembleConfigurationSection.class)
+    @Layout(EnsembleConfigurationSection.Other.class)
     @NumberInputWidget(minValidation = IsPositiveDoubleValidation.class, maxValidation = AtMostOneValidation.class)
     @Effect(predicate = Predicates.ColumnFractionEnabledPredicate.class, type = EffectType.SHOW)
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_COLUMN_FRACTION_LINEAR)
@@ -553,7 +607,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
                     """).modify();
     }
 
-    @Layout(EnsembleConfigurationSection.class)
+    @Layout(EnsembleConfigurationSection.Other.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Effect(predicate = Predicates.ColumnAbsoluteEnabledPredicate.class, type = EffectType.SHOW)
     @Persist(configKey = TreeEnsembleLearnerConfiguration.KEY_COLUMN_ABSOLUTE)
@@ -575,7 +629,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
                     """).modify();
     }
 
-    @Layout(EnsembleConfigurationSection.class)
+    @Layout(EnsembleConfigurationSection.Other.class)
     @RadioButtonsWidget
     @Persistor(Persistors.AttributeReusePersistor.class)
     @Modification.WidgetReference(AttributeReuseWidgetRef.class)
@@ -592,7 +646,7 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     public static void showAttributeSelectionReuse(final Modification.WidgetGroupModifier groupModifier) {
         groupModifier.find(AttributeReuseWidgetRef.class).addAnnotation(Widget.class)
             .withProperty("title", "Attribute selection").withProperty("description", """
-                        <p>
+                    <p>
                       <i>Use the same set of attributes for each tree</i>
                       means that the attributes are sampled once for each tree
                       and this sample is then used to construct the tree.
@@ -649,11 +703,25 @@ public abstract class AbstractTreeLearnerOptions implements NodeParameters {
     @OptionalWidget(defaultProvider = DefaultProviders.HiliteCountDefaultProvider.class)
     @NumberInputWidget(minValidation = IsPositiveIntegerValidation.class)
     @Persistor(Persistors.HiliteCountPersistor.class)
-    @Widget(title = "Enable highlighting", description = """
-            If selected, the node stores the configured number of rows and
-            allows highlighting them in the node view.
-            """)
+    @Modification.WidgetReference(HiliteCountWidgetRef.class)
     Optional<Integer> m_hiliteCount = Optional.empty();
+
+    private interface HiliteCountWidgetRef extends Modification.Reference {
+    }
+
+    /**
+     * Shows the hilite count option. This method is only needed when the default widget annotation needs to be
+     * explicitly shown (e.g., to override a hide in a parent class).
+     *
+     * @param groupModifier the group modifier
+     */
+    public static void showHiliteCountOption(final Modification.WidgetGroupModifier groupModifier) {
+        groupModifier.find(HiliteCountWidgetRef.class).addAnnotation(Widget.class)
+            .withProperty("title", "Enable highlighting").withProperty("description", """
+                    If selected, the node stores the configured number of rows and
+                    allows highlighting them in the node view.
+                    """).modify();
+    }
 
     @Layout(AdvancedSection.class)
     @Modification.WidgetReference(SaveTargetDistributionRef.class)

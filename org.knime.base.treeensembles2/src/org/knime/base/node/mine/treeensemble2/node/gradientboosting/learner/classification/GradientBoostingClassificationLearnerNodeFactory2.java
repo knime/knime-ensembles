@@ -48,55 +48,141 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.gradientboosting.learner.classification;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
+ * Node factory for the Gradient Boosted Trees Learner (Classification) node.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
-public class GradientBoostingClassificationLearnerNodeFactory2 extends NodeFactory<GradientBoostingClassificationLearnerNodeModel> {
+@SuppressWarnings("restriction")
+public class GradientBoostingClassificationLearnerNodeFactory2 extends
+    NodeFactory<GradientBoostingClassificationLearnerNodeModel> implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public GradientBoostingClassificationLearnerNodeModel createNodeModel() {
         return new GradientBoostingClassificationLearnerNodeModel(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected int getNrNodeViews() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeView<GradientBoostingClassificationLearnerNodeModel> createNodeView(final int viewIndex,
         final GradientBoostingClassificationLearnerNodeModel nodeModel) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean hasDialog() {
         return true;
     }
 
+    private static final String NODE_NAME = "Gradient Boosted Trees Learner";
+
+    private static final String NODE_ICON = "GradientBoostingLearner.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Learns a Gradient Boosted Trees model.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            <p> Learns Gradient Boosted Trees with the objective of classification. The algorithm uses very shallow
+                regression trees and a special form of boosting to build an ensemble of trees. The implementation
+                follows the algorithm in section 4.6 of the paper "Greedy Function Approximation: A Gradient Boosting
+                Machine" by Jerome H. Friedman (1999). For more information you can also take a look at <a
+                href="https://en.wikipedia.org/wiki/Gradient_boosting">this</a>. </p> <p> The used base learner for this
+                ensemble method is a simple regression tree as it is used in the <i>Tree Ensemble</i> , <i>Random
+                Forest</i> and <i>Simple Regression Tree</i> nodes. Per default a tree is build using binary splits for
+                numeric and nominal attributes (the later can be changed to multiway splits). The built-in missing value
+                handling tries to find the best direction for missing values to go to by testing each possible direction
+                and selecting the one yielding the best result (i.e. largest gain). </p> <p> In a regression tree the
+                predicted value for a leaf node is the mean target value of the records within the leaf. Hence the
+                predictions are best (with respect to the training data) if the variance of target values within a leaf
+                is minimal. This is achieved by splits that minimize the sum of squared errors in their respective
+                children. </p> <h4> Sampling </h4> <p> This node allows to perform row sampling (bagging) and attribute
+                sampling (attribute bagging) similar to the random forest* and tree ensemble nodes. If sampling is used
+                this is usually referred to as <i>Stochastic Gradient Boosted Trees</i>. The respective settings can be
+                found in the <i>Advanced Options</i> tab. </p> <br /> (*) RANDOM FORESTS is a registered trademark of
+                Minitab, LLC and is used with Minitab’s permission.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+            fixedPort("Input Data", """
+                The data to learn from. It must contain at least one nominal target column and either a fingerprint
+                (bit/byte/double vector) column or another numeric or nominal column.
+                """)
+    );
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+            fixedPort("Gradient Boosted Trees Model", """
+                The trained model.
+                """)
+    );
+
     /**
      * {@inheritDoc}
+     * @since 5.10
      */
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new GradientBoostingClassificationLearnerNodeDialogPane();
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL,
+            GradientBoostingClassificationLearnerNodeFactory2Parameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription( //
+            NODE_NAME, //
+            NODE_ICON, //
+            INPUT_PORTS, //
+            OUTPUT_PORTS, //
+            SHORT_DESCRIPTION, //
+            FULL_DESCRIPTION, //
+            List.of(), //
+            GradientBoostingClassificationLearnerNodeFactory2Parameters.class, //
+            null, //
+            NodeType.Learner, //
+            List.of(), //
+            null //
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL,
+            GradientBoostingClassificationLearnerNodeFactory2Parameters.class));
     }
 
 }

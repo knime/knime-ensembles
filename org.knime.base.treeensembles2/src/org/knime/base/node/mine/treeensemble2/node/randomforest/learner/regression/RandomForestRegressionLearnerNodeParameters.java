@@ -80,6 +80,7 @@ final class RandomForestRegressionLearnerNodeParameters extends RegressionTreeLe
             RegressionTreeLearnerOptions.setTargetColumnChoices(group);
 
             // tree options
+            AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showMinChildNodeSizeOnly(group);
             RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
 
@@ -89,6 +90,7 @@ final class RandomForestRegressionLearnerNodeParameters extends RegressionTreeLe
             AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
             // advanced options
+            AbstractTreeLearnerOptions.showHiliteCountOption(group);
             AbstractTreeLearnerOptions.showRandomSeedOptions(group);
 
         }

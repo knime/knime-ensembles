@@ -173,7 +173,7 @@
               "title" : "Use different set of attributes for each tree node"
             } ],
             "title" : "Attribute selection",
-            "description" : "    <p>\n  <i>Use the same set of attributes for each tree</i>\n  means that the attributes are sampled once for each tree\n  and this sample is then used to construct the tree.\n</p>\n<p>\n  <i>Use a different set of attributes for each tree node</i>\n  samples a different set of candidate attributes in each of the tree nodes\n  from which the optimal one is chosen to perform the split.\n  This is the option used in random forests.\n</p>\n",
+            "description" : "<p>\n  <i>Use the same set of attributes for each tree</i>\n  means that the attributes are sampled once for each tree\n  and this sample is then used to construct the tree.\n</p>\n<p>\n  <i>Use a different set of attributes for each tree node</i>\n  samples a different set of candidate attributes in each of the tree nodes\n  from which the optimal one is chosen to perform the split.\n  This is the option used in random forests.\n</p>\n",
             "default" : "DIFFERENT_FOR_EACH_NODE"
           },
           "columnAbsolute" : {

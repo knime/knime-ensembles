@@ -1,7 +1,7 @@
 {
   "data" : {
     "model" : {
-      "targetColumn" : "Categorical",
+      "targetColumn" : "Cluster Membership",
       "trainingAttributes" : {
         "trainingAttributesMode" : "COLUMNS"
       },
@@ -9,11 +9,11 @@
         "mode" : "MANUAL",
         "patternFilter" : {
           "pattern" : "",
-          "isCaseSensitive" : false,
+          "isCaseSensitive" : true,
           "isInverted" : false
         },
         "manualFilter" : {
-          "manuallySelected" : [ ],
+          "manuallySelected" : [ "Universe_0_0", "Universe_0_1", "Universe_1_0", "Universe_1_1" ],
           "manuallyDeselected" : [ ],
           "includeUnknownColumns" : true
         },
@@ -24,10 +24,10 @@
       },
       "ignoreColumnsWithoutDomain" : true,
       "missingValueHandling" : "XGBOOST",
-      "splitCriterion" : "INFORMATION_GAIN_RATIO",
+      "splitCriterion" : "GINI",
       "useAverageSplitPoints" : true,
       "useBinaryNominalSplits" : true,
-      "maxTreeDepth" : null,
+      "maxTreeDepth" : 4,
       "minNodeSizes" : {
         "minNodeSize" : null,
         "minChildNodeSize" : null
@@ -40,13 +40,17 @@
       "rowSamplingWithReplacement" : false,
       "rowSamplingMode" : "RANDOM",
       "numberOfModels" : 100,
-      "columnSamplingMode" : "SQUARE_ROOT",
+      "columnSamplingMode" : "NONE",
       "columnFractionLinear" : 1.0,
       "columnAbsolute" : 10,
-      "attributeReuse" : "DIFFERENT_FOR_EACH_NODE",
-      "seed" : "1764585560353",
+      "attributeReuse" : "SAME_FOR_TREE",
+      "seed" : "1767890162921",
       "hiliteCount" : null,
-      "saveTargetDistributionInNodes" : false
+      "saveTargetDistributionInNodes" : false,
+      "gradientBoostingParams" : {
+        "learningRate" : 0.1,
+        "alpha" : 0.95
+      }
     }
   },
   "schema" : {
@@ -174,7 +178,7 @@
             } ],
             "title" : "Attribute selection",
             "description" : "<p>\n  <i>Use the same set of attributes for each tree</i>\n  means that the attributes are sampled once for each tree\n  and this sample is then used to construct the tree.\n</p>\n<p>\n  <i>Use a different set of attributes for each tree node</i>\n  samples a different set of candidate attributes in each of the tree nodes\n  from which the optimal one is chosen to perform the split.\n  This is the option used in random forests.\n</p>\n",
-            "default" : "DIFFERENT_FOR_EACH_NODE"
+            "default" : "SAME_FOR_TREE"
           },
           "columnAbsolute" : {
             "type" : "integer",
@@ -205,34 +209,49 @@
               "title" : "Absolute number"
             } ],
             "title" : "Attribute sampling (columns)",
-            "description" : "     Defines the sampling of attributes to learn an individual tree.\n     This can either be a function based on the number of attributes\n     (linear fraction or square root) or some absolute value.\n     The latter can be used in conjunction with flow variables\n     to inject some other value derived from the number of attributes (e.g. Breiman suggests\n     starting with the square root of the\n     number of attributes but also to try to double or half that number).\n\n<ul>\n<li><b>All columns</b>: Disable column sampling and use all available attributes for every tree.\n</li>\n<li><b>Square root</b>: Sample the square root of the number of available attributes for each tree (default random forest behaviour).\n</li>\n<li><b>Linear fraction</b>: Sample a fraction of the available attributes for each tree.\n</li>\n<li><b>Absolute number</b>: Sample a fixed number of attributes for each tree.\n</li>\n</ul>",
-            "default" : "SQUARE_ROOT"
+            "description" : "Defines the sampling of attributes to learn an individual tree. This can either be a function based on the\nnumber of attributes (linear fraction or square root) or some absolute value. The latter can be used in\nconjunction with flow variables to inject some other value derived from the number of attributes (e.g.\nBreiman suggests starting with the square root of the number of attributes but also to try to double or\nhalf that number).\n\n<ul>\n<li><b>All columns</b>: Disable column sampling and use all available attributes for every tree.\n</li>\n<li><b>Square root</b>: Sample the square root of the number of available attributes for each tree (default random forest behaviour).\n</li>\n<li><b>Linear fraction</b>: Sample a fraction of the available attributes for each tree.\n</li>\n<li><b>Absolute number</b>: Sample a fixed number of attributes for each tree.\n</li>\n</ul>",
+            "default" : "NONE"
+          },
+          "gradientBoostingParams" : {
+            "type" : "object",
+            "properties" : {
+              "alpha" : {
+                "type" : "number",
+                "format" : "double",
+                "default" : 0.95
+              },
+              "learningRate" : {
+                "type" : "number",
+                "format" : "double",
+                "title" : "Learning rate",
+                "description" : "The learning rate influences how much influence a single model has on the ensemble result.\nUsually a value of 0.1 is a good starting point but the best learning rate also depends on the\nnumber of models. The more models the ensemble contains the lower the learning rate has to be.\n",
+                "default" : 0.1
+              }
+            },
+            "default" : {
+              "learningRate" : 0.1,
+              "alpha" : 0.95
+            }
           },
           "hardCodedRootColumn" : {
             "type" : [ "string", "null" ],
-            "title" : "Use fixed root attribute",
-            "description" : "  Force the selected column to be used as the root split attribute in all trees -- even if the\ncolumn is not in the attribute sample.\n",
             "default" : null
           },
           "hiliteCount" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
-            "title" : "Enable highlighting",
-            "description" : "If selected, the node stores the configured number of rows and\nallows highlighting them in the node view.\n",
             "default" : null
           },
           "ignoreColumnsWithoutDomain" : {
             "type" : "boolean",
-            "title" : "Ignore columns without domain information",
-            "description" : "If selected, nominal columns with no domain information are ignored\n(as they likely have too many possible values anyway).\n",
             "default" : true
           },
           "maxTreeDepth" : {
             "type" : [ "integer", "null" ],
             "format" : "int32",
             "title" : "Limit number of levels (tree depth)",
-            "description" : "Limit the maximal number of tree levels. When disabled the tree depth is unbounded.\nFor instance, a value of 1 would only split the (single) root node resulting in a decision stump\n",
-            "default" : null
+            "description" : "Limit the maximal number of tree levels. When disabled the tree depth is unbounded.\nFor instance, a value of 1 would only split the (single) root node resulting in a decision stump.\nFor gradient boosted trees usually a depth in the range 4 to 10 is sufficient. Larger trees will\nquickly lead to overfitting.\n",
+            "default" : 4
           },
           "minNodeSizes" : {
             "type" : "object",
@@ -240,15 +259,11 @@
               "minChildNodeSize" : {
                 "type" : [ "integer", "null" ],
                 "format" : "int32",
-                "title" : "Minimum child node size",
-                "description" : "Minimum number of records allowed in the child nodes after a split.\nMust not exceed half the minimum split node size. Note, this parameter is currently ignored for\nnominal columns if binary nominal splits are disabled.\n",
                 "default" : null
               },
               "minNodeSize" : {
                 "type" : [ "integer", "null" ],
                 "format" : "int32",
-                "title" : "Minimum split node size",
-                "description" : "Minimum number of records in a decision tree node so that another split\nis attempted.\nNote, this option does not make any implications on the minimum number of records in a\nterminal node.\nIf enabled, this number needs to be at least twice as large as the minimum child node size\n(as otherwise for binary splits one of the two children would have less records than specified).\n",
                 "default" : null
               }
             },
@@ -265,6 +280,8 @@
               "const" : "SURROGATE",
               "title" : "Surrogate"
             } ],
+            "title" : "Missing value handling",
+            "description" : "Specify how missing values should be handled during training.\n\n<ul>\n<li><b>XGBoost</b>: If this is selected (it is also the default), the learner will calculate which direction is best suited for missing values, by sending the missing values in each direction of a split. The direction that yields the best result (i.e. largest gain) is then used as default direction for missing values. This method works with both, binary and multiway splits.</li>\n<li><b>Surrogate</b>: This approach calculates for each split alternative splits that best approximate the best split. The method was first described in the book \"Classification and Regression Trees\" by Breiman et al. (1984). NOTE: This method can only be used with binary nominal splits.</li>\n</ul>",
             "default" : "XGBOOST"
           },
           "newSeed" : {
@@ -312,8 +329,6 @@
               "const" : "EQUAL_SIZE",
               "title" : "Equal size"
             } ],
-            "title" : "Data sampling mode",
-            "description" : "The sampling mode decides how the rows are sampled.\nIn the random mode, the rows are sampled from the whole dataset, i.e. each row has exactly the\nsame probability as in the sample.\nIn case of equal size sampling, first a sample from the minority class is drawn and then the\nsame number of rows as in the minority sample are drawn from all other classes so that each\nclass is represented with the same number of rows in the sample.\nIf stratified sampling is selected, the same fraction of rows is drawn from each class so the\nclass distribution in the sample is approximately the same as in the full dataset.\n\n<ul>\n<li><b>Random</b>: Sample rows uniformly at random.\n</li>\n<li><b>Stratified</b>: Sample rows stratified by the target class distribution.\n</li>\n<li><b>Equal size</b>: Sample the same number of rows for each class. Available for classification tasks.\n</li>\n</ul>",
             "default" : "RANDOM"
           },
           "rowSamplingWithReplacement" : {
@@ -324,8 +339,6 @@
           },
           "saveTargetDistributionInNodes" : {
             "type" : "boolean",
-            "title" : "Save target distribution in tree nodes",
-            "description" : "If selected, the model stores the distribution of the target category values in each tree node.\nStoring the class distribution may increase memory consumption considerably and we therefore\nrecommend disabling it if your use-case doesn't require it.\nClass distribution is only needed if\n<ul>\n    <li>You want to see the class distribution for each tree node in the node view.</li>\n    <li>You want to export individual decision trees to PMML.</li>\n    <li>\n        You want to use soft-voting (i.e. aggregation of probability distributions instead of\n        votes) in the predictor node.\n    </li>\n</ul>",
             "default" : false
           },
           "seed" : {
@@ -345,15 +358,13 @@
               "const" : "GINI",
               "title" : "Gini"
             } ],
-            "title" : "Split criterion",
-            "description" : "Choose the\n<a href=\"http://en.wikipedia.org/wiki/Decision_tree_learning#Formulae\">split criterion</a>\nhere. Gini is usually a good choice and is used in \"Classification and Regression Trees\"\n(Breiman et al, 1984) and the original random forest algorithm\n(as described by Breiman et al, 2001);\ninformation gain is used in C4.5; the information gain ratio normalizes the standard\ninformation gain by the split entropy to overcome any unfair preference for nominal splits with\nmany child nodes.\n\n<ul>\n<li><b>Information Gain</b>: Maximizes the information gain when creating splits. Equivalent to entropy reduction.\n</li>\n<li><b>Information Gain Ratio</b>: Uses the information gain ratio to compensate for the bias towards attributes with many distinct values.\n</li>\n<li><b>Gini</b>: Measures the impurity of a split based on the Gini index. Common default for classification tasks.\n</li>\n</ul>",
             "default" : "INFORMATION_GAIN_RATIO"
           },
           "targetColumn" : {
             "type" : "string",
             "title" : "Target column",
             "description" : "Select the column containing the value to be learned. Rows with missing values in this column are ignored during the learning process.\n",
-            "default" : "Categorical"
+            "default" : "Cluster Membership"
           },
           "trainingAttributes" : {
             "type" : "object",
@@ -452,30 +463,13 @@
             }
           }
         }
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/ignoreColumnsWithoutDomain",
-        "options" : {
-          "format" : "checkbox"
-        },
-        "rule" : {
-          "effect" : "SHOW",
-          "condition" : {
-            "scope" : "#/properties/model/properties/trainingAttributes/properties/trainingAttributesMode",
-            "schema" : {
-              "oneOf" : [ {
-                "const" : "COLUMNS"
-              } ]
-            }
-          }
-        }
       } ]
     }, {
       "label" : "Tree Options",
       "type" : "Section",
       "elements" : [ {
         "type" : "Control",
-        "scope" : "#/properties/model/properties/splitCriterion"
+        "scope" : "#/properties/model/properties/missingValueHandling"
       }, {
         "type" : "Control",
         "scope" : "#/properties/model/properties/useAverageSplitPoints",
@@ -511,60 +505,6 @@
           "hideOnNull" : true
         },
         "providedOptions" : [ "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
-        "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "The value must not exceed 2147483647.",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 2.147483647E9
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          },
-          "hideOnNull" : true
-        },
-        "providedOptions" : [ "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
-        "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "The value must not exceed 2147483647.",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 2.147483647E9
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          },
-          "hideOnNull" : true
-        },
-        "providedOptions" : [ "validation.max", "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/hardCodedRootColumn",
-        "options" : {
-          "format" : "dropDown",
-          "hideOnNull" : true
-        },
-        "providedOptions" : [ "possibleValues", "default" ]
       } ]
     }, {
       "label" : "Data Sampling",
@@ -620,18 +560,6 @@
             }
           }
         }
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/rowSamplingMode",
-        "rule" : {
-          "effect" : "SHOW",
-          "condition" : {
-            "scope" : "#/properties/model/properties/rowSamplingFraction/properties/enabled",
-            "schema" : {
-              "const" : true
-            }
-          }
-        }
       } ]
     }, {
       "label" : "Ensemble Configuration",
@@ -653,6 +581,28 @@
               "parameters" : {
                 "isExclusive" : false,
                 "min" : 1.0
+              }
+            }
+          }
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/gradientBoostingParams/properties/learningRate",
+        "options" : {
+          "stepSize" : 0.05,
+          "validation" : {
+            "max" : {
+              "errorMessage" : "The value must not exceed 1.",
+              "parameters" : {
+                "isExclusive" : false,
+                "max" : 1.0
+              }
+            },
+            "min" : {
+              "errorMessage" : "The value must be at least 0.",
+              "parameters" : {
+                "isExclusive" : false,
+                "min" : 0.0
               }
             }
           }
@@ -752,35 +702,6 @@
           "format" : "simpleButton",
           "triggerId" : "org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions$NewSeedButtonRef"
         }
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/hiliteCount",
-        "options" : {
-          "validation" : {
-            "max" : {
-              "errorMessage" : "The value must not exceed 2147483647.",
-              "parameters" : {
-                "isExclusive" : false,
-                "max" : 2.147483647E9
-              }
-            },
-            "min" : {
-              "errorMessage" : "The value must be at least 1.",
-              "parameters" : {
-                "isExclusive" : false,
-                "min" : 1.0
-              }
-            }
-          },
-          "hideOnNull" : true
-        },
-        "providedOptions" : [ "default" ]
-      }, {
-        "type" : "Control",
-        "scope" : "#/properties/model/properties/saveTargetDistributionInNodes",
-        "options" : {
-          "format" : "checkbox"
-        }
       } ]
     } ]
   },
@@ -865,6 +786,18 @@
           },
           "saveTargetDistributionInNodes" : {
             "configKey" : "saveTargetDistributionInNodes"
+          },
+          "gradientBoostingParams" : {
+            "type" : "object",
+            "properties" : {
+              "learningRate" : {
+                "configKey" : "learningRate"
+              },
+              "alpha" : {
+                "configKey" : "alphaFraction"
+              }
+            },
+            "propertiesRoute" : [ ".." ]
           }
         }
       }
@@ -876,43 +809,29 @@
     "values" : [ {
       "indices" : [ ],
       "value" : [ {
-        "id" : "Target",
-        "text" : "Target",
-        "type" : {
-          "id" : "org.knime.core.data.StringValue",
-          "text" : "String"
-        }
-      }, {
-        "id" : "Fingerprint",
-        "text" : "Fingerprint",
-        "type" : {
-          "id" : "org.knime.core.data.StringValue",
-          "text" : "String"
-        }
-      }, {
-        "id" : "Numeric",
-        "text" : "Numeric",
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
         "type" : {
           "id" : "org.knime.core.data.DoubleValue",
           "text" : "Number (Float)"
         }
-      } ]
-    } ]
-  }, {
-    "scope" : "#/properties/model/properties/hardCodedRootColumn",
-    "providedOptionName" : "default",
-    "values" : [ {
-      "indices" : [ ],
-      "value" : "Numeric"
-    } ]
-  }, {
-    "scope" : "#/properties/model/properties/hardCodedRootColumn",
-    "providedOptionName" : "possibleValues",
-    "values" : [ {
-      "indices" : [ ],
-      "value" : [ {
-        "id" : "Numeric",
-        "text" : "Numeric",
+      }, {
+        "id" : "Universe_0_0",
+        "text" : "Universe_0_0",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_0_1",
+        "text" : "Universe_0_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      }, {
+        "id" : "Universe_1_0",
+        "text" : "Universe_1_0",
         "type" : {
           "id" : "org.knime.core.data.DoubleValue",
           "text" : "Number (Float)"
@@ -931,14 +850,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 10
-    } ]
-  }, {
-    "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
-    "providedOptionName" : "default",
-    "values" : [ {
-      "indices" : [ ],
-      "value" : 1
+      "value" : 4
     } ]
   }, {
     "scope" : "#/properties/model/properties/minNodeSizes/properties/minChildNodeSize",
@@ -946,13 +858,6 @@
     "values" : [ {
       "indices" : [ ],
       "value" : null
-    } ]
-  }, {
-    "scope" : "#/properties/model/properties/minNodeSizes/properties/minNodeSize",
-    "providedOptionName" : "default",
-    "values" : [ {
-      "indices" : [ ],
-      "value" : 2
     } ]
   }, {
     "scope" : "#/properties/model/properties/seed",
@@ -967,22 +872,8 @@
     "values" : [ {
       "indices" : [ ],
       "value" : [ {
-        "id" : "Target",
-        "text" : "Target",
-        "type" : {
-          "id" : "org.knime.core.data.StringValue",
-          "text" : "String"
-        }
-      }, {
-        "id" : "Fingerprint",
-        "text" : "Fingerprint",
-        "type" : {
-          "id" : "org.knime.core.data.StringValue",
-          "text" : "String"
-        }
-      }, {
-        "id" : "Categorical",
-        "text" : "Categorical",
+        "id" : "Cluster Membership",
+        "text" : "Cluster Membership",
         "type" : {
           "id" : "org.knime.core.data.StringValue",
           "text" : "String"

@@ -45,6 +45,7 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
+import org.knime.base.node.mine.treeensemble2.node.learner.parameters.AbstractTreeLearnerOptions.ColumnSamplingModeRef;
 import org.knime.node.parameters.updates.EffectPredicate;
 import org.knime.node.parameters.updates.EffectPredicateProvider;
 
@@ -56,7 +57,7 @@ final class Predicates {
     static final class ColumnFractionEnabledPredicate implements EffectPredicateProvider {
         @Override
         public EffectPredicate init(final PredicateInitializer initializer) {
-            return initializer.getEnum(AbstractTreeLearnerOptions.ColumnSamplingModeRef.class)
+            return initializer.getEnum(ColumnSamplingModeRef.class)
                 .isOneOf(EnumOptions.ColumnSamplingModeOption.LINEAR);
         }
     }
@@ -64,7 +65,7 @@ final class Predicates {
     static final class ColumnAbsoluteEnabledPredicate implements EffectPredicateProvider {
         @Override
         public EffectPredicate init(final PredicateInitializer initializer) {
-            return initializer.getEnum(AbstractTreeLearnerOptions.ColumnSamplingModeRef.class)
+            return initializer.getEnum(ColumnSamplingModeRef.class)
                 .isOneOf(EnumOptions.ColumnSamplingModeOption.ABSOLUTE);
         }
     }

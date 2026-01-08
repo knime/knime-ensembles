@@ -62,9 +62,11 @@ import org.knime.core.node.NotConfigurableException;
  */
 public class GradientBoostingLearnerConfiguration extends TreeEnsembleLearnerConfiguration {
 
-    private static final String KEY_LEARNINGRATE = "learningRate";
+    /** Config path for learning rate */
+    public static final String KEY_LEARNINGRATE = "learningRate";
 
-    private static final String KEY_ALPHA_FRACTION = "alphaFraction";
+    /** Config path for alpha fraction */
+    public static final String KEY_ALPHA_FRACTION = "alphaFraction";
 
     /**
      * Default learning rate (0.1)

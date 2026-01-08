@@ -58,7 +58,12 @@ import org.knime.node.parameters.persistence.NodeParametersPersistor;
 import org.knime.node.parameters.persistence.legacy.EnumBooleanPersistor;
 import org.knime.node.parameters.persistence.legacy.LegacyColumnFilterPersistor;
 
-final class Persistors {
+/**
+ * Persistors for the tree ensemble learner options.
+ *
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ */
+public final class Persistors {
 
     private Persistors() {
         // prevent instantiation
@@ -101,7 +106,12 @@ final class Persistors {
         }
     }
 
-    static final class ColumnSamplingModePersistor
+    /**
+     * Persistor for the column sampling mode.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
+    public static final class ColumnSamplingModePersistor
         implements NodeParametersPersistor<EnumOptions.ColumnSamplingModeOption> {
         @Override
         public EnumOptions.ColumnSamplingModeOption load(final NodeSettingsRO settings)
@@ -128,8 +138,13 @@ final class Persistors {
         }
     }
 
+    /**
+     * Persistor for the attribute reuse option.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
     @SuppressWarnings("restriction")
-    static final class AttributeReusePersistor extends EnumBooleanPersistor<EnumOptions.AttributeReuseOption> {
+    public static final class AttributeReusePersistor extends EnumBooleanPersistor<EnumOptions.AttributeReuseOption> {
 
         AttributeReusePersistor() {
             super(TreeEnsembleLearnerConfiguration.KEY_IS_USE_DIFFERENT_ATTRIBUTES_AT_EACH_NODE,
@@ -235,7 +250,12 @@ final class Persistors {
         }
     }
 
-    static final class MaxDepthPersistor extends OptionalEmptyAsSpecialIntPersistor {
+    /**
+     * Persistor for the max depth parameter.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
+    public static final class MaxDepthPersistor extends OptionalEmptyAsSpecialIntPersistor {
 
         MaxDepthPersistor() {
             super(TreeEnsembleLearnerConfiguration.KEY_MAX_LEVELS, TreeEnsembleLearnerConfiguration.MAX_LEVEL_INFINITE);
