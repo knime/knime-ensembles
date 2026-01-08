@@ -69,6 +69,7 @@ import org.knime.node.impl.description.PortDescription;
 import org.knime.node.impl.description.ViewDescription;
 
 /**
+ * Node factory for the Simple Regression Tree Learner node.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany

@@ -80,6 +80,7 @@ final class RandomForestClassificationLearnerNodeFactory2Parameters extends Clas
 
             // tree options
             AbstractTreeLearnerOptions.showSplitCriterion(group);
+            AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showMinChildNodeSizeOnly(group);
             ClassificationTreeLearnerOptions.setMinChildNodeSizeDefaultToOne(group);
 
@@ -89,6 +90,7 @@ final class RandomForestClassificationLearnerNodeFactory2Parameters extends Clas
             AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
             // advanced
+            AbstractTreeLearnerOptions.showHiliteCountOption(group);
             AbstractTreeLearnerOptions.showSaveTargetDistribution(group);
             AbstractTreeLearnerOptions.showRandomSeedOptions(group);
         }

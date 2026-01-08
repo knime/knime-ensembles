@@ -49,14 +49,26 @@ import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerCo
 import org.knime.base.node.mine.treeensemble2.sample.row.RowSamplerFactory;
 import org.knime.node.parameters.widget.choices.Label;
 
-final class EnumOptions {
+/**
+ * Enumeration options for tree ensemble learners.
+ *
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ */
+public final class EnumOptions {
     private EnumOptions() {
         // prevent instantiation
     }
 
-    enum AttributeReuseOption {
+    /**
+     * Options for attribute reuse in tree ensembles.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
+    public enum AttributeReuseOption {
+            /** Option for entire tree */
             @Label("Use same set of attributes for entire tree")
             SAME_FOR_TREE, //
+            /** Option for each node */
             @Label("Use different set of attributes for each tree node")
             DIFFERENT_FOR_EACH_NODE;
 
@@ -161,20 +173,29 @@ final class EnumOptions {
         private final RowSamplerFactory.RowSamplingMode m_delegate;
     }
 
-    enum ColumnSamplingModeOption {
+    /**
+     * Options for column sampling in tree ensembles.
+     *
+     * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+     */
+    public enum ColumnSamplingModeOption {
+            /** Uses all columns */
             @Label(value = "All columns", description = """
                     Disable column sampling and use all available attributes for every tree.
                     """)
             NONE(TreeEnsembleLearnerConfiguration.ColumnSamplingMode.None),
+            /** Sample the square root of the number of available attributes for each tree */
             @Label(value = "Square root", description = """
                     Sample the square root of the number of available attributes for each tree (default random forest \
                     behaviour).
                     """)
             SQUARE_ROOT(TreeEnsembleLearnerConfiguration.ColumnSamplingMode.SquareRoot),
+            /** Sample a fraction of the available attributes for each tree */
             @Label(value = "Linear fraction", description = """
                     Sample a fraction of the available attributes for each tree.
                     """)
             LINEAR(TreeEnsembleLearnerConfiguration.ColumnSamplingMode.Linear),
+            /** Sample a fixed number of attributes for each tree */
             @Label(value = "Absolute number", description = """
                     Sample a fixed number of attributes for each tree.
                     """)

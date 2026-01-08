@@ -71,6 +71,7 @@ final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends Regressi
             // tree options
             AbstractTreeLearnerOptions.showUseMidpointSplits(group);
             AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
+            AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showSplitNodeSizes(group);
             RegressionTreeLearnerOptions.setMinSplitNodeSizeDefaultToTen(group);
             RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
@@ -88,6 +89,7 @@ final class TreeEnsembleRegressionLearnerNodeFactory2Parameters extends Regressi
             AbstractTreeLearnerOptions.showNumberOfModelsOption(group);
 
             // advanced options
+            AbstractTreeLearnerOptions.showHiliteCountOption(group);
             AbstractTreeLearnerOptions.showRandomSeedOptions(group);
         }
     }

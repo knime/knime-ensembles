@@ -47,12 +47,13 @@ package org.knime.base.node.mine.treeensemble2.node.learner.parameters;
 
 import org.knime.node.parameters.widget.number.NumberInputWidgetValidation;
 
-final class Validations {
+@SuppressWarnings("javadoc")
+public final class Validations {
     private Validations() {
         // utility class
     }
 
-    static final class AtMostOneValidation extends NumberInputWidgetValidation.MaxValidation {
+    public static final class AtMostOneValidation extends NumberInputWidgetValidation.MaxValidation {
         @Override
         protected double getMax() {
             return 1.0;

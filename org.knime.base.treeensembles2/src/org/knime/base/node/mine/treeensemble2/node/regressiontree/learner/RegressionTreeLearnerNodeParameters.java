@@ -75,13 +75,15 @@ final class RegressionTreeLearnerNodeParameters extends RegressionTreeLearnerOpt
             // tree options
             AbstractTreeLearnerOptions.showUseBinarySplitsForNominal(group);
             AbstractTreeLearnerOptions.showMissingValueHandling(group);
+            AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showSplitNodeSizes(group);
             RegressionTreeLearnerOptions.setMinSplitNodeSizeDefaultToTen(group);
             RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
 
-            // no ensemble options
+            // ensemble options
 
-            // no advanced options
+            // advanced options
+            AbstractTreeLearnerOptions.showHiliteCountOption(group);
         }
     }
 
