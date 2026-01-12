@@ -12,11 +12,11 @@ import org.knime.core.node.config.Config;
  */
 class PredictionFusionNodeConfig {
 
-	private static final String METHOD_CFG = "method";
-	private static final String CLASSES_CFG = "classes";
-	private static final String PREDICTIONS_CFG = "predictions";
-	private static final String NR_PREDICTIONS_CFG = "nrPredictions";
-	private static final String PREDICTION_CFG = "prediction";
+	static final String METHOD_CFG = "method";
+	static final String CLASSES_CFG = "classes";
+	static final String PREDICTIONS_CFG = "predictions";
+	static final String NR_PREDICTIONS_CFG = "nrPredictions";
+	static final String PREDICTION_CFG = "prediction";
 
 	private static final String METHOD_DEFAULT = "";
 	private static final String[] CLASSES_DEFAULT = new String[0];
@@ -143,8 +143,8 @@ class PredictionFusionNodeConfig {
 	 */
 	public static class PredictionConfig {
 
-		private static final String WEIGHT_CFG = "weight";
-		private static final String COLUMNS_CFG = "columns";
+		static final String WEIGHT_CFG = "weight";
+		static final String COLUMNS_CFG = "columns";
 
 		private int m_weight;
 		private String[] m_columns;
