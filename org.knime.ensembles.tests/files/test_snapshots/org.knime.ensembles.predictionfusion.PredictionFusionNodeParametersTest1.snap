@@ -1,0 +1,309 @@
+{
+  "data" : {
+    "model" : {
+      "method" : "MAXIMUM",
+      "classes" : [ {
+        "className" : "Cluster_0"
+      }, {
+        "className" : "Cluster_1"
+      }, {
+        "className" : "Cluster_2"
+      }, {
+        "className" : "Cluster_3"
+      } ],
+      "predictions" : [ {
+        "weight" : 1,
+        "confidenceColumns" : [ {
+          "className" : "Cluster_0",
+          "selectedColumn" : "Universe_1_1"
+        }, {
+          "className" : "Cluster_1",
+          "selectedColumn" : "Universe_1_1"
+        }, {
+          "className" : "Cluster_2",
+          "selectedColumn" : "Universe_1_1"
+        }, {
+          "className" : "Cluster_3",
+          "selectedColumn" : "Universe_1_1"
+        } ]
+      } ]
+    }
+  },
+  "schema" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "addClassesFromColumn" : {
+            "type" : "object",
+            "title" : "Add classes from column domain",
+            "description" : "Add classes from the domain of the selected string column.\n"
+          },
+          "classes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "className" : {
+                  "type" : "string",
+                  "title" : "Class name",
+                  "description" : "The name of the class.",
+                  "default" : ""
+                }
+              }
+            },
+            "title" : "Classes",
+            "description" : "The classes that were predicted and for which confidences are available. In case of a tie the higher\nclass (in the list) wins.\n",
+            "default" : [ ]
+          },
+          "classesColumn" : {
+            "type" : "string",
+            "title" : "Classes column",
+            "description" : "String column from which to extract the classes from it's domain.\n"
+          },
+          "method" : {
+            "oneOf" : [ {
+              "const" : "MAXIMUM",
+              "title" : "Maximum"
+            }, {
+              "const" : "MEAN",
+              "title" : "Mean"
+            }, {
+              "const" : "MEDIAN",
+              "title" : "Median"
+            }, {
+              "const" : "MINIMUM",
+              "title" : "Minimum"
+            } ],
+            "title" : "Method",
+            "description" : "The fusion method.\n\n<ul>\n<li><b>Maximum</b>: Maximum of all prediction confidences</li>\n<li><b>Mean</b>: Mean of all prediction confidences</li>\n<li><b>Median</b>: Median of all prediction confidences</li>\n<li><b>Minimum</b>: Minimum of all prediction confidences</li>\n</ul>",
+            "default" : "MAXIMUM"
+          },
+          "predictions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "confidenceColumns" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "object",
+                    "properties" : {
+                      "className" : {
+                        "type" : "string",
+                        "default" : ""
+                      },
+                      "selectedColumn" : {
+                        "type" : "string",
+                        "title" : "Column",
+                        "description" : "Select the confidence column for this class."
+                      }
+                    }
+                  },
+                  "title" : "Confidence columns",
+                  "description" : "Select the confidence column for each class. The columns must be compatible with double values.\n",
+                  "default" : [ ]
+                },
+                "weight" : {
+                  "type" : "integer",
+                  "format" : "int32",
+                  "title" : "Weight",
+                  "description" : "Multiplies the prediction confidences as if the prediction would have been added n times. This enables\na prediction to have more influence on the outcome than another. (Affects mean and median but not\nminimum or maximum.)\n",
+                  "default" : 1
+                }
+              }
+            },
+            "title" : "Class confidences",
+            "description" : "Each row represents the predicted confidences from one classifier. The fusion method is applied to all\nconfidence values of the same class.\n",
+            "default" : [ ]
+          }
+        }
+      }
+    }
+  },
+  "ui_schema" : {
+    "elements" : [ {
+      "type" : "Control",
+      "scope" : "#/properties/model/properties/method"
+    }, {
+      "label" : "Classes",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/classesColumn",
+        "options" : {
+          "format" : "dropDown"
+        },
+        "providedOptions" : [ "possibleValues" ]
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/addClassesFromColumn",
+        "options" : {
+          "format" : "simpleButton",
+          "triggerId" : "org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters$AddClassesFromColumnRef"
+        }
+      }, {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/classes",
+        "options" : {
+          "detail" : [ {
+            "type" : "Control",
+            "scope" : "#/properties/className",
+            "options" : {
+              "validation" : {
+                "pattern" : {
+                  "errorMessage" : "The field cannot be blank (it must contain at least one non-whitespace character).",
+                  "parameters" : {
+                    "pattern" : ".*\\S.*"
+                  }
+                }
+              }
+            }
+          } ],
+          "addButtonText" : "Add class",
+          "arrayElementTitle" : "Class",
+          "showSortButtons" : true
+        }
+      } ]
+    }, {
+      "label" : "Class Confidences",
+      "type" : "Section",
+      "elements" : [ {
+        "type" : "Control",
+        "scope" : "#/properties/model/properties/predictions",
+        "options" : {
+          "detail" : [ {
+            "type" : "Control",
+            "scope" : "#/properties/weight",
+            "options" : {
+              "validation" : {
+                "max" : {
+                  "errorMessage" : "The value must not exceed 2147483647.",
+                  "parameters" : {
+                    "isExclusive" : false,
+                    "max" : 2.147483647E9
+                  }
+                },
+                "min" : {
+                  "errorMessage" : "The value must be at least 1.",
+                  "parameters" : {
+                    "isExclusive" : false,
+                    "min" : 1.0
+                  }
+                }
+              }
+            }
+          }, {
+            "type" : "Control",
+            "scope" : "#/properties/confidenceColumns",
+            "options" : {
+              "detail" : [ {
+                "type" : "Control",
+                "scope" : "#/properties/selectedColumn",
+                "options" : {
+                  "format" : "dropDown"
+                },
+                "providedOptions" : [ "possibleValues" ]
+              } ],
+              "arrayElementTitle" : "Confidence Column",
+              "hasFixedSize" : true
+            },
+            "providedOptions" : [ "arrayElementTitle" ]
+          } ],
+          "addButtonText" : "Add prediction",
+          "arrayElementTitle" : "Prediction"
+        },
+        "providedOptions" : [ "elementDefaultValue" ]
+      } ]
+    } ]
+  },
+  "persist" : {
+    "type" : "object",
+    "properties" : {
+      "model" : {
+        "type" : "object",
+        "properties" : {
+          "method" : {
+            "configPaths" : [ [ "method" ] ]
+          },
+          "classesColumn" : { },
+          "addClassesFromColumn" : { },
+          "classes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "className" : {
+                  "route" : [ "..", ".." ],
+                  "configPaths" : [ [ "classes" ] ]
+                }
+              }
+            }
+          },
+          "predictions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "weight" : {
+                  "route" : [ "..", ".." ],
+                  "configPaths" : [ [ "predictions", "prediction${array_index}", "weight" ] ]
+                },
+                "confidenceColumns" : {
+                  "route" : [ "..", ".." ],
+                  "configPaths" : [ [ "predictions", "prediction${array_index}", "columns" ] ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "initialUpdates" : [ {
+    "scope" : "#/properties/model/properties/classesColumn",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "StringColumn",
+        "text" : "StringColumn",
+        "type" : {
+          "id" : "org.knime.core.data.StringValue",
+          "text" : "String"
+        }
+      } ]
+    } ]
+  }, {
+    "scope" : "#/properties/model/properties/predictions/items/properties/confidenceColumns/items/properties/selectedColumn",
+    "providedOptionName" : "possibleValues",
+    "values" : [ {
+      "indices" : [ ],
+      "value" : [ {
+        "id" : "Universe_1_1",
+        "text" : "Universe_1_1",
+        "type" : {
+          "id" : "org.knime.core.data.DoubleValue",
+          "text" : "Number (Float)"
+        }
+      } ]
+    } ]
+  } ],
+  "globalUpdates" : [ {
+    "trigger" : {
+      "id" : "org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters$AddClassesFromColumnRef"
+    },
+    "dependencies" : [ "#/properties/model/properties/classes", "#/properties/model/properties/classesColumn" ]
+  }, {
+    "trigger" : {
+      "scope" : "#/properties/model/properties/classes"
+    },
+    "dependencies" : [ "#/properties/model/properties/classes", "#/properties/model/properties/predictions/items/properties/confidenceColumns" ]
+  }, {
+    "trigger" : {
+      "scope" : "#/properties/model/properties/predictions/items/properties/confidenceColumns"
+    },
+    "dependencies" : [ "#/properties/model/properties/predictions/items/properties/confidenceColumns/items/properties/className" ]
+  } ]
+}

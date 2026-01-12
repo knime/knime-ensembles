@@ -47,56 +47,125 @@
  */
 package org.knime.ensembles.predictionfusion;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
- * The node factory.
- * 
+ * The node factory for the Prediction Fusion node.
+ *
  * @author Patrick Winter, University of Konstanz
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
-public class PredictionFusionNodeFactory extends NodeFactory<PredictionFusionNodeModel> {
+@SuppressWarnings("restriction")
+public class PredictionFusionNodeFactory extends NodeFactory<PredictionFusionNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public PredictionFusionNodeModel createNodeModel() {
 		return new PredictionFusionNodeModel();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getNrNodeViews() {
 		return 0;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public NodeView<PredictionFusionNodeModel> createNodeView(final int viewIndex,
 			final PredictionFusionNodeModel nodeModel) {
 		return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean hasDialog() {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public NodeDialogPane createNodeDialogPane() {
-		return new PredictionFusionNodeDialog();
-	}
+    private static final String NODE_NAME = "Prediction Fusion";
+
+    private static final String NODE_ICON = "./predictionfusion.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Fuses multiple prediction confidences into one, combined prediction.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            Fuses multiple prediction confidences into one, combined prediction, using the selected fusion method.
+                The selected fusion method will be applied to all confidence values (resulting from multiple
+                predictions) of the same class. After the fusion method was applied, the resulting combined prediction
+                confidences will be normalized to add up to one, such that they can be interpreted as probabilities. <br
+                /><br /> Note: Missing values will be skipped.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+            fixedPort("Original predictions", """
+                Table containing the predictions.
+                """)
+    );
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+            fixedPort("Fused predictions", """
+                Table containing the fused prediction confidences and the winning class.
+                """)
+    );
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, PredictionFusionNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription( //
+            NODE_NAME, //
+            NODE_ICON, //
+            INPUT_PORTS, //
+            OUTPUT_PORTS, //
+            SHORT_DESCRIPTION, //
+            FULL_DESCRIPTION, //
+            List.of(), //
+            PredictionFusionNodeParameters.class, //
+            null, //
+            NodeType.Predictor, //
+            List.of(), //
+            null //
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, PredictionFusionNodeParameters.class));
+    }
 
 }
