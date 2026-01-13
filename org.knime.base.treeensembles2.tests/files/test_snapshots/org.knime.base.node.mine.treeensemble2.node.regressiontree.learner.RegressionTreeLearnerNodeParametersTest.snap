@@ -710,7 +710,7 @@
     "providedOptionName" : "default",
     "values" : [ {
       "indices" : [ ],
-      "value" : 10
+      "value" : 1
     } ]
   }, {
     "scope" : "#/properties/model/properties/seed",
