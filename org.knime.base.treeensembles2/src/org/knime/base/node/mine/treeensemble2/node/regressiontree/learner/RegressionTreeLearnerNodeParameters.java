@@ -52,6 +52,7 @@ import org.knime.base.node.mine.treeensemble2.node.learner.parameters.Regression
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
 import org.knime.node.parameters.NodeParametersInput;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.widget.OptionalWidget;
 
 /**
  * Node parameters for Simple Regression Tree Learner.
@@ -77,7 +78,7 @@ final class RegressionTreeLearnerNodeParameters extends RegressionTreeLearnerOpt
             AbstractTreeLearnerOptions.showMissingValueHandling(group);
             AbstractTreeLearnerOptions.showMaxTreeDepthOption(group);
             MinNodeSizesParameters.showSplitNodeSizes(group);
-            RegressionTreeLearnerOptions.setMinSplitNodeSizeDefaultToTen(group);
+            RegressionTreeLearnerOptions.setMinSplitNodeSizeDefault(group, MinSplitNodeSizeDefaultProvider.class);
             RegressionTreeLearnerOptions.setMinChildNodeSizeDefaultToFive(group);
 
             // ensemble options
@@ -85,6 +86,16 @@ final class RegressionTreeLearnerNodeParameters extends RegressionTreeLearnerOpt
             // advanced options
             AbstractTreeLearnerOptions.showHiliteCountOption(group);
         }
+
+        private static class MinSplitNodeSizeDefaultProvider implements OptionalWidget.DefaultValueProvider<Integer> {
+
+            @Override
+            public Integer computeState(final NodeParametersInput context) {
+                return 1;
+            }
+
+        }
+
     }
 
     RegressionTreeLearnerNodeParameters() {
