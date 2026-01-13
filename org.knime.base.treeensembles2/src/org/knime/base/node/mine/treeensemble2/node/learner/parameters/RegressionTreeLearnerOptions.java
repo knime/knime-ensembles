@@ -92,7 +92,7 @@ public class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
      * @param groupModifier the widget group modifier
      */
     public static void setMinSplitNodeSizeDefaultToTen(final Modification.WidgetGroupModifier groupModifier) {
-        MinNodeSizesParameters.setMinSplitNodeSizeDefault(groupModifier, MinSplitNodeSizeDefaultProvider.class);
+        setMinSplitNodeSizeDefault(groupModifier, MinSplitNodeSizeDefaultProvider.class);
     }
 
     /**
@@ -102,6 +102,17 @@ public class RegressionTreeLearnerOptions extends AbstractTreeLearnerOptions {
      */
     public static void setMinChildNodeSizeDefaultToFive(final Modification.WidgetGroupModifier groupModifier) {
         MinNodeSizesParameters.setMinChildNodeSizeDefault(groupModifier, MinChildNodeSizeDefaultProvider.class);
+    }
+
+    /**
+     * Sets the default minimum split node size provider.
+     *
+     * @param groupModifier the widget group modifier
+     * @param defaultProviderClass the provider class for the default value of the minimum split node size
+     */
+    public static void setMinSplitNodeSizeDefault(final Modification.WidgetGroupModifier groupModifier,
+        final Class<?> defaultProviderClass) {
+        MinNodeSizesParameters.setMinSplitNodeSizeDefault(groupModifier, defaultProviderClass);
     }
 
     /**
