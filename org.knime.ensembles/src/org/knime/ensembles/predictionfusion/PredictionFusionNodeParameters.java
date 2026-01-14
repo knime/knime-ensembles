@@ -50,12 +50,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -67,6 +70,7 @@ import org.knime.core.webui.node.dialog.defaultdialog.internal.persistence.Persi
 import org.knime.core.webui.node.dialog.defaultdialog.internal.widget.ArrayWidgetInternal;
 import org.knime.core.webui.node.dialog.defaultdialog.util.updates.StateComputationFailureException;
 import org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters.ConfidenceColumn.ClassNameRef;
+import org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters.ConfidenceColumn.DoNotPersistString;
 import org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters.ConfidenceColumn.SyncConfidenceColumnsWithClassesProvider;
 import org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters.PredictionItem.ConfidenceColumnsRef;
 import org.knime.ensembles.predictionfusion.methods.impl.Maximum;
@@ -92,6 +96,7 @@ import org.knime.node.parameters.updates.ParameterReference;
 import org.knime.node.parameters.updates.StateProvider;
 import org.knime.node.parameters.updates.ValueProvider;
 import org.knime.node.parameters.updates.ValueReference;
+import org.knime.node.parameters.updates.legacy.ColumnNameAutoGuessValueProvider;
 import org.knime.node.parameters.widget.choices.ChoicesProvider;
 import org.knime.node.parameters.widget.choices.Label;
 import org.knime.node.parameters.widget.choices.util.ColumnSelectionUtil;
@@ -137,9 +142,24 @@ class PredictionFusionNodeParameters implements NodeParameters {
             """)
     @ChoicesProvider(StringColumnsProvider.class)
     @ValueReference(ClassesColumnRef.class)
+    @Persistor(DoNotPersistString.class)
+    @ValueProvider(ClassesColumnAutoGuessProvider.class)
     String m_classesColumn;
 
     static final class ClassesColumnRef implements ParameterReference<String> {
+    }
+
+    static final class ClassesColumnAutoGuessProvider extends ColumnNameAutoGuessValueProvider {
+
+        protected ClassesColumnAutoGuessProvider() {
+            super(ClassesColumnRef.class);
+        }
+
+        @Override
+        protected Optional<DataColumnSpec> autoGuessColumn(final NodeParametersInput input) {
+            return ColumnSelectionUtil.getFirstCompatibleColumnOfFirstPort(input, StringValue.class);
+        }
+
     }
 
     @Layout(ClassesSection.class)
@@ -209,18 +229,15 @@ class PredictionFusionNodeParameters implements NodeParameters {
 
             for (ClassItem existingVariable : existingClassItems) {
                 if (domainValueStrings.contains(existingVariable.m_className)) {
-                    newClassItems.add(existingVariable);
                     encounteredClassItemNames.add(existingVariable.m_className);
-                } else {
-                    newClassItems.add(existingVariable);
                 }
+                newClassItems.add(existingVariable);
             }
 
             for (String domainValueString : domainValueStrings) {
-                if (encounteredClassItemNames.contains(domainValueString)) {
-                    continue;
+                if (!encounteredClassItemNames.contains(domainValueString)) {
+                    newClassItems.add(new ClassItem(domainValueString));
                 }
-                newClassItems.add(new ClassItem(domainValueString));
             }
 
             return newClassItems.toArray(ClassItem[]::new);
@@ -246,7 +263,7 @@ class PredictionFusionNodeParameters implements NodeParameters {
                 throw new StateComputationFailureException();
             }
             return classesColumnDomain.getValues().stream().map(DataCell::toString).toList();
-		}
+        }
 
     }
 
@@ -558,7 +575,7 @@ class PredictionFusionNodeParameters implements NodeParameters {
         String m_className;
 
         static final class ClassNameRef implements ParameterReference<String> {
-		}
+        }
 
         @Widget(title = "Column", description = "Select the confidence column for this class.")
         @ChoicesProvider(DoubleColumnsProvider.class)
@@ -621,19 +638,14 @@ class PredictionFusionNodeParameters implements NodeParameters {
             }
 
             private static void checkForClassItemChange(final ConfidenceColumn[] currentColumns,
-                final ClassItem[] classes)
-                throws StateComputationFailureException {
+                final ClassItem[] classes) throws StateComputationFailureException {
                 if (currentColumns.length == classes.length) {
-                    boolean allMatch = true;
                     for (int i = 0; i < classes.length; i++) {
                         if (!currentColumns[i].m_className.equals(classes[i].m_className)) {
-                            allMatch = false;
-                            break;
+                            return; // class items have changed
                         }
                     }
-                    if (allMatch) {
-                        throw new StateComputationFailureException();
-                    }
+                    throw new StateComputationFailureException();
                 }
             }
 
