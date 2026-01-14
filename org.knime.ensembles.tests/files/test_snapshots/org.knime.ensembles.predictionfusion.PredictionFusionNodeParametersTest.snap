@@ -204,7 +204,9 @@
           "method" : {
             "configPaths" : [ [ "method" ] ]
           },
-          "classesColumn" : { },
+          "classesColumn" : {
+            "configPaths" : [ ]
+          },
           "addClassesFromColumn" : { },
           "classes" : {
             "type" : "array",
@@ -268,6 +270,12 @@
     } ]
   } ],
   "globalUpdates" : [ {
+    "trigger" : {
+      "id" : "after-open-dialog"
+    },
+    "triggerInitially" : true,
+    "dependencies" : [ "#/properties/model/properties/classesColumn" ]
+  }, {
     "trigger" : {
       "id" : "org.knime.ensembles.predictionfusion.PredictionFusionNodeParameters$AddClassesFromColumnRef"
     },
