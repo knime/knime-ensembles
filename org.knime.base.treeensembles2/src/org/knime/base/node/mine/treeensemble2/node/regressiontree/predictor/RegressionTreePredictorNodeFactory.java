@@ -47,45 +47,129 @@
  */
 package org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor;
 
+import static org.knime.node.impl.description.PortDescription.fixedPort;
+
+import java.util.List;
+import java.util.Map;
+
+import org.knime.core.node.NodeDescription;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.core.webui.node.dialog.NodeDialog;
+import org.knime.core.webui.node.dialog.NodeDialogFactory;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.SettingsType;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultKaiNodeInterface;
+import org.knime.core.webui.node.dialog.defaultdialog.DefaultNodeDialog;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterface;
+import org.knime.core.webui.node.dialog.kai.KaiNodeInterfaceFactory;
+import org.knime.node.impl.description.DefaultNodeDescriptionUtil;
+import org.knime.node.impl.description.PortDescription;
 
 /**
- * 
+ * Node factory for the Simple Regression Tree Predictor node.
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
-public class RegressionTreePredictorNodeFactory extends NodeFactory<RegressionTreePredictorNodeModel> {
+@SuppressWarnings("restriction")
+public class RegressionTreePredictorNodeFactory extends NodeFactory<RegressionTreePredictorNodeModel>
+    implements NodeDialogFactory, KaiNodeInterfaceFactory {
 
-    /** {@inheritDoc} */
     @Override
     public final RegressionTreePredictorNodeModel createNodeModel() {
         return new RegressionTreePredictorNodeModel();
     }
 
-    /** {@inheritDoc} */
     @Override
     protected final int getNrNodeViews() {
         return 0;
     }
 
-    /** {@inheritDoc} */
     @Override
     public final NodeView<RegressionTreePredictorNodeModel> createNodeView(final int viewIndex,
         final RegressionTreePredictorNodeModel nodeModel) {
         throw new IndexOutOfBoundsException();
     }
 
-    /** {@inheritDoc} */
     @Override
     protected final boolean hasDialog() {
         return true;
     }
 
-    /** {@inheritDoc} */
+    private static final String NODE_NAME = "Simple Regression Tree Predictor";
+
+    private static final String NODE_ICON = "Simple_Regression_Tree_Predictor.png";
+
+    private static final String SHORT_DESCRIPTION = """
+            Applies regression from a regression tree model.
+            """;
+
+    private static final String FULL_DESCRIPTION = """
+            Applies regression from a regression tree model by using the mean of the records in the corresponding
+            child node.
+            """;
+
+    private static final List<PortDescription> INPUT_PORTS = List.of(
+            fixedPort("Model", """
+                Regression Tree Model as produced by Simple Regression Tree Learner node.
+                """),
+            fixedPort("Input Data", """
+                The data to predict.
+                """)
+    );
+
+    private static final List<PortDescription> OUTPUT_PORTS = List.of(
+            fixedPort("Predicted Output", """
+                The predicted data.
+                """)
+    );
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
     @Override
-    protected final NodeDialogPane createNodeDialogPane() {
-        return new RegressionTreePredictorNodeDialogPane();
+    public NodeDialogPane createNodeDialogPane() {
+        return NodeDialogManager.createLegacyFlowVariableNodeDialog(createNodeDialog());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public NodeDialog createNodeDialog() {
+        return new DefaultNodeDialog(SettingsType.MODEL, RegressionTreePredictorNodeParameters.class);
+    }
+
+    @Override
+    public NodeDescription createNodeDescription() {
+        return DefaultNodeDescriptionUtil.createNodeDescription( //
+            NODE_NAME, //
+            NODE_ICON, //
+            INPUT_PORTS, //
+            OUTPUT_PORTS, //
+            SHORT_DESCRIPTION, //
+            FULL_DESCRIPTION, //
+            List.of(), //
+            RegressionTreePredictorNodeParameters.class, //
+            null, //
+            NodeType.Predictor, //
+            List.of(), //
+            null //
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 5.10
+     */
+    @Override
+    public KaiNodeInterface createKaiNodeInterface() {
+        return new DefaultKaiNodeInterface(Map.of(SettingsType.MODEL, RegressionTreePredictorNodeParameters.class));
     }
 
 }
