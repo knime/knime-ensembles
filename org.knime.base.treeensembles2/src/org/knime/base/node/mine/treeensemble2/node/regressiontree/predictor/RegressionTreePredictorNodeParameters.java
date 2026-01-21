@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -41,87 +42,38 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- *
- * History
- *   Jan 10, 2012 (wiswedel): created
  */
+
 package org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor;
 
-import org.knime.base.node.mine.treeensemble2.node.predictor.AbstractPredictorConfiguration;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
+import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
+import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
+import org.knime.node.parameters.persistence.Persist;
 
 /**
- * Configuration for a Simple Regression Tree Predictor node.
+ * Node parameters for Simple Regression Tree Predictor.
  *
- * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @author Magnus Gohm, KNIME GmbH, Konstanz, Germany
+ * @author AI Migration Pipeline v1.2
  */
-public final class RegressionTreePredictorConfiguration extends AbstractPredictorConfiguration {
+@SuppressWarnings("restriction")
+@LoadDefaultsForAbsentFields
+@Modification(RegressionTreePredictorNodeParameters.RegressionTreePredictorModification.class)
+final class RegressionTreePredictorNodeParameters extends TreeEnsemblePredictorOptions {
 
-    static final String CFG_TARGET_COLUMN_NAME = "targetColumnName";
+    static final class RegressionTreePredictorModification implements Modification.Modifier {
 
-    /**
-     * @param targetColName
-     * @return default prediction column name based on the target column name.  */
-    public static final String getPredictColumnName(final String targetColName) {
-        return "Prediction (" + targetColName + ")";
+        @Override
+        public void modify(final Modification.WidgetGroupModifier group) {
+            useChangePredictionColumnName(group);
+            usePredictionColumnName(group);
+        }
+
     }
 
-    /**
-     * Only use this method if the target column name is not known.
-     *
-     * @return default prediction column name if the target column name is not known.
-     */
-    public static final String getDefaultPredictColumnName() {
-        return getPredictColumnName("");
-    }
-
-    private String m_targetColumnName;
-
-    /**
-     * @param targetColName name of the target column
-     *
-     */
-    public RegressionTreePredictorConfiguration(final String targetColName) {
-        super(targetColName);
-    }
-
-
-    /**
-     * Creates default configuration.
-     * Intended for the use in configure to enable autoconfiguration of the node.
-     *
-     * @param targetColName
-     * @return default configuration
-     */
-    public static RegressionTreePredictorConfiguration createDefault(final String targetColName) {
-        return new RegressionTreePredictorConfiguration(targetColName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void internalSave(final NodeSettingsWO settings) {
-        settings.addString(CFG_TARGET_COLUMN_NAME, m_targetColumnName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void internalLoadInDialog(final NodeSettingsRO settings) throws NotConfigurableException {
-        m_targetColumnName = settings.getString(CFG_TARGET_COLUMN_NAME, "");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void internalLoadInModel(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_targetColumnName = settings.getString(CFG_TARGET_COLUMN_NAME);
-    }
+    // only visible in flow variable tab.
+    @Persist(configKey = RegressionTreePredictorConfiguration.CFG_TARGET_COLUMN_NAME)
+    String m_targetColumnName;
 
 }
