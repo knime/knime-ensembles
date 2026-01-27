@@ -48,9 +48,10 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.column;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TreeAttributeColumnData;
 import org.knime.base.node.mine.treeensemble2.data.TreeData;
 
@@ -67,15 +68,20 @@ public class SubsetColumnSampleTest extends AbstractColumnSampleTest {
         SubsetColumnSample sample = new SubsetColumnSample(data, colIndices);
         int i = 0;
         for (final TreeAttributeColumnData col : sample) {
-            assertEquals("Wrong column returned.", data.getColumns()[colIndices[i++]], col);
+            assertEquals(data.getColumns()[colIndices[i++]], col, "Wrong column returned.");
         }
     }
 
-    @Test (expected = UnsupportedOperationException.class)
+    @Test
     public void testIteratorRemove() throws Exception {
-        final TreeData data = createTreeData();
-        int[] colIndices = new int[]{1, 3, 5};
-        SubsetColumnSample sample = new SubsetColumnSample(data, colIndices);
-        sample.iterator().remove();
+        assertThrows(
+            UnsupportedOperationException.class,
+            () -> {
+                final TreeData data = createTreeData();
+                int[] colIndices = new int[]{1, 3, 5};
+                SubsetColumnSample sample = new SubsetColumnSample(data, colIndices);
+                sample.iterator().remove();
+            }
+        );
     }
 }

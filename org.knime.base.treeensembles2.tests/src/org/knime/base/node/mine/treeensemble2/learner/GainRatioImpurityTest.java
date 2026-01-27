@@ -48,9 +48,9 @@
  */
 package org.knime.base.node.mine.treeensemble2.learner;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Contains unit tests for the class {@link GainRatioImpurity}. <br>
@@ -75,21 +75,21 @@ public class GainRatioImpurityTest {
         double[] partitionWeights = new double[]{6, 4};
         double totalWeight = 10;
 
-        assertEquals("Gain was incorrect.", 0.02,
-            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.02,
+            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
 
         postSplitImpurity = 0.0;
-        assertEquals("Gain was incorrect.", 0.5,
-            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.5,
+            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
 
         priorImpurity = 0.37;
         postSplitImpurity = 0.33;
-        assertEquals("Gain was incorrect.", 0.04,
-            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.04,
+            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
 
         partitionWeights = new double[]{6, 4, 3, 7};
         totalWeight = 20;
-        assertEquals("Gain was incorrect.", 0.04 / 1.9261207468426806,
-            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.04 / 1.9261207468426806,
+            gainRatioImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
     }
 }

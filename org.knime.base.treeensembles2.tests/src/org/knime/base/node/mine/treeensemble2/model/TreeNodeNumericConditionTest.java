@@ -48,16 +48,14 @@
  */
 package org.knime.base.node.mine.treeensemble2.model;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.decisiontree2.PMMLBooleanOperator;
 import org.knime.base.node.mine.decisiontree2.PMMLCompoundPredicate;
 import org.knime.base.node.mine.decisiontree2.PMMLOperator;
@@ -95,61 +93,61 @@ public class TreeNodeNumericConditionTest {
         final String colName = col.getMetaData().getAttributeName();
         map.put(colName, 2.5);
         final PredictorRecord record = new PredictorRecord(map);
-        assertTrue("2.5 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "2.5 was falsely rejected.");
         map.clear();
         map.put(colName, 3);
-        assertTrue("3 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "3 was falsely rejected.");
         map.clear();
         map.put(colName, 4);
-        assertFalse("4 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "4 was falsely accepted.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertFalse("Missing values were falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "Missing values were falsely accepted.");
 
         cond = new TreeNodeNumericCondition(col.getMetaData(), 3, NumericOperator.LessThanOrEqual, true);
         map.clear();
         map.put(colName, 2.5);
-        assertTrue("2.5 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "2.5 was falsely rejected.");
         map.clear();
         map.put(colName, 3);
-        assertTrue("3 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "3 was falsely rejected.");
         map.clear();
         map.put(colName, 4);
-        assertFalse("4 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "4 was falsely accepted.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertTrue("Missing values were falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "Missing values were falsely rejected.");
 
         cond = new TreeNodeNumericCondition(col.getMetaData(), 4, NumericOperator.LargerThan, false);
         map.clear();
         map.put(colName, 2.5);
-        assertFalse("2.5 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "2.5 was falsely accepted.");
         map.clear();
         map.put(colName, 3);
-        assertFalse("3 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "3 was falsely accepted.");
         map.clear();
         map.put(colName, 4);
-        assertFalse("4 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "4 was falsely accepted.");
         map.clear();
         map.put(colName, 4.01);
-        assertTrue("4.01 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "4.01 was falsely rejected.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertFalse("Missing values were falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "Missing values were falsely accepted.");
 
         cond = new TreeNodeNumericCondition(col.getMetaData(), 4, NumericOperator.LargerThan, true);
         map.clear();
         map.put(colName, 2.5);
-        assertFalse("2.5 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "2.5 was falsely accepted.");
         map.clear();
         map.put(colName, 3);
-        assertFalse("3 was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "3 was falsely accepted.");
         map.clear();
         map.put(colName, 4.01);
-        assertTrue("4 was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "4 was falsely rejected.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertTrue("Missing values were falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "Missing values were falsely rejected.");
     }
 
     /**
@@ -164,28 +162,28 @@ public class TreeNodeNumericConditionTest {
         final TreeNumericColumnData col = dataGen.createNumericAttributeColumn("1,2,3,4,4,5,6,7", "testCol", 0);
         TreeNodeNumericCondition cond = new TreeNodeNumericCondition(col.getMetaData(), 3, NumericOperator.LessThanOrEqual, false);
         PMMLPredicate predicate = cond.toPMMLPredicate();
-        assertThat(predicate, instanceOf(PMMLSimplePredicate.class));
+        assertTrue(predicate instanceof PMMLSimplePredicate);
         PMMLSimplePredicate simplePredicate = (PMMLSimplePredicate)predicate;
-        assertEquals("Wrong attribute", col.getMetaData().getAttributeName(), simplePredicate.getSplitAttribute());
-        assertEquals("Wrong operator", PMMLOperator.LESS_OR_EQUAL, simplePredicate.getOperator());
-        assertEquals("Wrong threshold", Double.toString(3), simplePredicate.getThreshold());
+        assertEquals(col.getMetaData().getAttributeName(), simplePredicate.getSplitAttribute(), "Wrong attribute");
+        assertEquals(PMMLOperator.LESS_OR_EQUAL, simplePredicate.getOperator(), "Wrong operator");
+        assertEquals(Double.toString(3), simplePredicate.getThreshold(), "Wrong threshold");
 
         cond = new TreeNodeNumericCondition(col.getMetaData(), 4.5, NumericOperator.LargerThan, true);
         predicate = cond.toPMMLPredicate();
-        assertThat(predicate, instanceOf(PMMLCompoundPredicate.class));
+        assertTrue(predicate instanceof PMMLCompoundPredicate);
         PMMLCompoundPredicate compound = (PMMLCompoundPredicate)predicate;
-        assertEquals("Wrong boolean operator in compound.", PMMLBooleanOperator.OR, compound.getBooleanOperator());
+        assertEquals(PMMLBooleanOperator.OR, compound.getBooleanOperator(), "Wrong boolean operator in compound.");
         List<PMMLPredicate> preds = compound.getPredicates();
-        assertEquals("Wrong number of predicates in compound.", 2, preds.size());
-        assertThat(preds.get(0), instanceOf(PMMLSimplePredicate.class));
+        assertEquals(2, preds.size(), "Wrong number of predicates in compound.");
+        assertTrue(preds.get(0) instanceof PMMLSimplePredicate);
         simplePredicate = (PMMLSimplePredicate)preds.get(0);
-        assertEquals("Wrong attribute", col.getMetaData().getAttributeName(), simplePredicate.getSplitAttribute());
-        assertEquals("Wrong operator", PMMLOperator.GREATER_THAN, simplePredicate.getOperator());
-        assertEquals("Wrong threshold", Double.toString(4.5), simplePredicate.getThreshold());
+        assertEquals(col.getMetaData().getAttributeName(), simplePredicate.getSplitAttribute(), "Wrong attribute");
+        assertEquals(PMMLOperator.GREATER_THAN, simplePredicate.getOperator(), "Wrong operator");
+        assertEquals(Double.toString(4.5), simplePredicate.getThreshold(), "Wrong threshold");
 
-        assertThat(preds.get(1), instanceOf(PMMLSimplePredicate.class));
+        assertTrue(preds.get(1) instanceof PMMLSimplePredicate);
         simplePredicate = (PMMLSimplePredicate)preds.get(1);
-        assertEquals("Should be isMissing",PMMLOperator.IS_MISSING, simplePredicate.getOperator());
+        assertEquals(PMMLOperator.IS_MISSING, simplePredicate.getOperator(), "Should be isMissing");
 
     }
 }

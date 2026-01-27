@@ -48,9 +48,9 @@
  */
 package org.knime.base.node.mine.treeensemble2.learner;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Contains unit test for the class {@link GiniImpurity}.
@@ -70,21 +70,21 @@ public class GiniImpurityTest {
         double[] targetCounts = new double[]{5, 5};
         double partitionWeight = 10;
         final GiniImpurity giniImpurity = GiniImpurity.INSTANCE;
-        assertEquals("Gini impurity was not correct.", 0.5,
-            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE);
+        assertEquals(0.5,
+            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE, "Gini impurity was not correct.");
 
         targetCounts = new double[]{3, 7};
-        assertEquals("Gini impurity was not correct.", 0.42,
-            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE);
+        assertEquals(0.42,
+            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE, "Gini impurity was not correct.");
 
         targetCounts = new double[]{10, 0};
-        assertEquals("Gini impurity was not correct.", 0.0,
-            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE);
+        assertEquals(0.0,
+            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE, "Gini impurity was not correct.");
 
         targetCounts = new double[]{3, 0, 10, 4, 3};
         partitionWeight = 20;
-        assertEquals("Gini impurity was not correct.", 0.665,
-            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE);
+        assertEquals(0.665,
+            giniImpurity.getPartitionImpurity(targetCounts, partitionWeight), TOLERANCE, "Gini impurity was not correct.");
     }
 
     /**
@@ -99,25 +99,25 @@ public class GiniImpurityTest {
         double[] partitionWeights = new double[]{5, 5};
         double totalWeight = 10;
 
-        assertEquals("Post split impurity was not correct.", 0.4,
-            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.4,
+            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE, "Post split impurity was not correct.");
 
         partitionValues = new double[]{0.5, 0.5};
-        assertEquals("Post split impurity was not correct.", 0.5,
-            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.5,
+            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE, "Post split impurity was not correct.");
 
         partitionValues = new double[]{0.0, 0.5};
-        assertEquals("Post split impurity was not correct.", 0.25,
-            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.25,
+            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE, "Post split impurity was not correct.");
 
         partitionWeights = new double[]{3, 7};
-        assertEquals("Post split impurity was not correct.", 0.35,
-            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.35,
+            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE, "Post split impurity was not correct.");
 
         partitionValues = new double[]{0.2, 0.48, 0.3, 0.4};
         partitionWeights = new double[]{1, 2, 3, 4};
-        assertEquals("Post split impurity was not correct.", 0.366,
-            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.366,
+            giniImpurity.getPostSplitImpurity(partitionValues, partitionWeights, totalWeight), TOLERANCE, "Post split impurity was not correct.");
 
     }
 
@@ -134,16 +134,16 @@ public class GiniImpurityTest {
         double[] partitionWeights = new double[]{6, 4};
         double totalWeight = 10;
 
-        assertEquals("Gain was incorrect.", 0.02,
-            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.02,
+            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
 
         postSplitImpurity = 0.0;
-        assertEquals("Gain was incorrect.", 0.5,
-            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.5,
+            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
 
         priorImpurity = 0.37;
         postSplitImpurity = 0.33;
-        assertEquals("Gain was incorrect.", 0.04,
-            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE);
+        assertEquals(0.04,
+            giniImpurity.getGain(priorImpurity, postSplitImpurity, partitionWeights, totalWeight), TOLERANCE, "Gain was incorrect.");
     }
 }

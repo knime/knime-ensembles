@@ -48,13 +48,12 @@
  */
 package org.knime.base.node.mine.treeensemble2.data.memberships;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.BitSet;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TestDataGenerator;
 import org.knime.base.node.mine.treeensemble2.data.TreeData;
 import org.knime.base.node.mine.treeensemble2.node.learner.TreeEnsembleLearnerConfiguration;
@@ -81,7 +80,7 @@ public class RootDescendantDataMembershipsTest {
         BitSet firstHalf = new BitSet(nrRows);
         firstHalf.set(0, nrRows / 2);
         DataMemberships firstHalfChildMemberships = rootMemberships.createChildMemberships(firstHalf);
-        assertThat(firstHalfChildMemberships, instanceOf(BitSetDescendantDataMemberships.class));
+        assertTrue(firstHalfChildMemberships instanceof BitSetDescendantDataMemberships);
         BitSetDescendantDataMemberships bitSetFirstHalfChildMemberships =
             (BitSetDescendantDataMemberships)firstHalfChildMemberships;
         assertEquals(firstHalf, bitSetFirstHalfChildMemberships.getBitSet());
@@ -89,7 +88,7 @@ public class RootDescendantDataMembershipsTest {
         BitSet firstQuarter = new BitSet(nrRows);
         firstQuarter.set(0, nrRows / 4);
         DataMemberships firstQuarterGrandChild = firstHalfChildMemberships.createChildMemberships(firstQuarter);
-        assertThat(firstQuarterGrandChild, instanceOf(BitSetDescendantDataMemberships.class));
+        assertTrue(firstQuarterGrandChild instanceof BitSetDescendantDataMemberships);
         BitSetDescendantDataMemberships bitSetFirstQuarterGrandChild =
             (BitSetDescendantDataMemberships)firstQuarterGrandChild;
         assertEquals(firstQuarter, bitSetFirstQuarterGrandChild.getBitSet());
@@ -106,7 +105,7 @@ public class RootDescendantDataMembershipsTest {
         RootDataMemberships rootMemberships = new RootDataMemberships(rowSample, data, indexManager);
 
         ColumnMemberships rootColMem = rootMemberships.getColumnMemberships(0);
-        assertThat(rootColMem, instanceOf(IntArrayColumnMemberships.class));
+        assertTrue(rootColMem instanceof IntArrayColumnMemberships);
         assertEquals(nrRows, rootColMem.size());
         int[] expectedOriginalIndices = new int[]{0, 1, 7, 8, 10, 2, 6, 11, 12, 3, 4, 5, 9, 13};
         for (int i = 0; rootColMem.next(); i++) {
@@ -120,7 +119,7 @@ public class RootDescendantDataMembershipsTest {
         lastHalf.set(nrRows / 2, nrRows);
         DataMemberships lastHalfChild = rootMemberships.createChildMemberships(lastHalf);
         ColumnMemberships childColMem = lastHalfChild.getColumnMemberships(0);
-        assertThat(childColMem, instanceOf(DescendantColumnMemberships.class));
+        assertTrue(childColMem instanceof DescendantColumnMemberships);
         assertEquals(nrRows / 2, childColMem.size());
         expectedOriginalIndices = new int[]{7, 8, 10, 11, 12, 9, 13};
         int[] expectedIndexInColumn = new int[]{2, 3, 4, 7, 8, 12, 13};

@@ -48,10 +48,11 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.column;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.learner.TreeNodeSignatureFactory;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 
@@ -62,7 +63,8 @@ import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 public class RFSubsetColumnSampleStrategyTest extends AbstractColumnSampleTest {
 
     /**
-     * Tests the method {@link RFSubsetColumnSampleStrategy#getColumnSampleForTreeNode(org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature)}
+     * Tests the method {@link RFSubsetColumnSampleStrategy#getColumnSampleForTreeNode
+     * (org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature)}
      *
      * @throws Exception
      */
@@ -72,17 +74,17 @@ public class RFSubsetColumnSampleStrategyTest extends AbstractColumnSampleTest {
         final TreeNodeSignatureFactory sigFac = createSignatureFactory();
         TreeNodeSignature rootSig = sigFac.getRootSignature();
         ColumnSample sample = strategy.getColumnSampleForTreeNode(rootSig);
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         int[] colIndices0 = sample.getColumnIndices();
         sample = strategy.getColumnSampleForTreeNode(sigFac.getChildSignatureFor(rootSig, (byte)0));
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         int[] colIndices1 = sample.getColumnIndices();
         sample = strategy.getColumnSampleForTreeNode(sigFac.getChildSignatureFor(rootSig, (byte)1));
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         int[] colIndices2 = sample.getColumnIndices();
-        assertEquals("sample sizes differ.", colIndices0.length, colIndices1.length);
-        assertEquals("sample sizes differ.", colIndices0.length, colIndices2.length);
-        assertEquals("sample sizes differ.", colIndices1.length, colIndices2.length);
+        assertEquals(colIndices0.length, colIndices1.length, "sample sizes differ.");
+        assertEquals(colIndices0.length, colIndices2.length, "sample sizes differ.");
+        assertEquals(colIndices1.length, colIndices2.length, "sample sizes differ.");
         boolean match = true;
         for (int i = 0; i < colIndices0.length; i++) {
             match = match && colIndices0[i] == colIndices1[i] && colIndices0[i] == colIndices2[i];
@@ -90,16 +92,26 @@ public class RFSubsetColumnSampleStrategyTest extends AbstractColumnSampleTest {
                 break;
             }
         }
-        assertFalse("It is very unlikely that we get 3 times the same column sample.", match);
+        assertFalse(match, "It is very unlikely that we get 3 times the same column sample.");
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testSubsetSizeSmallerZero() throws Exception {
-        new RFSubsetColumnSampleStrategy(createTreeData(), RD, -1);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                new RFSubsetColumnSampleStrategy(createTreeData(), RD, -1);
+            }
+        );
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testSubsetSizeGreaterNumColumns() throws Exception {
-        new RFSubsetColumnSampleStrategy(createTreeData(), RD, TREE_DATA_SIZE + 1);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                new RFSubsetColumnSampleStrategy(createTreeData(), RD, TREE_DATA_SIZE + 1);
+            }
+        );
     }
 }

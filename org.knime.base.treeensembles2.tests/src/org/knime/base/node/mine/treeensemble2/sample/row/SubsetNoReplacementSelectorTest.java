@@ -48,12 +48,13 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.row;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.BitSet;
 
 import org.apache.commons.math.random.RandomData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TestDataGenerator;
 
 import com.google.common.collect.Lists;
@@ -73,32 +74,52 @@ public class SubsetNoReplacementSelectorTest {
         for (int i = 1; i <= 20; i++) {
             SubsetNoReplacementRowSample sample = selector.select(rd, 20, i);
             int included = sample.getIncludedBitSet().cardinality();
-            assertEquals("The sample was expected to contain " + i + "rows but contained " + included + "rows instead.",
-                i, included);
+            assertEquals(i, included,
+                "The sample was expected to contain " + i + "rows but contained " + included + "rows instead.");
         }
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testSelectRdNull() throws Exception {
-        SubsetNoReplacementSelector.getInstance().select(null, 10, 3);
+        assertThrows(
+            NullPointerException.class,
+            () -> {
+                SubsetNoReplacementSelector.getInstance().select(null, 10, 3);
+            }
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSelectNrTotalSmallerZero() throws Exception {
-        final RandomData rd = TestDataGenerator.createRandomData();
-        SubsetNoReplacementSelector.getInstance().select(rd, -2, 5);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                final RandomData rd = TestDataGenerator.createRandomData();
+                SubsetNoReplacementSelector.getInstance().select(rd, -2, 5);
+            }
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSelectNrSelectSmallerZero() throws Exception {
-        final RandomData rd = TestDataGenerator.createRandomData();
-        SubsetNoReplacementSelector.getInstance().select(rd, 10, -5);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                final RandomData rd = TestDataGenerator.createRandomData();
+                SubsetNoReplacementSelector.getInstance().select(rd, 10, -5);
+            }
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSelectNrTotalSmallerNrSelect() throws Exception {
-        final RandomData rd = TestDataGenerator.createRandomData();
-        SubsetNoReplacementSelector.getInstance().select(rd, 10, 20);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                final RandomData rd = TestDataGenerator.createRandomData();
+                SubsetNoReplacementSelector.getInstance().select(rd, 10, 20);
+            }
+        );
     }
 
     @Test
@@ -117,11 +138,10 @@ public class SubsetNoReplacementSelectorTest {
         SubsetNoReplacementRowSample sample2 = new SubsetNoReplacementRowSample(bs2, 10, 0.4);
         int[] offsets = new int[]{0, 5};
         SubsetNoReplacementRowSample combined = selector.combine(Lists.newArrayList(sample1, sample2), offsets, 15);
-        assertEquals("The number of rows in the combined Sample is not correct.", 7,
-            combined.getIncludedBitSet().cardinality());
-        assertEquals(
-            "The total number of rows (the size of the set we draw from) is not correct in the combined sample.", 15,
-            combined.getNrRows());
+        assertEquals(7, combined.getIncludedBitSet().cardinality(),
+            "The number of rows in the combined Sample is not correct.");
+        assertEquals(15, combined.getNrRows(),
+            "The total number of rows (the size of the set we draw from) is not correct in the combined sample.");
     }
 
 }

@@ -48,10 +48,11 @@
 package org.knime.base.node.mine.treeensemble2.data;
 
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.knime.base.node.mine.treeensemble2.data.TreeNominalColumnData.BinarySplitEnumeration;
 import org.knime.base.node.mine.treeensemble2.data.TreeNominalColumnData.FullBinarySplitEnumeration;
 
@@ -60,7 +61,8 @@ import org.knime.base.node.mine.treeensemble2.data.TreeNominalColumnData.FullBin
  */
 public class FullBinarySplitEnumerationTest {
 
-    @Test(timeout=2000L)
+    @Test
+    @Timeout(value = 2, unit = TimeUnit.SECONDS)
     public void testBinarySplitEnumerationCountTuples() {
         byte maxNrUniqueValues = 10;
         for (byte nrUniqueValues = 2; nrUniqueValues < maxNrUniqueValues; nrUniqueValues++) {
@@ -70,64 +72,66 @@ public class FullBinarySplitEnumerationTest {
             do {
                 count++;
             } while (instance.next());
-            Assert.assertEquals("For test count = " + nrUniqueValues, expectedTupleCount, count);
+            Assertions.assertEquals(expectedTupleCount, count, "For test count = " + nrUniqueValues);
         }
     }
 
-    @Test(timeout=2000L)
+    @Test
+    @Timeout(value = 2, unit = TimeUnit.SECONDS)
     public void testEnumerationForCountEquals4() {
         FullBinarySplitEnumeration instance = new FullBinarySplitEnumeration((byte)4);
-        Assert.assertEquals(toBigInteger("1000"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1001"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1010"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1011"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1100"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1101"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("1110"), instance.getValueMask());
+        Assertions.assertEquals(toBigInteger("1000"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1001"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1010"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1011"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1100"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1101"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("1110"), instance.getValueMask());
 
-        Assert.assertFalse(instance.next());
+        Assertions.assertFalse(instance.next());
     }
 
-    @Test(timeout=2000L)
+    @Test
+    @Timeout(value = 2, unit = TimeUnit.SECONDS)
     public void testEnumerationForCountEquals5() {
         FullBinarySplitEnumeration instance = new FullBinarySplitEnumeration((byte)5);
-        Assert.assertEquals(toBigInteger("10000"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10001"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10010"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10011"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10100"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10101"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10110"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("10111"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11000"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11001"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11010"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11011"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11100"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11101"), instance.getValueMask());
-        Assert.assertTrue(instance.next());
-        Assert.assertEquals(toBigInteger("11110"), instance.getValueMask());
+        Assertions.assertEquals(toBigInteger("10000"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10001"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10010"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10011"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10100"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10101"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10110"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("10111"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11000"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11001"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11010"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11011"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11100"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11101"), instance.getValueMask());
+        Assertions.assertTrue(instance.next());
+        Assertions.assertEquals(toBigInteger("11110"), instance.getValueMask());
 
-        Assert.assertFalse(instance.next());
+        Assertions.assertFalse(instance.next());
     }
 
     private static final BigInteger toBigInteger(final String mask) {

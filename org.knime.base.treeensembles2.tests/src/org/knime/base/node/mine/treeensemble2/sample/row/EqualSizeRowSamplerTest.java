@@ -48,10 +48,10 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.row;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.commons.math.random.RandomData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TestDataGenerator;
 
 /**
