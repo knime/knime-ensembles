@@ -48,19 +48,17 @@
  */
 package org.knime.base.node.mine.treeensemble2.data;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.BitSet;
 
 import org.apache.commons.math.random.RandomData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.memberships.DataMemberships;
 import org.knime.base.node.mine.treeensemble2.data.memberships.DefaultDataIndexManager;
 import org.knime.base.node.mine.treeensemble2.data.memberships.IDataIndexManager;
@@ -161,7 +159,7 @@ public class TreeNumericColumnDataTest {
         ClassificationPriors priors = targetData.getDistribution(rowWeights, config);
         SplitCandidate splitCandidate = columnData.calcBestSplitClassification(dataMemberships, priors, targetData, rd);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NumericSplitCandidate.class));
+        assertTrue(splitCandidate instanceof NumericSplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(/*0.42 - 0.300 */0.12, splitCandidate.getGainValue(), 0.00001); // libre office calc
         NumericSplitCandidate numSplitCandidate = (NumericSplitCandidate)splitCandidate;
@@ -180,7 +178,7 @@ public class TreeNumericColumnDataTest {
         SplitCandidate splitCandidateChild =
             columnData.calcBestSplitClassification(childMemberships, childTargetPriors, targetData, rd);
         assertNotNull(splitCandidateChild);
-        assertThat(splitCandidateChild, instanceOf(NumericSplitCandidate.class));
+        assertTrue(splitCandidateChild instanceof NumericSplitCandidate);
         assertEquals(0.5, splitCandidateChild.getGainValue(), 0.00001); // manually via libre office calc
         TreeNodeNumericCondition[] childConditions2 = ((NumericSplitCandidate)splitCandidateChild).getChildConditions();
         assertEquals(2, childConditions2.length);
@@ -218,7 +216,7 @@ public class TreeNumericColumnDataTest {
         ClassificationPriors priors = targetData.getDistribution(rowWeights, config);
         SplitCandidate splitCandidate = columnData.calcBestSplitClassification(dataMemberships, priors, targetData, rd);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NumericMissingSplitCandidate.class));
+        assertTrue(splitCandidate instanceof NumericMissingSplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(0.42, splitCandidate.getGainValue(), 0.0001);
 
@@ -256,7 +254,7 @@ public class TreeNumericColumnDataTest {
         ClassificationPriors priors = targetData.getDistribution(rowWeights, config);
         SplitCandidate splitCandidate = columnData.calcBestSplitClassification(dataMemberships, priors, targetData, rd);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NumericSplitCandidate.class));
+        assertTrue(splitCandidate instanceof NumericSplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(/*0.21875 - 0.166666667 */0.05208, splitCandidate.getGainValue(), 0.001); // manually calculated
         NumericSplitCandidate numSplitCandidate = (NumericSplitCandidate)splitCandidate;
@@ -354,7 +352,7 @@ public class TreeNumericColumnDataTest {
         TreeNodeCondition[] firstConditions = firstSplit.getChildConditions();
         assertEquals(2, firstConditions.length);
         for (int i = 0; i < firstConditions.length; i++) {
-            assertThat(firstConditions[i], instanceOf(TreeNodeNumericCondition.class));
+            assertTrue(firstConditions[i] instanceof TreeNodeNumericCondition);
             TreeNodeNumericCondition numCond = (TreeNodeNumericCondition)firstConditions[i];
             assertEquals(1.5, numCond.getSplitValue(), 0);
         }
@@ -370,7 +368,7 @@ public class TreeNumericColumnDataTest {
         assertEquals(6.883555, secondSplit.getGainValue(), 1e-5);
         TreeNodeCondition[] secondConditions = secondSplit.getChildConditions();
         for (int i = 0; i < secondConditions.length; i++) {
-            assertThat(secondConditions[i], instanceOf(TreeNodeNumericCondition.class));
+            assertTrue(secondConditions[i] instanceof TreeNodeNumericCondition);
             TreeNodeNumericCondition numCond = (TreeNodeNumericCondition)secondConditions[i];
             assertEquals(6.5, numCond.getSplitValue(), 0);
         }
@@ -399,26 +397,26 @@ public class TreeNumericColumnDataTest {
         final TreeTargetNominalColumnData target1 = TestDataGenerator.createNominalTargetColumn(target1CSV);
         final SplitCandidate split1 =
             col.calcBestSplitClassification(dataMem, target1.getDistribution(weights, config), target1, rd);
-        assertEquals("Wrong gain.", expectedGain, split1.getGainValue(), 1e-8);
+        assertEquals(expectedGain, split1.getGainValue(), 1e-8, "Wrong gain.");
         final TreeNodeCondition[] childConds1 = split1.getChildConditions();
         final TreeNodeNumericCondition numCondLeft1 = (TreeNodeNumericCondition)childConds1[0];
-        assertEquals("Wrong split point.", 3.5, numCondLeft1.getSplitValue(), 1e-8);
-        assertTrue("Missings were not sent in the correct direction.", numCondLeft1.acceptsMissings());
+        assertEquals(3.5, numCondLeft1.getSplitValue(), 1e-8, "Wrong split point.");
+        assertTrue(numCondLeft1.acceptsMissings(), "Missings were not sent in the correct direction.");
         final TreeNodeNumericCondition numCondRight1 = (TreeNodeNumericCondition)childConds1[1];
-        assertEquals("Wrong split point.", 3.5, numCondRight1.getSplitValue(), 1e-8);
-        assertFalse("Missings were not sent in the correct direction.", numCondRight1.acceptsMissings());
+        assertEquals(3.5, numCondRight1.getSplitValue(), 1e-8, "Wrong split point.");
+        assertFalse(numCondRight1.acceptsMissings(), "Missings were not sent in the correct direction.");
 
         final TreeTargetNominalColumnData target2 = TestDataGenerator.createNominalTargetColumn(target2CSV);
         final SplitCandidate split2 =
             col.calcBestSplitClassification(dataMem, target2.getDistribution(weights, config), target2, rd);
-        assertEquals("Wrong gain.", expectedGain, split2.getGainValue(), 1e-8);
+        assertEquals(expectedGain, split2.getGainValue(), 1e-8, "Wrong gain.");
         final TreeNodeCondition[] childConds2 = split2.getChildConditions();
         final TreeNodeNumericCondition numCondLeft2 = (TreeNodeNumericCondition)childConds2[0];
-        assertEquals("Wrong split point.", 3.5, numCondLeft2.getSplitValue(), 1e-8);
-        assertFalse("Missings were not sent in the correct direction.", numCondLeft2.acceptsMissings());
+        assertEquals(3.5, numCondLeft2.getSplitValue(), 1e-8, "Wrong split point.");
+        assertFalse(numCondLeft2.acceptsMissings(), "Missings were not sent in the correct direction.");
         final TreeNodeNumericCondition numCondRight2 = (TreeNodeNumericCondition)childConds2[1];
-        assertEquals("Wrong split point.", 3.5, numCondRight2.getSplitValue(), 1e-8);
-        assertTrue("Missings were not sent in the correct direction.", numCondRight2.acceptsMissings());
+        assertEquals(3.5, numCondRight2.getSplitValue(), 1e-8, "Wrong split point.");
+        assertTrue(numCondRight2.acceptsMissings(), "Missings were not sent in the correct direction.");
     }
 
     /**
@@ -443,13 +441,13 @@ public class TreeNumericColumnDataTest {
         BitSet inChild = col.updateChildMemberships(numCond, dataMem);
         BitSet expected = new BitSet(3);
         expected.set(0, 3);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
         // greater than
         numCond = new TreeNodeNumericCondition(col.getMetaData(), 10, NumericOperator.LargerThan, false);
         inChild = col.updateChildMemberships(numCond, dataMem);
         expected.clear();
         expected.set(4, 7);
-        assertEquals("The produced BitSet is incorrect", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect");
 
         // with missing values
         final String missingsCSV = "-2, 0, 1, 43, 61, 66, NaN";
@@ -461,25 +459,25 @@ public class TreeNumericColumnDataTest {
         expected.clear();
         expected.set(0, 3);
         expected.set(6);
-        assertEquals("The produced BitSet is incorrect", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect");
         // less than or equals not missing
         numCond = new TreeNodeNumericCondition(colWithMissings.getMetaData(), 12, NumericOperator.LessThanOrEqual, false);
         inChild = colWithMissings.updateChildMemberships(numCond, dataMem);
         expected.clear();
         expected.set(0, 3);
-        assertEquals("The produced BitSet is incorrect", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect");
         // larger than or missing
         numCond = new TreeNodeNumericCondition(colWithMissings.getMetaData(), 43, NumericOperator.LargerThan, true);
         inChild = colWithMissings.updateChildMemberships(numCond, dataMem);
         expected.clear();
         expected.set(4, 7);
-        assertEquals("The produced BitSet is incorrect", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect");
         // larger than not missing
         numCond = new TreeNodeNumericCondition(colWithMissings.getMetaData(), 12, NumericOperator.LargerThan, false);
         inChild = colWithMissings.updateChildMemberships(numCond, dataMem);
         expected.clear();
         expected.set(3, 6);
-        assertEquals("The produced BitSet is incorrect", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect");
     }
 
 }

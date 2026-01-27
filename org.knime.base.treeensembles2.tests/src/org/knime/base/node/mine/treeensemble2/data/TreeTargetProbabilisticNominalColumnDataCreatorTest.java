@@ -48,12 +48,13 @@
  */
 package org.knime.base.node.mine.treeensemble2.data;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.def.DoubleCell;
@@ -80,7 +81,7 @@ public class TreeTargetProbabilisticNominalColumnDataCreatorTest {
         return FACTORY.createCell(ds, 1e-5);
     }
 
-    @Before
+    @BeforeEach
     public void init() {
         final DataColumnSpecCreator specCreator =
             new DataColumnSpecCreator("test", NominalDistributionCellFactory.TYPE);
@@ -101,10 +102,15 @@ public class TreeTargetProbabilisticNominalColumnDataCreatorTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testIncompatibleTypeInConstructor() throws Exception {
-        final DataColumnSpecCreator specCreator = new DataColumnSpecCreator("test", DoubleCell.TYPE);
-        new TreeTargetProbabilisticNominalColumnDataCreator(specCreator.createSpec());
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                final DataColumnSpecCreator specCreator = new DataColumnSpecCreator("test", DoubleCell.TYPE);
+                new TreeTargetProbabilisticNominalColumnDataCreator(specCreator.createSpec());
+            }
+        );
     }
 
 }

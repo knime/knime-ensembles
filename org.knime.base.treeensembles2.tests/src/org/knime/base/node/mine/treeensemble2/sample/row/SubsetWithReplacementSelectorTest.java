@@ -48,12 +48,11 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.row;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.number.OrderingComparison.lessThan;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.math.random.RandomData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TestDataGenerator;
 
 import com.google.common.collect.Lists;
@@ -73,12 +72,12 @@ public class SubsetWithReplacementSelectorTest {
         for (int i = 1; i < 20; i++) {
             SubsetWithReplacementRowSample sample = selector.select(rd, 20, i);
             int included = SamplerTestUtil.countRows(sample);
-            assertThat("Unexpected number of included rows", included, is(i));
+            assertEquals(i, included, "Unexpected number of included rows");
         }
 
         SubsetWithReplacementRowSample sample = selector.select(rd, 1000, 1000);
         int uniqueRows = SamplerTestUtil.countUniqueRows(sample);
-        assertThat("A bootstrap sample will usually contain about 63.2% of the rows.", uniqueRows, is(lessThan(700)));
+        assertTrue(uniqueRows < 700, "A bootstrap sample will usually contain about 63.2% of the rows.");
     }
 
 
@@ -91,8 +90,9 @@ public class SubsetWithReplacementSelectorTest {
         int[] offsets = new int[]{0, 7};
         SubsetWithReplacementRowSample combined =
             SubsetWithReplacementSelector.getInstance().combine(Lists.newArrayList(sample1, sample2), offsets, 15);
-        assertThat("Unexpected number of combined rows", SamplerTestUtil.countRows(combined),
-            is(SamplerTestUtil.countRows(sample1) + SamplerTestUtil.countRows(sample2)));
-        assertThat("Unexpected number of rows", combined.getNrRows(), is(15));
+        assertEquals(SamplerTestUtil.countRows(sample1) + SamplerTestUtil.countRows(sample2),
+            SamplerTestUtil.countRows(combined),
+            "A bootstrap sample will usually contain about 63.2% of the rows.");
+        assertEquals(15, combined.getNrRows(), "Unexpected number of rows");
     }
 }

@@ -48,10 +48,11 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.column;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.learner.TreeNodeSignatureFactory;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 
@@ -62,7 +63,8 @@ import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 public class SubsetColumnSampleStrategyTest extends AbstractColumnSampleTest {
 
     /**
-     * Tests the method {@link SubsetColumnSampleStrategy#getColumnSampleForTreeNode(org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature)}
+     * Tests the method {@link SubsetColumnSampleStrategy#getColumnSampleForTreeNode
+     * (org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature)}
      * also tests {@link SubsetColumnSample} since the both always act in combination.
      *
      * @throws Exception
@@ -73,23 +75,33 @@ public class SubsetColumnSampleStrategyTest extends AbstractColumnSampleTest {
         TreeNodeSignatureFactory sigFac = createSignatureFactory();
         TreeNodeSignature rootSig = sigFac.getRootSignature();
         ColumnSample sample = strategy.getColumnSampleForTreeNode(rootSig);
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         int[] colIndices = sample.getColumnIndices();
         sample = strategy.getColumnSampleForTreeNode(sigFac.getChildSignatureFor(rootSig, (byte)0));
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         assertArrayEquals(colIndices, sample.getColumnIndices());
         sample = strategy.getColumnSampleForTreeNode(sigFac.getChildSignatureFor(rootSig, (byte)1));
-        assertEquals("Wrong number of columns in sample.", 5, sample.getNumCols());
+        assertEquals(5, sample.getNumCols(), "Wrong number of columns in sample.");
         assertArrayEquals(colIndices, sample.getColumnIndices());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testSubsetSizeSmallerZero() throws Exception {
-        new SubsetColumnSampleStrategy(createTreeData(), RD, -32);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                new SubsetColumnSampleStrategy(createTreeData(), RD, -32);
+            }
+        );
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testSubsetSizeGreaterNumberColumns() throws Exception {
-        new SubsetColumnSampleStrategy(createTreeData(), RD, TREE_DATA_SIZE + 1);
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                new SubsetColumnSampleStrategy(createTreeData(), RD, TREE_DATA_SIZE + 1);
+            }
+        );
     }
 }

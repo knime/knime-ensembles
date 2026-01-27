@@ -48,14 +48,14 @@
  */
 package org.knime.base.node.mine.treeensemble2.data.memberships;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.BitSet;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class contains unit tests for the corresponding class IntArrayColumnMemberships
@@ -100,36 +100,36 @@ public class IntArrayColumnMembershipsTest {
         // iterate from start to end
         int i = 0;
         while (colMem.next()) {
-            assertEquals("Wrong index in column", COLUMN_INDICES[i], colMem.getIndexInColumn());
-            assertEquals("Wrong index in dataMemberships", DATAMEMBERSHIPS_INDICES[i], colMem.getIndexInDataMemberships());
-            assertEquals("Wrong original index", ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.getOriginalIndex());
-            assertEquals("Wrong rowWeight", WEIGHTS[DATAMEMBERSHIPS_INDICES[i++]], colMem.getRowWeight(), 0.0);
+            assertEquals(COLUMN_INDICES[i], colMem.getIndexInColumn(), "Wrong index in column");
+            assertEquals(DATAMEMBERSHIPS_INDICES[i], colMem.getIndexInDataMemberships(), "Wrong index in dataMemberships");
+            assertEquals(ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.getOriginalIndex(), "Wrong original index");
+            assertEquals(WEIGHTS[DATAMEMBERSHIPS_INDICES[i++]], colMem.getRowWeight(), 0.0, "Wrong rowWeight");
         }
-        assertEquals("Wrong number of records in column memberships", COLUMN_INDICES.length, i);
+        assertEquals(COLUMN_INDICES.length, i, "Wrong number of records in column memberships");
 
         // reset
         colMem.reset();
-        assertTrue("Reset unsuccessful", colMem.next());
-        assertEquals("ColumnMemberships at wrong position after reset", COLUMN_INDICES[0], colMem.getIndexInColumn());
+        assertTrue(colMem.next(), "Reset unsuccessful");
+        assertEquals(COLUMN_INDICES[0], colMem.getIndexInColumn(), "ColumnMemberships at wrong position after reset");
 
         // go to last valid position
         colMem.goToLast();
-        assertEquals("ColumnMemberships at wrong position after goToLast", COLUMN_INDICES[COLUMN_INDICES.length - 1], colMem.getIndexInColumn());
+        assertEquals(COLUMN_INDICES[COLUMN_INDICES.length - 1], colMem.getIndexInColumn(), "ColumnMemberships at wrong position after goToLast");
 
         // iterate from end to start
         i = COLUMN_INDICES.length - 1;
         do {
-            assertEquals("Wrong index in column", COLUMN_INDICES[i], colMem.getIndexInColumn());
-            assertEquals("Wrong index in dataMemberships", DATAMEMBERSHIPS_INDICES[i], colMem.getIndexInDataMemberships());
-            assertEquals("Wrong original index", ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.getOriginalIndex());
-            assertEquals("Wrong rowWeight", WEIGHTS[DATAMEMBERSHIPS_INDICES[i--]], colMem.getRowWeight(), 0.0);
+            assertEquals(COLUMN_INDICES[i], colMem.getIndexInColumn(), "Wrong index in column");
+            assertEquals(DATAMEMBERSHIPS_INDICES[i], colMem.getIndexInDataMemberships(), "Wrong index in dataMemberships");
+            assertEquals(ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.getOriginalIndex(), "Wrong original index");
+            assertEquals(WEIGHTS[DATAMEMBERSHIPS_INDICES[i--]], colMem.getRowWeight(), 0.0, "Wrong rowWeight");
         } while (colMem.previous());
 
         colMem.reset();
 
         // move to next index from index 7 in the column
         assertTrue(colMem.nextIndexFrom(7));
-        assertEquals("nextIndexFrom moved to the wrong position", 9, colMem.getIndexInColumn());
+        assertEquals(9, colMem.getIndexInColumn(), "nextIndexFrom moved to the wrong position");
     }
 
     /**
@@ -142,10 +142,10 @@ public class IntArrayColumnMembershipsTest {
         final DataMemberships dataMem = new MockDataMemberships(ORIGINAL_INDICES, WEIGHTS);
         final IntArrayColumnMemberships colMem = new IntArrayColumnMemberships(COLUMN_INDICES, DATAMEMBERSHIPS_INDICES, dataMem);
         for(int i = 0; i < WEIGHTS.length; i++) {
-            assertEquals("Wrong index in column", COLUMN_INDICES[i], colMem.descendantGetIndexInColumn(i));
-            assertEquals("Wrong index in dataMemberships", DATAMEMBERSHIPS_INDICES[i], colMem.descendantGetIndexInDataMemberships(i));
-            assertEquals("Wrong original index", ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.descendantGetIndexInOriginal(i));
-            assertEquals("Wrong weight", WEIGHTS[DATAMEMBERSHIPS_INDICES[i]], colMem.descendantGetRowWeight(i), 0.0);
+            assertEquals(COLUMN_INDICES[i], colMem.descendantGetIndexInColumn(i), "Wrong index in column");
+            assertEquals(DATAMEMBERSHIPS_INDICES[i], colMem.descendantGetIndexInDataMemberships(i), "Wrong index in dataMemberships");
+            assertEquals(ORIGINAL_INDICES[DATAMEMBERSHIPS_INDICES[i]], colMem.descendantGetIndexInOriginal(i), "Wrong original index");
+            assertEquals(WEIGHTS[DATAMEMBERSHIPS_INDICES[i]], colMem.descendantGetRowWeight(i), 0.0, "Wrong weight");
         }
     }
 
@@ -158,12 +158,12 @@ public class IntArrayColumnMembershipsTest {
     public void testSize() throws Exception {
         final DataMemberships dataMem = new MockDataMemberships(ORIGINAL_INDICES, WEIGHTS);
         final IntArrayColumnMemberships colMem = new IntArrayColumnMemberships(COLUMN_INDICES, DATAMEMBERSHIPS_INDICES, dataMem);
-        assertEquals("Wrong size returned", COLUMN_INDICES.length, colMem.size());
+        assertEquals(COLUMN_INDICES.length, colMem.size(), "Wrong size returned");
 
         final int[] indexInColumn = Arrays.copyOfRange(COLUMN_INDICES, 1, 3);
         final int[] indexInDataMemberships = Arrays.copyOfRange(indexInColumn, 1, 3);
         final IntArrayColumnMemberships smallerColMem = new IntArrayColumnMemberships(indexInColumn, indexInDataMemberships, dataMem);
-        assertEquals("Wrong size returned", 2, smallerColMem.size());
+        assertEquals(2, smallerColMem.size(), "Wrong size returned");
     }
 
     private static class MockDataMemberships implements DataMemberships {

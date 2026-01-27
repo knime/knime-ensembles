@@ -48,10 +48,10 @@
  */
 package org.knime.base.node.mine.treeensemble2.sample.column;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.learner.TreeNodeSignatureFactory;
 import org.knime.base.node.mine.treeensemble2.model.TreeNodeSignature;
 
@@ -73,7 +73,7 @@ public class AllColumnSampleStrategyTest extends AbstractColumnSampleTest {
         final TreeNodeSignatureFactory sigFac = createSignatureFactory();
         TreeNodeSignature rootSig = sigFac.getRootSignature();
         ColumnSample sample = allColStrategy.getColumnSampleForTreeNode(rootSig);
-        assertEquals("Wrong number of columns in sample.", TREE_DATA_SIZE, sample.getNumCols());
+        assertEquals(TREE_DATA_SIZE, sample.getNumCols(), "Wrong number of columns in sample.");
         int[] colIndices = new int[TREE_DATA_SIZE];
         for (int i = 0; i < colIndices.length; i++) {
             colIndices[i] = i;
@@ -82,7 +82,7 @@ public class AllColumnSampleStrategyTest extends AbstractColumnSampleTest {
 
         TreeNodeSignature childSig = sigFac.getChildSignatureFor(rootSig, (byte)0);
         sample = allColStrategy.getColumnSampleForTreeNode(childSig);
-        assertEquals("Wrong number of columns in sample.", TREE_DATA_SIZE, sample.getNumCols());
+        assertEquals(TREE_DATA_SIZE, sample.getNumCols(), "Wrong number of columns in sample.");
         assertArrayEquals(colIndices, sample.getColumnIndices());
     }
 

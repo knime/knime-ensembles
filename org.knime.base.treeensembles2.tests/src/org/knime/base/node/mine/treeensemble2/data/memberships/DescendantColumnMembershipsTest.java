@@ -48,12 +48,12 @@
  */
 package org.knime.base.node.mine.treeensemble2.data.memberships;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.BitSet;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class contains unit tests for the DescendantColumnMemberships
@@ -175,36 +175,36 @@ public class DescendantColumnMembershipsTest {
         // test iteration from start to end
         int i = 0;
         while (colMem.next()) {
-            assertEquals("column index did not match", COLUMN_INDEX[i], colMem.getIndexInColumn());
-            assertEquals("original index did not match", ORIGINAL_INDEX[i], colMem.getOriginalIndex());
-            assertEquals("DataMemberships index did not match", DATAMEM_INDEX[i], colMem.getIndexInDataMemberships());
-            assertEquals("Weight did not match", WEIGHTS[i++], colMem.getRowWeight(), 0.0);
+            assertEquals(COLUMN_INDEX[i], colMem.getIndexInColumn(), "column index did not match");
+            assertEquals(ORIGINAL_INDEX[i], colMem.getOriginalIndex(), "original index did not match");
+            assertEquals(DATAMEM_INDEX[i], colMem.getIndexInDataMemberships(), "DataMemberships index did not match");
+            assertEquals(WEIGHTS[i++], colMem.getRowWeight(), 0.0, "Weight did not match");
         }
 
         // test reset
         colMem.reset();
         colMem.next();
-        assertEquals("reset did not work", COLUMN_INDEX[0], colMem.getIndexInColumn());
+        assertEquals(COLUMN_INDEX[0], colMem.getIndexInColumn(), "reset did not work");
 
         // test goToLast
         colMem.goToLast();
-        assertEquals("goToLast did not work", COLUMN_INDEX[COLUMN_INDEX.length - 1], colMem.getIndexInColumn());
+        assertEquals(COLUMN_INDEX[COLUMN_INDEX.length - 1], colMem.getIndexInColumn(), "goToLast did not work");
 
         // test iteration from end to start
         i = COLUMN_INDEX.length - 1;
         do {
-            assertEquals("column index did not match", COLUMN_INDEX[i], colMem.getIndexInColumn());
-            assertEquals("original index did not match", ORIGINAL_INDEX[i], colMem.getOriginalIndex());
-            assertEquals("DataMemberships index did not match", DATAMEM_INDEX[i], colMem.getIndexInDataMemberships());
-            assertEquals("Weight did not match", WEIGHTS[i--], colMem.getRowWeight(), 0.0);
+            assertEquals(COLUMN_INDEX[i], colMem.getIndexInColumn(), "column index did not match");
+            assertEquals(ORIGINAL_INDEX[i], colMem.getOriginalIndex(), "original index did not match");
+            assertEquals(DATAMEM_INDEX[i], colMem.getIndexInDataMemberships(), "DataMemberships index did not match");
+            assertEquals(WEIGHTS[i--], colMem.getRowWeight(), 0.0, "Weight did not match");
         } while (colMem.previous());
 
         colMem.reset();
 
         // test nextIndexFrom
         colMem.nextIndexFrom(COLUMN_INDEX[COLUMN_INDEX.length / 2] + 1);
-        assertEquals("nextIndexFrom did not work.", COLUMN_INDEX[COLUMN_INDEX.length / 2 + 1],
-            colMem.getIndexInColumn());
+        assertEquals(COLUMN_INDEX[COLUMN_INDEX.length / 2 + 1],
+            colMem.getIndexInColumn(), "nextIndexFrom did not work.");
 
         assertFalse(colMem.nextIndexFrom(100));
     }
@@ -221,10 +221,10 @@ public class DescendantColumnMembershipsTest {
                 new MockIntArrayColumnMemberships(COLUMN_INDEX, DATAMEM_INDEX, WEIGHTS, ORIGINAL_INDEX, INTERNAL_INDEX);
             final DescendantColumnMemberships colMem =
                 new DescendantColumnMemberships(mockRootColMem, createIncludedBitSet());
-        assertEquals("Size does not work correctly.", included.cardinality(), colMem.size());
+        assertEquals(included.cardinality(), colMem.size(), "Size does not work correctly.");
         final BitSet smallerInc = (BitSet)included.clone();
         smallerInc.set(smallerInc.nextSetBit(0), false);
         final DescendantColumnMemberships smallerColMem = new DescendantColumnMemberships(mockRootColMem, smallerInc);
-        assertEquals("Size does not work correctly.", colMem.size() - 1, smallerColMem.size());
+        assertEquals(colMem.size() - 1, smallerColMem.size(), "Size does not work correctly.");
     }
 }

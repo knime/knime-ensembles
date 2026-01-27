@@ -48,12 +48,12 @@
  */
 package org.knime.base.node.mine.treeensemble2.data;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.BinaryNominalSplitsPCA;
 import org.knime.base.node.mine.treeensemble2.data.NominalValueRepresentation;
 import org.knime.base.node.mine.treeensemble2.data.BinaryNominalSplitsPCA.CombinedAttributeValues;

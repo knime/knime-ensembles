@@ -51,8 +51,8 @@ import java.math.BigInteger;
 import java.util.HashSet;
 
 import org.apache.commons.math.random.RandomDataImpl;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.TreeNominalColumnData.FullBinarySplitEnumeration;
 import org.knime.base.node.mine.treeensemble2.data.TreeNominalColumnData.RandomBinarySplitEnumeration;
 
@@ -83,13 +83,13 @@ public class RandomBinarySplitEnumerationTest {
         do {
             BigInteger valueMask = randomEnum.getValueMask();
             if (!allAvailableBS.remove(valueMask)) {
-                Assert.fail("value mask appeared twice: " + valueMask + " (this is iteration " + i + ".)");
+                Assertions.fail("value mask appeared twice: " + valueMask + " (this is iteration " + i + ".)");
             }
             i++;
         } while (randomEnum.next());
 
         if (!allAvailableBS.isEmpty()) {
-            Assert.fail("Some value masks not returned (" + allAvailableBS.size() + " left)");
+            Assertions.fail("Some value masks not returned (" + allAvailableBS.size() + " left)");
         }
     }
 

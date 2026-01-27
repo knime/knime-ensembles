@@ -48,18 +48,16 @@
  */
 package org.knime.base.node.mine.treeensemble2.model;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.decisiontree2.PMMLBooleanOperator;
 import org.knime.base.node.mine.decisiontree2.PMMLCompoundPredicate;
 import org.knime.base.node.mine.decisiontree2.PMMLOperator;
@@ -92,75 +90,76 @@ public class TreeNodeNominalBinaryConditionTest {
         final TreeEnsembleLearnerConfiguration config = new TreeEnsembleLearnerConfiguration(false);
         final TestDataGenerator dataGen = new TestDataGenerator(config);
         final TreeNominalColumnData col = dataGen.createNominalAttributeColumn("A,A,B,C,C,D", "testcol", 0);
-        TreeNodeNominalBinaryCondition cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(1), true, false);
+        TreeNodeNominalBinaryCondition cond =
+                new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(1), true, false);
         final Map<String, Object> map = Maps.newHashMap();
         final String colName = col.getMetaData().getAttributeName();
         map.put(colName, 0);
         PredictorRecord record = new PredictorRecord(map);
-        assertTrue("The value A was not accepted but should have been.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value A was not accepted but should have been.");
         map.clear();
         map.put(colName, 1);
-        assertFalse("The value B was falsely accepted", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value B was falsely accepted");
         map.clear();
         map.put(colName, 2);
-        assertFalse("The value C was falsely accepted", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value C was falsely accepted");
         map.clear();
         map.put(colName, 3);
-        assertFalse("The value D was falsely accepted", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value D was falsely accepted");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertFalse("The condition falsely accepted missing values", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The condition falsely accepted missing values");
 
         cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(5), true, true);
         map.clear();
         map.put(colName, 0);
-        assertTrue("The value A was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value A was falsely rejected.");
         map.clear();
         map.put(colName, 2);
-        assertTrue("The value C was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value C was falsely rejected.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertTrue("Missing values were falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "Missing values were falsely rejected.");
         map.clear();
         map.put(colName, 1);
-        assertFalse("The value B was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value B was falsely accepted.");
         map.clear();
         map.put(colName, 3);
-        assertFalse("The value B was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value B was falsely accepted.");
 
         cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(5), false, true);
         map.clear();
         map.put(colName, 0);
-        assertFalse("The value A was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value A was falsely accepted.");
         map.clear();
         map.put(colName, 2);
-        assertFalse("The value C was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value C was falsely accepted.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertTrue("Missing values were falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "Missing values were falsely rejected.");
         map.clear();
         map.put(colName, 1);
-        assertTrue("The value B was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value B was falsely rejected.");
         map.clear();
         map.put(colName, 3);
-        assertTrue("The value D was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value D was falsely rejected.");
 
         cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(5), false, false);
         map.clear();
         map.put(colName, 0);
-        assertFalse("The value A was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value A was falsely accepted.");
         map.clear();
         map.put(colName, 2);
-        assertFalse("The value C was falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "The value C was falsely accepted.");
         map.clear();
         map.put(colName, PredictorRecord.NULL);
-        assertFalse("Missing values were falsely accepted.", cond.testCondition(record));
+        assertFalse(cond.testCondition(record), "Missing values were falsely accepted.");
         map.clear();
         map.put(colName, 1);
-        assertTrue("The value B was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value B was falsely rejected.");
         map.clear();
         map.put(colName, 3);
-        assertTrue("The value D was falsely rejected.", cond.testCondition(record));
+        assertTrue(cond.testCondition(record), "The value D was falsely rejected.");
     }
 
     /**
@@ -174,29 +173,31 @@ public class TreeNodeNominalBinaryConditionTest {
         final TreeEnsembleLearnerConfiguration config = new TreeEnsembleLearnerConfiguration(false);
         final TestDataGenerator dataGen = new TestDataGenerator(config);
         final TreeNominalColumnData col = dataGen.createNominalAttributeColumn("A,A,B,C,C,D", "testcol", 0);
-        TreeNodeNominalBinaryCondition cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(1), true, false);
+        TreeNodeNominalBinaryCondition cond =
+                new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(1), true, false);
         PMMLPredicate predicate = cond.toPMMLPredicate();
-        assertThat(predicate, instanceOf(PMMLSimpleSetPredicate.class));
+        assertTrue(predicate instanceof PMMLSimpleSetPredicate);
         PMMLSimpleSetPredicate setPredicate = (PMMLSimpleSetPredicate)predicate;
-        assertEquals("Wrong attribute", col.getMetaData().getAttributeName(), setPredicate.getSplitAttribute());
-        assertEquals("Wrong set predicate", PMMLSetOperator.IS_IN, setPredicate.getSetOperator());
-        assertArrayEquals("Wrong values",new String[]{"A"}, setPredicate.getValues().toArray(new String[1]));
+        assertEquals(col.getMetaData().getAttributeName(), setPredicate.getSplitAttribute(), "Wrong attribute");
+        assertEquals(PMMLSetOperator.IS_IN, setPredicate.getSetOperator(), "Wrong set predicate");
+        assertArrayEquals(new String[]{"A"}, setPredicate.getValues().toArray(new String[1]), "Wrong values");
 
         cond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(2), false, true);
         predicate = cond.toPMMLPredicate();
-        assertEquals("Wrong attribute", col.getMetaData().getAttributeName(), predicate.getSplitAttribute());
-        assertThat(predicate, instanceOf(PMMLCompoundPredicate.class));
+        assertEquals(col.getMetaData().getAttributeName(), predicate.getSplitAttribute(), "Wrong attribute");
+        assertTrue(predicate instanceof PMMLCompoundPredicate);
         PMMLCompoundPredicate compoundPredicate = (PMMLCompoundPredicate)predicate;
-        assertEquals("Wrong boolean operator", PMMLBooleanOperator.OR, compoundPredicate.getBooleanOperator());
+        assertEquals(PMMLBooleanOperator.OR, compoundPredicate.getBooleanOperator(), "Wrong boolean operator");
         LinkedList<PMMLPredicate>preds = compoundPredicate.getPredicates();
-        assertEquals("Number of predicates did not match.", 2, preds.size());
-        assertThat(preds.get(0), instanceOf(PMMLSimpleSetPredicate.class));
+        assertEquals(2, preds.size(), "Number of predicates did not match.");
+        assertTrue(preds.get(0) instanceof PMMLSimpleSetPredicate);
         setPredicate = (PMMLSimpleSetPredicate)preds.get(0);
-        assertEquals("Wrong attribute", col.getMetaData().getAttributeName(), setPredicate.getSplitAttribute());
-        assertEquals("Wrong set predicate", PMMLSetOperator.IS_NOT_IN, setPredicate.getSetOperator());
-        assertArrayEquals("Wrong values", new String[]{"B"}, setPredicate.getValues().toArray(new String[1]));
-        assertThat(preds.get(1), instanceOf(PMMLSimplePredicate.class));
+        assertEquals(col.getMetaData().getAttributeName(), setPredicate.getSplitAttribute(),
+            "Attribute name did not match.");
+        assertEquals(PMMLSetOperator.IS_NOT_IN, setPredicate.getSetOperator(), "Wrong set predicate");
+        assertArrayEquals(new String[]{"B"}, setPredicate.getValues().toArray(new String[1]), "Wrong values");
+        assertTrue(preds.get(1) instanceof PMMLSimplePredicate);
         PMMLSimplePredicate simplePredicate = (PMMLSimplePredicate)preds.get(1);
-        assertEquals("Should be isMissing",PMMLOperator.IS_MISSING, simplePredicate.getOperator());
+        assertEquals(PMMLOperator.IS_MISSING, simplePredicate.getOperator(), "Should be isMissing");
     }
 }

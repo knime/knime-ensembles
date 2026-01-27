@@ -48,12 +48,13 @@
  */
 package org.knime.base.node.mine.treeensemble2.data.memberships;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -85,13 +86,17 @@ public class ByteWeightContainerTest {
         assertArrayEquals(expected, bwc.getAllWeights(), 1e-8);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testTooLargeCounts() throws Exception {
-        new ByteWeightContainer(Lists.newArrayList(1, 256));
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ByteWeightContainer(Lists.newArrayList(1, 256));
+        });
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test
     public void testCountSmallerZero() throws Exception {
-        new ByteWeightContainer(Lists.newArrayList(1, 3, -1));
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ByteWeightContainer(Lists.newArrayList(1, 3, -1));
+        });
     }
 }

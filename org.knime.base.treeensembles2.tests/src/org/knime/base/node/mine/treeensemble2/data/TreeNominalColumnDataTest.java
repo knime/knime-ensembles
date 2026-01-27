@@ -48,21 +48,19 @@
  */
 package org.knime.base.node.mine.treeensemble2.data;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.BitSet;
 
 import org.apache.commons.math.random.RandomData;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.knime.base.node.mine.treeensemble2.data.memberships.DataMemberships;
 import org.knime.base.node.mine.treeensemble2.data.memberships.DefaultDataIndexManager;
 import org.knime.base.node.mine.treeensemble2.data.memberships.IDataIndexManager;
@@ -265,7 +263,7 @@ public class TreeNominalColumnDataTest {
         SplitCandidate splitCandidate =
             columnData.calcBestSplitClassification(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalBinarySplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(0.1371428, splitCandidate.getGainValue(), 0.00001); // manually via open office calc
         NominalBinarySplitCandidate binSplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
@@ -304,7 +302,7 @@ public class TreeNominalColumnDataTest {
         RandomData rd = TestDataGenerator.createRandomData();
         SplitCandidate splitCandidate = columnData.calcBestSplitClassification(dataMemberships, priors, targetData, rd);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalBinarySplitCandidate);
         NominalBinarySplitCandidate binarySplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
         TreeNodeNominalBinaryCondition[] childConditions = binarySplitCandidate.getChildConditions();
         assertEquals(2, childConditions.length);
@@ -325,15 +323,15 @@ public class TreeNominalColumnDataTest {
         splitCandidate = columnData.calcBestSplitClassification(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
         binarySplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
-        assertEquals("Gain was not as expected", 0.08, binarySplitCandidate.getGainValue(), 1e-8);
+        assertEquals(0.08, binarySplitCandidate.getGainValue(), 1e-8, "Gain was not as expected");
         childConditions = binarySplitCandidate.getChildConditions();
         String[] conditionValues = new String[]{"O", "?"};
-        assertArrayEquals("Values in nominal condition did not match", conditionValues, childConditions[0].getValues());
-        assertArrayEquals("Values in nominal condition did not match", conditionValues, childConditions[1].getValues());
-        assertEquals("Wrong set logic.", SetLogic.IS_NOT_IN, childConditions[0].getSetLogic());
-        assertEquals("Wrong set logic.", SetLogic.IS_IN, childConditions[1].getSetLogic());
-        assertFalse("Missig values are not sent to the correct child.", childConditions[0].acceptsMissings());
-        assertTrue("Missig values are not sent to the correct child.", childConditions[1].acceptsMissings());
+        assertArrayEquals(conditionValues, childConditions[0].getValues(), "Values in nominal condition did not match");
+        assertArrayEquals(conditionValues, childConditions[1].getValues(), "Values in nominal condition did not match");
+        assertEquals(SetLogic.IS_NOT_IN, childConditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, childConditions[1].getSetLogic(), "Wrong set logic.");
+        assertFalse(childConditions[0].acceptsMissings(), "Missig values are not sent to the correct child.");
+        assertTrue(childConditions[1].acceptsMissings(), "Missig values are not sent to the correct child.");
     }
 
     /**
@@ -361,17 +359,17 @@ public class TreeNominalColumnDataTest {
         final DataMemberships dataMem = new MockDataColMem(originalIndex, columnIndex, rowWeights);
         final SplitCandidate split = columnData.calcBestSplitClassification(dataMem,
             target.getDistribution(rowWeights, config), target, TestDataGenerator.createRandomData());
-        assertThat(split, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(split instanceof NominalBinarySplitCandidate);
         final NominalBinarySplitCandidate nomSplit = (NominalBinarySplitCandidate)split;
         TreeNodeNominalBinaryCondition[] childConditions = nomSplit.getChildConditions();
-        assertEquals("Wrong gain value.", 0.18, nomSplit.getGainValue(), 1e-8);
+        assertEquals(0.18, nomSplit.getGainValue(), 1e-8, "Wrong gain value.");
         final String[] conditionValues = new String[]{"S", "R"};
-        assertArrayEquals("Values in nominal condition did not match", conditionValues, childConditions[0].getValues());
-        assertArrayEquals("Values in nominal condition did not match", conditionValues, childConditions[1].getValues());
-        assertEquals("Wrong set logic.", SetLogic.IS_NOT_IN, childConditions[0].getSetLogic());
-        assertEquals("Wrong set logic.", SetLogic.IS_IN, childConditions[1].getSetLogic());
-        assertTrue("Missing values are not sent to the correct child.", childConditions[0].acceptsMissings());
-        assertFalse("Missing values are not sent to the correct child.", childConditions[1].acceptsMissings());
+        assertArrayEquals(conditionValues, childConditions[0].getValues(), "Values in nominal condition did not match");
+        assertArrayEquals(conditionValues, childConditions[1].getValues(), "Values in nominal condition did not match");
+        assertEquals(SetLogic.IS_NOT_IN, childConditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, childConditions[1].getSetLogic(), "Wrong set logic.");
+        assertTrue(childConditions[0].acceptsMissings(), "Missing values are not sent to the correct child.");
+        assertFalse(childConditions[1].acceptsMissings(), "Missing values are not sent to the correct child.");
     }
 
     /**
@@ -397,7 +395,7 @@ public class TreeNominalColumnDataTest {
         SplitCandidate splitCandidate =
             columnData.calcBestSplitClassification(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalBinarySplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(0.0689342404, splitCandidate.getGainValue(), 0.00001); // manually via libre office calc
         NominalBinarySplitCandidate binSplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
@@ -415,7 +413,7 @@ public class TreeNominalColumnDataTest {
             columnData.calcBestSplitClassification(child1Memberships, childTargetPriors, targetData, null);
 
         assertNotNull(splitCandidateChild);
-        assertThat(splitCandidateChild, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidateChild instanceof NominalBinarySplitCandidate);
         assertEquals(0.0086419753, splitCandidateChild.getGainValue(), 0.00001); // manually via libre office calc
 
         inChild = columnData.updateChildMemberships(childConditions[1], dataMemberships);
@@ -450,7 +448,7 @@ public class TreeNominalColumnDataTest {
         SplitCandidate splitCandidate =
             columnData.calcBestSplitClassification(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalBinarySplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(0.0659, splitCandidate.getGainValue(), 0.0001);
         NominalBinarySplitCandidate binarySplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
@@ -480,20 +478,20 @@ public class TreeNominalColumnDataTest {
         TreeTargetNominalColumnData targetCol = TestDataGenerator.createNominalTargetColumn(noMissingTarget);
         DataMemberships dataMem = createMockDataMemberships(targetCol.getNrRows());
         SplitCandidate split = dataCol.calcBestSplitClassification(dataMem, targetCol.getDistribution(dataMem, config), targetCol, rd);
-        assertNotNull("There is a possible split.", split);
-        assertEquals("Incorrect gain.", 0.2086, split.getGainValue(), 1e-3);
-        assertThat(split, instanceOf(NominalBinarySplitCandidate.class));
+        assertNotNull(split, "There is a possible split.");
+        assertEquals(0.2086, split.getGainValue(), 1e-3, "Incorrect gain.");
+        assertTrue(split instanceof NominalBinarySplitCandidate);
         NominalBinarySplitCandidate nomSplit = (NominalBinarySplitCandidate)split;
-        assertTrue("No missing values in the column.", nomSplit.getMissedRows().isEmpty());
+        assertTrue(nomSplit.getMissedRows().isEmpty(), "No missing values in the column.");
         TreeNodeNominalBinaryCondition[] conditions = nomSplit.getChildConditions();
-        assertEquals("A binary split must have 2 child conditions.", 2, conditions.length);
+        assertEquals(2, conditions.length, "A binary split must have 2 child conditions.");
         String[] values = new String[]{"a", "c"};
-        assertArrayEquals("Wrong values in child condition.", values, conditions[0].getValues());
-        assertArrayEquals("Wrong values in child condition.", values, conditions[1].getValues());
-        assertEquals("Wrong set logic.",SetLogic.IS_NOT_IN, conditions[0].getSetLogic());
-        assertEquals("Wrong set logic.",SetLogic.IS_IN, conditions[1].getSetLogic());
-        assertFalse("Missing values should be sent to the majority child (i.e. right)", conditions[0].acceptsMissings());
-        assertTrue("Missing values should be sent to the majority child (i.e. right)", conditions[1].acceptsMissings());
+        assertArrayEquals(values, conditions[0].getValues(), "Wrong values in child condition.");
+        assertArrayEquals(values, conditions[1].getValues(), "Wrong values in child condition.");
+        assertEquals(SetLogic.IS_NOT_IN, conditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, conditions[1].getSetLogic(), "Wrong set logic.");
+        assertFalse(conditions[0].acceptsMissings(), "Missing values should be sent to the majority child (i.e. right)");
+        assertTrue(conditions[1].acceptsMissings(), "Missing values should be sent to the majority child (i.e. right)");
 
         // test the case that there are missing values in the training data
         final String missingCSV =    "a, a, a, b, b, b, b, c, c, ?";
@@ -502,19 +500,19 @@ public class TreeNominalColumnDataTest {
         targetCol = TestDataGenerator.createNominalTargetColumn(missingTarget);
         dataMem = createMockDataMemberships(targetCol.getNrRows());
         split = dataCol.calcBestSplitClassification(dataMem, targetCol.getDistribution(dataMem, config), targetCol, rd);
-        assertNotNull("There is a possible split.", split);
-        assertEquals("Incorrect gain.", 0.24, split.getGainValue(), 1e-3);
-        assertThat(split, instanceOf(NominalBinarySplitCandidate.class));
+        assertNotNull(split, "There is a possible split.");
+        assertEquals(0.24, split.getGainValue(), 1e-3, "Incorrect gain.");
+        assertTrue(split instanceof NominalBinarySplitCandidate);
         nomSplit = (NominalBinarySplitCandidate)split;
-        assertTrue("Split should handle missing values.", nomSplit.getMissedRows().isEmpty());
+        assertTrue(nomSplit.getMissedRows().isEmpty(), "Split should handle missing values.");
         conditions = nomSplit.getChildConditions();
-        assertEquals("Wrong number of child conditions.", 2, conditions.length);
-        assertArrayEquals("Wrong values in child condition.", values, conditions[0].getValues());
-        assertArrayEquals("Wrong values in child condition.", values, conditions[1].getValues());
-        assertEquals("Wrong set logic.",SetLogic.IS_NOT_IN, conditions[0].getSetLogic());
-        assertEquals("Wrong set logic.",SetLogic.IS_IN, conditions[1].getSetLogic());
-        assertTrue("Missing values should be sent to left child", conditions[0].acceptsMissings());
-        assertFalse("Missing values should be sent to left child", conditions[1].acceptsMissings());
+        assertEquals(2, conditions.length, "Wrong number of child conditions.");
+        assertArrayEquals(values, conditions[0].getValues(), "Wrong values in child condition.");
+        assertArrayEquals(values, conditions[1].getValues(), "Wrong values in child condition.");
+        assertEquals(SetLogic.IS_NOT_IN, conditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, conditions[1].getSetLogic(), "Wrong set logic.");
+        assertTrue(conditions[0].acceptsMissings(), "Missing values should be sent to left child");
+        assertFalse(conditions[1].acceptsMissings(), "Missing values should be sent to left child");
     }
 
     /**
@@ -541,7 +539,7 @@ public class TreeNominalColumnDataTest {
         SplitCandidate splitCandidate =
             columnData.calcBestSplitClassification(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalMultiwaySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalMultiwaySplitCandidate);
         assertFalse(splitCandidate.canColumnBeSplitFurther());
         assertEquals(0.0744897959, splitCandidate.getGainValue(), 0.00001); // manually via libre office calc
         NominalMultiwaySplitCandidate multiWaySplitCandidate = (NominalMultiwaySplitCandidate)splitCandidate;
@@ -571,19 +569,19 @@ public class TreeNominalColumnDataTest {
         TreeTargetNominalColumnData targetCol = TestDataGenerator.createNominalTargetColumn(noMissingTarget);
         DataMemberships dataMem = createMockDataMemberships(targetCol.getNrRows());
         SplitCandidate split = dataCol.calcBestSplitClassification(dataMem, targetCol.getDistribution(dataMem, config), targetCol, rd);
-        assertNotNull("There is a possible split.", split);
-        assertEquals("Incorrect gain.", 0.216, split.getGainValue(), 1e-3);
-        assertThat(split, instanceOf(NominalMultiwaySplitCandidate.class));
+        assertNotNull(split, "There is a possible split.");
+        assertEquals(0.216, split.getGainValue(), 1e-3, "Incorrect gain.");
+        assertTrue(split instanceof NominalMultiwaySplitCandidate);
         NominalMultiwaySplitCandidate nomSplit = (NominalMultiwaySplitCandidate)split;
-        assertTrue("No missing values in the column.", nomSplit.getMissedRows().isEmpty());
+        assertTrue(nomSplit.getMissedRows().isEmpty(), "No missing values in the column.");
         TreeNodeNominalCondition[] conditions = nomSplit.getChildConditions();
-        assertEquals("Wrong number of child conditions.", 3, conditions.length);
-        assertEquals("Wrong value in child condition.", "a", conditions[0].getValue());
-        assertEquals("Wrong value in child condition.", "b", conditions[1].getValue());
-        assertEquals("Wrong value in child condition.", "c", conditions[2].getValue());
-        assertFalse("Missing values should be sent to the majority child (i.e. b)", conditions[0].acceptsMissings());
-        assertTrue("Missing values should be sent to the majority child (i.e. b)", conditions[1].acceptsMissings());
-        assertFalse("Missing values should be sent to the majority child (i.e. b)", conditions[2].acceptsMissings());
+        assertEquals(3, conditions.length, "Wrong number of child conditions.");
+        assertEquals("a", conditions[0].getValue(), "Wrong value in child condition.");
+        assertEquals("b", conditions[1].getValue(), "Wrong value in child condition.");
+        assertEquals("c", conditions[2].getValue(), "Wrong value in child condition.");
+        assertFalse(conditions[0].acceptsMissings(), "Missing values should be sent to the majority child (i.e. b)");
+        assertTrue(conditions[1].acceptsMissings(), "Missing values should be sent to the majority child (i.e. b)");
+        assertFalse(conditions[2].acceptsMissings(), "Missing values should be sent to the majority child (i.e. b)");
 
         // test the case that there are missing values in the training data
         final String missingCSV =    "a, a, a, b, b, b, b, c, c, ?";
@@ -592,19 +590,19 @@ public class TreeNominalColumnDataTest {
         targetCol = TestDataGenerator.createNominalTargetColumn(missingTarget);
         dataMem = createMockDataMemberships(targetCol.getNrRows());
         split = dataCol.calcBestSplitClassification(dataMem, targetCol.getDistribution(dataMem, config), targetCol, rd);
-        assertNotNull("There is a possible split.", split);
-        assertEquals("Incorrect gain.", 0.2467, split.getGainValue(), 1e-3);
-        assertThat(split, instanceOf(NominalMultiwaySplitCandidate.class));
+        assertNotNull(split, "There is a possible split.");
+        assertEquals(0.2467, split.getGainValue(), 1e-3, "Incorrect gain.");
+        assertTrue(split instanceof NominalMultiwaySplitCandidate);
         nomSplit = (NominalMultiwaySplitCandidate)split;
-        assertTrue("Split should handle missing values.", nomSplit.getMissedRows().isEmpty());
+        assertTrue(nomSplit.getMissedRows().isEmpty(), "Split should handle missing values.");
         conditions = nomSplit.getChildConditions();
-        assertEquals("Wrong number of child conditions.", 3, conditions.length);
-        assertEquals("Wrong value in child condition.", "a", conditions[0].getValue());
-        assertEquals("Wrong value in child condition.", "b", conditions[1].getValue());
-        assertEquals("Wrong value in child condition.", "c", conditions[2].getValue());
-        assertFalse("Missing values should be sent to b", conditions[0].acceptsMissings());
-        assertTrue("Missing values should be sent to b", conditions[1].acceptsMissings());
-        assertFalse("Missing values should be sent to b", conditions[2].acceptsMissings());
+        assertEquals(3, conditions.length, "Wrong number of child conditions.");
+        assertEquals("a", conditions[0].getValue(), "Wrong value in child condition.");
+        assertEquals("b", conditions[1].getValue(), "Wrong value in child condition.");
+        assertEquals("c", conditions[2].getValue(), "Wrong value in child condition.");
+        assertFalse(conditions[0].acceptsMissings(), "Missing values should be sent to b");
+        assertTrue(conditions[1].acceptsMissings(), "Missing values should be sent to b");
+        assertFalse(conditions[2].acceptsMissings(), "Missing values should be sent to b");
     }
 
 
@@ -629,7 +627,7 @@ public class TreeNominalColumnDataTest {
         RegressionPriors priors = targetData.getPriors(rowWeights, config);
         SplitCandidate splitCandidate = columnData.calcBestSplitRegression(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalBinarySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalBinarySplitCandidate);
         assertTrue(splitCandidate.canColumnBeSplitFurther());
         assertEquals(32.9143, splitCandidate.getGainValue(), 0.0001);
         NominalBinarySplitCandidate binarySplitCandidate = (NominalBinarySplitCandidate)splitCandidate;
@@ -665,20 +663,20 @@ public class TreeNominalColumnDataTest {
         DataMemberships dataMemberships = new MockDataColMem(indices, indices, weights);
         // first test the case that there are no missing values during training (we still need to provide a missing value direction for prediction)
         SplitCandidate split = dataCol.calcBestSplitRegression(dataMemberships, targetCol.getPriors(weights, config), targetCol, rd);
-        assertNotNull("SplitCandidate may not be null", split);
-        assertThat(split, instanceOf(NominalBinarySplitCandidate.class));
-        assertEquals("Wrong gain.", 22.755555, split.getGainValue(), 1e-5);
-        assertTrue("No missing values in dataCol therefore the missedRows BitSet must be empty.", split.getMissedRows().isEmpty());
+        assertNotNull(split, "SplitCandidate may not be null");
+        assertTrue(split instanceof NominalBinarySplitCandidate);
+        assertEquals(22.755555, split.getGainValue(), 1e-5, "Wrong gain.");
+        assertTrue(split.getMissedRows().isEmpty(), "No missing values in dataCol therefore the missedRows BitSet must be empty.");
         NominalBinarySplitCandidate nomSplit = (NominalBinarySplitCandidate)split;
         TreeNodeNominalBinaryCondition[] conditions = nomSplit.getChildConditions();
-        assertEquals("Binary split candidate must have two children.", 2, conditions.length);
+        assertEquals(2, conditions.length, "Binary split candidate must have two children.");
         final String[] values = new String[]{"A", "C"};
-        assertArrayEquals("Wrong values in split condition.",values, conditions[0].getValues());
-        assertArrayEquals("Wrong values in split condition.",values, conditions[1].getValues());
-        assertFalse("Missings should go with majority", conditions[0].acceptsMissings());
-        assertTrue("Missings should go with majority", conditions[1].acceptsMissings());
-        assertEquals("Wrong set logic.", SetLogic.IS_NOT_IN, conditions[0].getSetLogic());
-        assertEquals("Wrong set logic.", SetLogic.IS_IN, conditions[1].getSetLogic());
+        assertArrayEquals(values, conditions[0].getValues(), "Wrong values in split condition.");
+        assertArrayEquals(values, conditions[1].getValues(), "Wrong values in split condition.");
+        assertFalse(conditions[0].acceptsMissings(), "Missings should go with majority");
+        assertTrue(conditions[1].acceptsMissings(), "Missings should go with majority");
+        assertEquals(SetLogic.IS_NOT_IN, conditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, conditions[1].getSetLogic(), "Wrong set logic.");
 
         // test the case that there are missing values during training
         final String missingCSV =    "A, A, A, B, B, B, B, C, C, ?";
@@ -693,19 +691,19 @@ public class TreeNominalColumnDataTest {
         }
         dataMemberships = new MockDataColMem(indices, indices, weights);
         split = dataCol.calcBestSplitRegression(dataMemberships, targetCol.getPriors(weights, config), targetCol, rd);
-        assertNotNull("SplitCandidate may not be null.", split);
-        assertThat(split, instanceOf(NominalBinarySplitCandidate.class));
-        assertEquals("Wrong gain.", 36.1, split.getGainValue(), 1e-5);
-        assertTrue("Conditions should handle missing values therefore the missedRows BitSet must be empty.", split.getMissedRows().isEmpty());
+        assertNotNull(split, "SplitCandidate may not be null.");
+        assertTrue(split instanceof NominalBinarySplitCandidate);
+        assertEquals(36.1, split.getGainValue(), 1e-5, "Wrong gain.");
+        assertTrue(split.getMissedRows().isEmpty(), "Conditions should handle missing values therefore the missedRows BitSet must be empty.");
         nomSplit = (NominalBinarySplitCandidate)split;
         conditions = nomSplit.getChildConditions();
-        assertEquals("Binary split candidate must have two children.", 2, conditions.length);
-        assertArrayEquals("Wrong values in split condition.",values, conditions[0].getValues());
-        assertArrayEquals("Wrong values in split condition.",values, conditions[1].getValues());
-        assertTrue("Missings should go with B (because there target values are similar)", conditions[0].acceptsMissings());
-        assertFalse("Missings should go with B (because there target values are similar)", conditions[1].acceptsMissings());
-        assertEquals("Wrong set logic.", SetLogic.IS_NOT_IN, conditions[0].getSetLogic());
-        assertEquals("Wrong set logic.", SetLogic.IS_IN, conditions[1].getSetLogic());
+        assertEquals(2, conditions.length, "Binary split candidate must have two children.");
+        assertArrayEquals(values, conditions[0].getValues(), "Wrong values in split condition.");
+        assertArrayEquals(values, conditions[1].getValues(), "Wrong values in split condition.");
+        assertTrue(conditions[0].acceptsMissings(), "Missings should go with B (because there target values are similar)");
+        assertFalse(conditions[1].acceptsMissings(), "Missings should go with B (because there target values are similar)");
+        assertEquals(SetLogic.IS_NOT_IN, conditions[0].getSetLogic(), "Wrong set logic.");
+        assertEquals(SetLogic.IS_IN, conditions[1].getSetLogic(), "Wrong set logic.");
     }
 
     /**
@@ -730,7 +728,7 @@ public class TreeNominalColumnDataTest {
         RegressionPriors priors = targetData.getPriors(rowWeights, config);
         SplitCandidate splitCandidate = columnData.calcBestSplitRegression(dataMemberships, priors, targetData, null);
         assertNotNull(splitCandidate);
-        assertThat(splitCandidate, instanceOf(NominalMultiwaySplitCandidate.class));
+        assertTrue(splitCandidate instanceof NominalMultiwaySplitCandidate);
         assertFalse(splitCandidate.canColumnBeSplitFurther());
         assertEquals(36.9643, splitCandidate.getGainValue(), 0.0001);
         NominalMultiwaySplitCandidate multiwaySplitCandidate = (NominalMultiwaySplitCandidate)splitCandidate;
@@ -766,19 +764,19 @@ public class TreeNominalColumnDataTest {
         DataMemberships dataMemberships = new MockDataColMem(indices, indices, weights);
         // first test the case that there are no missing values during training (we still need to provide a missing value direction for prediction)
         SplitCandidate split = dataCol.calcBestSplitRegression(dataMemberships, targetCol.getPriors(weights, config), targetCol, rd);
-        assertNotNull("SplitCandidate may not be null", split);
-        assertThat(split, instanceOf(NominalMultiwaySplitCandidate.class));
-        assertEquals("Wrong gain.", 22.888888, split.getGainValue(), 1e-5);
-        assertTrue("No missing values in dataCol therefore the missedRows BitSet must be empty.", split.getMissedRows().isEmpty());
+        assertNotNull(split, "SplitCandidate may not be null");
+        assertTrue(split instanceof NominalMultiwaySplitCandidate);
+        assertEquals(22.888888, split.getGainValue(), 1e-5, "Wrong gain.");
+        assertTrue(split.getMissedRows().isEmpty(), "No missing values in dataCol therefore the missedRows BitSet must be empty.");
         NominalMultiwaySplitCandidate nomSplit = (NominalMultiwaySplitCandidate)split;
         TreeNodeNominalCondition[] conditions = nomSplit.getChildConditions();
-        assertEquals("3 nominal values therefore there must be 3 children.", 3, conditions.length);
-        assertEquals("Wrong value.", "A", conditions[0].getValue());
-        assertEquals("Wrong value.", "B", conditions[1].getValue());
-        assertEquals("Wrong value.", "C", conditions[2].getValue());
-        assertFalse("Missings should go with majority", conditions[0].acceptsMissings());
-        assertTrue("Missings should go with majority", conditions[1].acceptsMissings());
-        assertFalse("Missings should go with majority", conditions[2].acceptsMissings());
+        assertEquals(3, conditions.length, "3 nominal values therefore there must be 3 children.");
+        assertEquals("A", conditions[0].getValue(), "Wrong value.");
+        assertEquals("B", conditions[1].getValue(), "Wrong value.");
+        assertEquals("C", conditions[2].getValue(), "Wrong value.");
+        assertFalse(conditions[0].acceptsMissings(), "Missings should go with majority");
+        assertTrue(conditions[1].acceptsMissings(), "Missings should go with majority");
+        assertFalse(conditions[2].acceptsMissings(), "Missings should go with majority");
 
         // test the case that there are missing values during training
         final String missingCSV =    "A, A, A, B, B, B, B, C, C, ?";
@@ -793,19 +791,19 @@ public class TreeNominalColumnDataTest {
         }
         dataMemberships = new MockDataColMem(indices, indices, weights);
         split = dataCol.calcBestSplitRegression(dataMemberships, targetCol.getPriors(weights, config), targetCol, rd);
-        assertNotNull("SplitCandidate may not be null.", split);
-        assertThat(split, instanceOf(NominalMultiwaySplitCandidate.class));
+        assertNotNull(split, "SplitCandidate may not be null.");
+        assertTrue(split instanceof NominalMultiwaySplitCandidate);
 //        assertEquals("Wrong gain.", 36.233333333, split.getGainValue(), 1e-5);
-        assertTrue("Conditions should handle missing values therefore the missedRows BitSet must be empty.", split.getMissedRows().isEmpty());
+        assertTrue(split.getMissedRows().isEmpty(), "Conditions should handle missing values therefore the missedRows BitSet must be empty.");
         nomSplit = (NominalMultiwaySplitCandidate)split;
         conditions = nomSplit.getChildConditions();
-        assertEquals("3 values (not counting missing values) therefore there must be 3 children.", 3, conditions.length);
-        assertEquals("Wrong value.", "A", conditions[0].getValue());
-        assertEquals("Wrong value.", "B", conditions[1].getValue());
-        assertEquals("Wrong value.", "C", conditions[2].getValue());
-        assertFalse("Missings should go with majority", conditions[0].acceptsMissings());
-        assertTrue("Missings should go with majority", conditions[1].acceptsMissings());
-        assertFalse("Missings should go with majority", conditions[2].acceptsMissings());
+        assertEquals(3, conditions.length, "3 values (not counting missing values) therefore there must be 3 children.");
+        assertEquals("A", conditions[0].getValue(), "Wrong value.");
+        assertEquals("B", conditions[1].getValue(), "Wrong value.");
+        assertEquals("C", conditions[2].getValue(), "Wrong value.");
+        assertFalse(conditions[0].acceptsMissings(), "Missings should go with majority");
+        assertTrue(conditions[1].acceptsMissings(), "Missings should go with majority");
+        assertFalse(conditions[2].acceptsMissings(), "Missings should go with majority");
     }
 
     /**
@@ -834,67 +832,67 @@ public class TreeNominalColumnDataTest {
         BitSet expected = new BitSet(12);
         BitSet inChild = col.updateChildMemberships(binCond, dataMem);
         expected.set(4, 7);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         binCond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(2), true, true);
         expected.clear();
         expected.set(4, 7);
         expected.set(10, 12);
         inChild = col.updateChildMemberships(binCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         binCond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(2), false, false);
         expected.clear();
         expected.set(0, 4);
         expected.set(7, 10);
         inChild = col.updateChildMemberships(binCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         binCond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(2), false, true);
         expected.clear();
         expected.set(0, 4);
         expected.set(7, 12);
         inChild = col.updateChildMemberships(binCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         binCond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(5), true, false);
         expected.clear();
         expected.set(0, 4);
         expected.set(7, 10);
         inChild = col.updateChildMemberships(binCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         binCond = new TreeNodeNominalBinaryCondition(col.getMetaData(), BigInteger.valueOf(5), true, true);
         expected.clear();
         expected.set(0, 4);
         expected.set(7, 12);
         inChild = col.updateChildMemberships(binCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         TreeNodeNominalCondition multiCond = new TreeNodeNominalCondition(col.getMetaData(), 0, false);
         expected.clear();
         expected.set(0, 4);
         inChild = col.updateChildMemberships(multiCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         multiCond = new TreeNodeNominalCondition(col.getMetaData(), 0, true);
         expected.clear();
         expected.set(0, 4);
         expected.set(10, 12);
         inChild = col.updateChildMemberships(multiCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         multiCond = new TreeNodeNominalCondition(col.getMetaData(), 2, false);
         expected.clear();
         expected.set(7, 10);
         inChild = col.updateChildMemberships(multiCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
 
         multiCond = new TreeNodeNominalCondition(col.getMetaData(), 2, true);
         expected.clear();
         expected.set(7, 12);
         inChild = col.updateChildMemberships(multiCond, dataMem);
-        assertEquals("The produced BitSet is incorrect.", expected, inChild);
+        assertEquals(expected, inChild, "The produced BitSet is incorrect.");
     }
 
 }
