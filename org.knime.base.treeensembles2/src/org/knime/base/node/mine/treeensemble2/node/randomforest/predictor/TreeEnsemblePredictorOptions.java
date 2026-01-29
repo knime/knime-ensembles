@@ -84,9 +84,11 @@ public class TreeEnsemblePredictorOptions implements NodeParameters {
 
     private static final String PREDICTION_COLUMN_NAME_WIDGET_TITLE = "Prediction column name";
 
-    private static final String CHANGE_PREDICTION_COLUMN_NAME_TITLE = "Change prediction column name";
+    /** Title for the {@code changePredictionColumnName} widget. */
+    public static final String CHANGE_PREDICTION_COLUMN_NAME_TITLE = "Change prediction column name";
 
-    private static final String CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION =
+    /** Description for the {@code changePredictionColumnName} widget. */
+    public static final String CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION =
         "Select to customize the name of the column containing the prediction.";
 
     private static final String PREDICTION_COLUMN_NAME_DESCRIPTION_REGRESSION = """

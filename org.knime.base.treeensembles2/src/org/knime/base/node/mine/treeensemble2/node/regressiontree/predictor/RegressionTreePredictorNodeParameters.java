@@ -48,8 +48,10 @@ package org.knime.base.node.mine.treeensemble2.node.regressiontree.predictor;
 
 import org.knime.base.node.mine.treeensemble2.node.randomforest.predictor.TreeEnsemblePredictorOptions;
 import org.knime.core.webui.node.dialog.defaultdialog.widget.Modification;
+import org.knime.node.parameters.Widget;
 import org.knime.node.parameters.migration.LoadDefaultsForAbsentFields;
 import org.knime.node.parameters.persistence.Persist;
+import org.knime.node.parameters.updates.ValueReference;
 
 /**
  * Node parameters for Simple Regression Tree Predictor.
@@ -66,11 +68,19 @@ final class RegressionTreePredictorNodeParameters extends TreeEnsemblePredictorO
 
         @Override
         public void modify(final Modification.WidgetGroupModifier group) {
-            useChangePredictionColumnName(group);
             usePredictionColumnName(group);
         }
 
     }
+
+    /**
+     * Overshadows the parent parameter to change the default.
+     */
+    @Persist(configKey = "changePredictionColumnName")
+    @Widget(title = TreeEnsemblePredictorOptions.CHANGE_PREDICTION_COLUMN_NAME_TITLE,
+        description = TreeEnsemblePredictorOptions.CHANGE_PREDICTION_COLUMN_NAME_DESCRIPTION)
+    @ValueReference(ChangePredictionColumnNameEffectRef.class)
+    boolean m_changePredictionColumnName;
 
     // only visible in flow variable tab.
     @Persist(configKey = RegressionTreePredictorConfiguration.CFG_TARGET_COLUMN_NAME)
