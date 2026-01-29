@@ -32,7 +32,7 @@
             "type" : "boolean",
             "title" : "Change prediction column name",
             "description" : "Select to customize the name of the column containing the prediction.",
-            "default" : true
+            "default" : false
           },
           "predictionColumnName" : {
             "type" : "string",
